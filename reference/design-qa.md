@@ -78,3 +78,22 @@ Systematic scan of all 5 PULSE pages surfaced these confirmed defects:
 
 ### Architecture note learned
 Nested blocks (a block authored inside another block's cell, e.g. `schedule` inside `columns`) are NOT auto-decorated by EDS — only top-level `main > .section > div > .block` blocks run their JS. Style nested structures via the parent block's CSS against the raw authored DOM, or invoke decoration manually.
+
+## Round-3 — schedule flattening (caught by user on published site)
+
+The `schedule` sub-block was authored with nested wrapper divs inside a columns
+cell. Locally (`aem up`) the divs survived and the CSS matched; on the PUBLISHED
+site the DA pipeline STRIPPED the wrapper divs, collapsing the schedule to a flat
+`<p>` sequence (time/title/body ×4) — so `.schedule > div > div` matched nothing
+and the schedule rendered as plain muted text. This is the local≠published trap
+in its purest form.
+
+Fix: author the schedule as a flat `<p>` sequence (matching what DA emits) and
+style via `:nth-child(3n+1/2/3)` cycling. Now local and published render
+identically — verified orange time labels (rgb(249,115,22)/800), uppercase
+titles, muted body ON THE PUBLISHED SITE.
+
+Reinforced lesson: **always do the final measured verification on the published
+`{branch}--…aem.page` URL**, not just local. Nested structural divs in default
+content do not survive DA; use flat sequences + nth-child, or build structure in
+block JS (which runs post-delivery and is safe).
