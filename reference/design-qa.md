@@ -37,3 +37,44 @@ verification. Maintained during Phase 4 and any follow-up fixes.
   fresh build before final visual sign-off.
 - `columns.culture` team photo occasionally appears blank in full-page
   screenshots (lazy-load timing) — confirmed present when scrolled into view.
+
+## Full per-block scan (round 2) — findings
+
+Systematic scan of all 5 PULSE pages surfaced these confirmed defects:
+
+### High
+- valuecards: icon tile (56x56 orange-tint bg, radius 12px) not rendering — glyph only.
+- schedule (in columns.schedule-layout): time labels not orange/bold, titles not uppercase — block CSS not applying to nested structure.
+- contactform: form card container (bg #f7f8fa, 2px #111827 border, radius 24px) entirely missing.
+- hero badge (product-discovery "Drop 01 Out Now"): blue, should be orange pill.
+- pdp ADD TO CART: renders black (#111827), should be blue (#1d4ed8).
+- testimonials-as-reviews (product-details): spurious 2px border, white bg (should be #f7f8fa), reversed content order, stars grey (should be orange), no avatar.
+
+### Medium
+- Default-content section H2s render 44px (global) vs design 40px — applies to specs/reviews/related/locations/accordion headings.
+- contactform info labels (#111827 full) should be muted ~60%.
+- specs cards missing leading icon tile.
+- productgrid.related cards white-on-surface blend (cards should be #fff on #f7f8fa section — actually build has surface cards on surface section).
+
+### Low (cosmetic, deprioritized)
+- eyebrow letter-spacing 1px vs ~2px; input/accordion border 1px vs 1.5px; ugcgrid card 10% vs 8%; various radius 8px vs 12px; newsletter input has border (design none); hero h1 64px vs ~48px on discovery.
+
+## Round-2 resolutions (all verified via measured computed styles, local)
+
+- valuecards icon tile: FALSE POSITIVE — tile renders correctly (56x56, orange-tint bg, orange glyph). Agent measured before block CSS applied.
+- schedule time labels/titles: FIXED — nested block wasn't auto-decorating; styled raw structure in columns.schedule-layout CSS. Verified orange #f97316 / weight 800 / uppercase.
+- contactform card: FIXED — card treatment moved onto <form> element. Verified surface bg, 2px ink border, 24px radius. Info labels muted 70%.
+- hero badge (discovery): FIXED — `.hero.center-hero.drop` orange pill variant. Verified orange, radius 99px.
+- pdp ADD TO CART: FIXED — forced blue in pdp.css. Verified rgb(29,78,216).
+- testimonials.reviews (PDP): FIXED — variant with no border, surface bg, author-on-top (column-reverse), orange stars. Verified.
+- section H2 40px: FIXED globally for section default-content headings.
+
+### Deferred (low-severity cosmetic, documented not fixed)
+- eyebrow letter-spacing 1px vs ~2px (sub-perceptible)
+- input/accordion border 1px vs 1.5px
+- ugcgrid card bg 10% vs 8%
+- specs card leading icon tile (design has small icon; build omits) — would need icon assets
+- discovery hero h1 64px vs ~48px; newsletter input has border vs none; assorted 8px vs 12px radii
+
+### Architecture note learned
+Nested blocks (a block authored inside another block's cell, e.g. `schedule` inside `columns`) are NOT auto-decorated by EDS — only top-level `main > .section > div > .block` blocks run their JS. Style nested structures via the parent block's CSS against the raw authored DOM, or invoke decoration manually.
