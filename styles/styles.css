@@ -304,12 +304,6 @@ main > .section:first-of-type {
   margin-top: 0;
 }
 
-@media (width >= 900px) {
-  main > .section > div {
-    padding: 0 32px;
-  }
-}
-
 /* section metadata */
 main .section.light,
 main .section.highlight {
@@ -409,14 +403,14 @@ main .section a.button:any-link {
 }
 
 main .section a.button.primary,
-main .section a.button:any-link {
+main .section a.button:not(.secondary, .accent) {
   background-color: var(--pulse-blue);
   border-color: var(--pulse-blue);
   color: var(--pulse-white);
 }
 
 main .section a.button.primary:hover,
-main .section a.button:hover {
+main .section a.button:not(.secondary, .accent):hover {
   background-color: var(--link-hover-color);
   border-color: var(--link-hover-color);
 }

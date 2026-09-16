@@ -60,10 +60,12 @@
   margin: 0 auto;
 }
 
-.hero.split .hero-text {
-  display: flex;
-  flex-direction: column;
-  gap: var(--pulse-space-3);
+.hero.split .hero-text > * {
+  margin-top: var(--pulse-space-3);
+}
+
+.hero.split .hero-text > *:first-child {
+  margin-top: 0;
 }
 
 .hero.split picture {
@@ -116,10 +118,16 @@
   line-height: 1.5;
 }
 
-/* buttons — each in its own .button-wrapper <p>; render them inline side by side */
-.hero.split .button-wrapper {
+/* buttons — each in its own .button-wrapper <p>; render them inline side by side.
+   The wrapper before the first button keeps the row's top margin; a button-wrapper
+   immediately following another sits on the same line with no extra top margin. */
+.hero.split .hero-text > .button-wrapper {
   display: inline-block;
-  margin: var(--pulse-space-1) var(--pulse-space-2) 0 0;
+  margin-right: var(--pulse-space-2);
+}
+
+.hero.split .hero-text > .button-wrapper + .button-wrapper {
+  margin-top: 0;
 }
 
 /* centered simple hero variant (Lifestyle "Your Life, Amplified") */
