@@ -118,7 +118,8 @@
   font-weight: 600;
 }
 
-.columns.schedule-layout > div p:not(.button-wrapper) {
+/* left (narrative) column paragraphs */
+.columns.schedule-layout > div > div:first-child p:not(.button-wrapper) {
   color: var(--pulse-ink-70);
   font-size: var(--pulse-fs-body-lg);
   line-height: 1.6;
@@ -132,30 +133,29 @@
   border-radius: var(--pulse-radius-lg);
 }
 
-/* Schedule list — nested `.schedule` block is inside a columns cell, so EDS
-   never decorates it (only top-level blocks auto-decorate). Style the raw
-   authored structure directly: each row = time cell + detail cell. */
-.columns.schedule-layout .schedule {
+/* Schedule list — authored as a flat sequence of paragraphs in the SECOND
+   column (time / title / body, repeating). Nested wrapper divs don't survive
+   the DA pipeline, so we style the flat sequence via :nth-child cycling of 3.
+   The right column is a bare div (no .columns-img-col / not first child). */
+.columns.schedule-layout > div > div:last-child {
   display: flex;
   flex-direction: column;
-  gap: var(--pulse-space-4);
+  gap: 6px;
 }
 
-.columns.schedule-layout .schedule > div {
-  display: grid;
-  grid-template-columns: 110px 1fr;
-  gap: var(--pulse-space-3);
+.columns.schedule-layout > div > div:last-child > p {
+  margin: 0;
 }
 
-/* time cell (first child of each row) — orange, bold, with a short rule above */
-.columns.schedule-layout .schedule > div > div:first-child {
+/* every 1st of 3 = time label — orange, bold, short rule above, extra top gap */
+.columns.schedule-layout > div > div:last-child > p:nth-child(3n + 1) {
   color: var(--pulse-orange);
   font-size: var(--pulse-fs-eyebrow);
   font-weight: 800;
-  padding-top: 8px;
+  margin-top: var(--pulse-space-3);
 }
 
-.columns.schedule-layout .schedule > div > div:first-child::before {
+.columns.schedule-layout > div > div:last-child > p:nth-child(3n + 1)::before {
   content: '';
   display: block;
   width: 32px;
@@ -164,9 +164,12 @@
   background-color: var(--pulse-ink);
 }
 
-/* detail cell: title (strong) uppercase ink, body muted */
-.columns.schedule-layout .schedule > div > div:last-child p:first-child {
-  margin: 0;
+.columns.schedule-layout > div > div:last-child > p:first-child {
+  margin-top: 0;
+}
+
+/* every 2nd of 3 = title (has <strong>) — uppercase ink */
+.columns.schedule-layout > div > div:last-child > p:nth-child(3n + 2) {
   color: var(--pulse-ink);
   font-size: var(--pulse-fs-body-lg);
   font-weight: 700;
@@ -174,16 +177,11 @@
   text-transform: uppercase;
 }
 
-.columns.schedule-layout .schedule > div > div:last-child p:first-child strong {
-  font-weight: 700;
-}
-
-.columns.schedule-layout .schedule > div > div:last-child p:last-child {
-  margin: 6px 0 0;
+/* every 3rd of 3 = body — muted small */
+.columns.schedule-layout > div > div:last-child > p:nth-child(3n) {
   color: var(--pulse-ink-70);
   font-size: var(--pulse-fs-small);
   line-height: 1.5;
-  text-transform: none;
 }
 
 .columns.schedule-layout em {
