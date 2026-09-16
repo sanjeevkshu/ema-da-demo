@@ -1,0 +1,43 @@
+/* PULSE filter bar — category pills + sort control */
+.filterbar > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--pulse-space-3);
+  flex-wrap: wrap;
+}
+
+.filterbar .filterbar-pills ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.filterbar .filterbar-pills li {
+  padding: 10px 20px;
+  border-radius: var(--pulse-radius-pill);
+  background-color: var(--pulse-surface);
+  color: var(--pulse-ink);
+  font-size: var(--pulse-fs-small);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.filterbar .filterbar-pills li.is-active {
+  background-color: var(--pulse-blue);
+  color: var(--pulse-white);
+}
+
+.filterbar .filterbar-sort,
+.filterbar .filterbar-sort * {
+  margin: 0;
+  color: var(--pulse-ink-70);
+  font-size: var(--pulse-fs-small);
+}
+
+.filterbar .filterbar-sort strong {
+  color: var(--pulse-blue);
+}

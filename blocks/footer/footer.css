@@ -1,20 +1,167 @@
+/* PULSE footer */
+/* stylelint-disable no-descending-specificity -- structural footer selectors mix specificity by design */
 footer {
-  background-color: var(--light-color);
-  font-size: var(--body-font-size-xs);
+  background-color: var(--pulse-ink);
+  color: var(--pulse-white);
+  font-family: var(--pulse-font);
+  font-size: var(--pulse-fs-small);
 }
 
 footer .footer > div {
   margin: auto;
-  max-width: 1200px;
-  padding: 40px 24px 24px;
+  max-width: var(--pulse-content-max);
+  padding: var(--pulse-space-6);
 }
 
 footer .footer p {
   margin: 0;
 }
 
-@media (width >= 900px) {
+footer .footer a:any-link {
+  color: var(--pulse-white-80);
+  text-decoration: none;
+}
+
+footer .footer a:hover {
+  color: var(--pulse-white);
+  text-decoration: underline;
+}
+
+/* ---- column row ---- */
+footer .footer-columns {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr 1fr;
+  gap: var(--pulse-space-6);
+}
+
+footer .footer-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pulse-space-3);
+}
+
+/* brand column: wordmark + tagline */
+footer .footer-col-brand {
+  gap: var(--pulse-space-2);
+  max-width: 320px;
+}
+
+footer .footer-col-brand > p:first-child a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--pulse-white);
+}
+
+footer .footer-col-brand > p:first-child a::before {
+  content: 'P';
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background-color: var(--pulse-orange);
+  color: var(--pulse-white);
+  font-size: 18px;
+  font-weight: 800;
+}
+
+footer .footer-col-brand > p:not(:first-child) {
+  color: var(--pulse-white-70);
+  line-height: 1.5;
+}
+
+/* link column headings (PRODUCTS / EXPLORE / JOIN THE PULSE) */
+footer .footer-col > p > strong {
+  color: var(--pulse-orange);
+  font-size: var(--pulse-fs-eyebrow);
+  font-weight: 700;
+}
+
+footer .footer-col ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pulse-space-3);
+}
+
+/* "JOIN THE PULSE" body copy */
+footer .footer-col > p:not(:has(strong), .footer-socials) {
+  color: var(--pulse-white-70);
+  line-height: 1.5;
+}
+
+/* social icons row — circular chips */
+footer .footer-socials {
+  display: flex;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+footer .footer-socials a {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: rgb(255 255 255 / 8%);
+  color: transparent;
+  font-size: 0;
+  line-height: 40px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+footer .footer-socials a::first-letter {
+  color: var(--pulse-white);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+footer .footer-socials a:hover {
+  background-color: var(--pulse-orange);
+  text-decoration: none;
+}
+
+/* ---- bottom bar ---- */
+footer .footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--pulse-space-3);
+  border-top: 1px solid var(--pulse-white-10);
+  margin-top: var(--pulse-space-6);
+  padding-top: var(--pulse-space-3);
+}
+
+footer .footer-bottom p {
+  color: var(--pulse-white-50);
+  font-size: var(--pulse-fs-xsmall);
+  text-transform: uppercase;
+}
+
+@media (width <= 900px) {
   footer .footer > div {
-    padding: 40px 32px 24px;
+    padding: var(--pulse-space-5) var(--pulse-content-pad);
+  }
+
+  footer .footer-columns {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--pulse-space-5) var(--pulse-space-3);
+  }
+
+  footer .footer-col-brand {
+    grid-column: 1 / -1;
+  }
+
+  footer .footer-bottom {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }

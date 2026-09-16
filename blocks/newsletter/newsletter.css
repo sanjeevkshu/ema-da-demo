@@ -1,0 +1,58 @@
+/* PULSE newsletter — light-blue band, heading/copy left, email form right */
+.newsletter > div {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: var(--pulse-space-6);
+}
+
+.newsletter .newsletter-text h2 {
+  margin: 0 0 var(--pulse-space-1);
+  font-size: var(--pulse-fs-h2);
+  font-weight: 700;
+}
+
+.newsletter .newsletter-text p {
+  margin: 0;
+  color: var(--pulse-ink-70);
+  font-size: var(--pulse-fs-body);
+  line-height: 1.5;
+}
+
+.newsletter .newsletter-form-el {
+  display: flex;
+  gap: 12px;
+}
+
+.newsletter .newsletter-form-el input {
+  flex: 1;
+  padding: 14px 20px;
+  border-radius: var(--pulse-radius-sm);
+  border: 1px solid var(--pulse-ink);
+  background-color: var(--pulse-white);
+  font-family: var(--pulse-font);
+  font-size: var(--pulse-fs-body);
+}
+
+.newsletter .newsletter-form-el button {
+  padding: 14px 28px;
+  border: 0;
+  border-radius: var(--pulse-radius-sm);
+  background-color: var(--pulse-blue);
+  color: var(--pulse-white);
+  font-family: var(--pulse-font);
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.newsletter .newsletter-form-el button:hover {
+  background-color: var(--link-hover-color);
+}
+
+@media (width <= 900px) {
+  .newsletter {
+    grid-template-columns: 1fr;
+    gap: var(--pulse-space-3);
+  }
+}
