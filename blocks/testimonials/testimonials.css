@@ -1,0 +1,61 @@
+/* PULSE testimonials — bordered quote cards with avatar + handle */
+.testimonials {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--pulse-space-3);
+}
+
+.testimonials .testimonials-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pulse-space-3);
+  padding: var(--pulse-space-4);
+  border-radius: var(--pulse-radius-xl);
+  border: 2px solid var(--pulse-ink);
+  background-color: var(--pulse-white);
+}
+
+.testimonials .testimonials-quote,
+.testimonials .testimonials-quote * {
+  margin: 0;
+  color: var(--pulse-ink);
+  font-size: var(--pulse-fs-lead);
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.testimonials .testimonials-author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.testimonials .testimonials-author img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.testimonials .testimonials-author p {
+  margin: 0;
+}
+
+/* first line (handle) bold, following line muted */
+.testimonials .testimonials-author p:first-of-type,
+.testimonials .testimonials-author strong {
+  font-size: var(--pulse-fs-body);
+  font-weight: 700;
+  color: var(--pulse-ink);
+}
+
+.testimonials .testimonials-author p:last-of-type {
+  font-size: var(--pulse-fs-xsmall);
+  color: var(--pulse-ink-70);
+}
+
+@media (width <= 900px) {
+  .testimonials {
+    grid-template-columns: 1fr;
+  }
+}

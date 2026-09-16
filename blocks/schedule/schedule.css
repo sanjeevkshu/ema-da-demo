@@ -1,0 +1,56 @@
+/* PULSE schedule — timed rows (orange time + underline, title + body) */
+.schedule {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pulse-space-4);
+}
+
+.schedule .schedule-item {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: var(--pulse-space-3);
+}
+
+.schedule .schedule-time,
+.schedule .schedule-time * {
+  margin: 0;
+  color: var(--pulse-orange);
+  font-size: var(--pulse-fs-eyebrow);
+  font-weight: 800;
+}
+
+.schedule .schedule-time {
+  padding-top: 8px;
+}
+
+/* short accent rule above the time label */
+.schedule .schedule-time::before {
+  content: '';
+  display: block;
+  width: 32px;
+  height: 2px;
+  margin-bottom: 8px;
+  background-color: var(--pulse-ink);
+}
+
+.schedule .schedule-detail p:first-child,
+.schedule .schedule-detail strong {
+  margin: 0;
+  color: var(--pulse-ink);
+  font-size: var(--pulse-fs-body-lg);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.schedule .schedule-detail p:last-child {
+  margin: 6px 0 0;
+  color: var(--pulse-ink-70);
+  font-size: var(--pulse-fs-small);
+  line-height: 1.5;
+}
+
+@media (width <= 900px) {
+  .schedule .schedule-item {
+    grid-template-columns: 100px 1fr;
+  }
+}

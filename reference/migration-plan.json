@@ -1,0 +1,24 @@
+{
+  "brand": "PULSE",
+  "fileKey": "dbJRnntnVQz6IEF1cqUGeA",
+  "figmaUrl": "https://www.figma.com/design/dbJRnntnVQz6IEF1cqUGeA/Agentic-AI-Delivery",
+  "canvasNodeId": "0:1",
+  "responsiveStrategy": "fold-into-css",
+  "pages": [
+    { "order": 1, "slug": "know-the-brand", "nodeId": "23:3", "figmaName": "know-the-brand-desktop", "tabletNodeId": "2:1101", "mobileNodeId": "2:1690", "width": 1440, "status": "pending" },
+    { "order": 2, "slug": "lifestyle-vision", "nodeId": "2:235", "figmaName": "lifestyle-vision-desktop", "tabletNodeId": "2:1195", "mobileNodeId": "2:1772", "width": 1440, "status": "pending" },
+    { "order": 3, "slug": "contact", "nodeId": "2:417", "figmaName": "contact-desktop", "tabletNodeId": "2:1284", "mobileNodeId": "2:1840", "width": 1440, "status": "pending" },
+    { "order": 4, "slug": "product-discovery", "nodeId": "2:652", "figmaName": "product-discovery-desktop", "tabletNodeId": "2:1404", "mobileNodeId": null, "width": 1440, "status": "pending" },
+    { "order": 5, "slug": "product-details", "nodeId": "2:796", "figmaName": "product-details-desktop", "tabletNodeId": "2:1529", "mobileNodeId": null, "width": 1440, "status": "pending" },
+    { "order": 6, "slug": "landing-page", "nodeId": "1:1413", "figmaName": "Landing page", "width": 1440, "status": "pending", "note": "generic wireframe kit" },
+    { "order": 7, "slug": "about", "nodeId": "1:1140", "figmaName": "About", "width": 1440, "status": "pending", "note": "generic wireframe kit" },
+    { "order": 8, "slug": "article", "nodeId": "1:1214", "figmaName": "Article", "width": 1440, "status": "pending", "note": "generic wireframe kit" },
+    { "order": 9, "slug": "shop", "nodeId": "1:1288", "figmaName": "Shop", "width": 1442, "status": "pending", "note": "generic wireframe kit" },
+    { "order": 10, "slug": "product-detail-page", "nodeId": "1:1045", "figmaName": "Product detail page", "width": 1440, "status": "pending", "note": "generic wireframe kit" }
+  ],
+  "designSystemSources": {
+    "coreComponents": "2:48",
+    "brandShowcase": "2:1966",
+    "designSystemNotes": "2:2264"
+  }
+}

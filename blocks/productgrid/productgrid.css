@@ -1,0 +1,100 @@
+/* PULSE product grid — 3-up cards with image, name/price row, tagline, CTA */
+.productgrid ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--pulse-space-3);
+}
+
+.productgrid .productgrid-card {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-content: start;
+  border-radius: var(--pulse-radius-xl);
+  background-color: var(--pulse-surface);
+  border: 2px solid var(--pulse-surface);
+  overflow: hidden;
+}
+
+.productgrid .productgrid-card.productgrid-featured {
+  border-color: var(--pulse-blue);
+}
+
+.productgrid .productgrid-image {
+  grid-column: 1 / -1;
+}
+
+.productgrid .productgrid-image img {
+  width: 100%;
+  height: 320px;
+  object-fit: cover;
+  display: block;
+}
+
+.productgrid .productgrid-name {
+  grid-column: 1;
+  padding: var(--pulse-space-3) var(--pulse-space-3) 0;
+  font-size: var(--pulse-fs-h3);
+  color: var(--pulse-ink);
+}
+
+.productgrid .productgrid-price {
+  grid-column: 2;
+  align-self: center;
+  padding: var(--pulse-space-3) var(--pulse-space-3) 0;
+  text-align: right;
+  color: var(--pulse-blue);
+  font-size: var(--pulse-fs-h3);
+  font-weight: 500;
+}
+
+.productgrid .productgrid-tagline {
+  grid-column: 1 / -1;
+  padding: 8px var(--pulse-space-3) 0;
+  color: var(--pulse-ink-70);
+  font-size: var(--pulse-fs-body);
+}
+
+.productgrid .productgrid-cta {
+  grid-column: 1 / -1;
+  margin-top: auto;
+  padding: var(--pulse-space-2) var(--pulse-space-3) var(--pulse-space-3);
+}
+
+.productgrid .productgrid-name *,
+.productgrid .productgrid-price *,
+.productgrid .productgrid-tagline * {
+  margin: 0;
+}
+
+.productgrid .productgrid-btn {
+  display: block;
+  text-align: center;
+  padding: 14px;
+  border-radius: var(--pulse-radius-md);
+  border: 1px solid var(--pulse-ink);
+  background-color: var(--pulse-white);
+  color: var(--pulse-ink);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.productgrid .productgrid-featured .productgrid-btn {
+  background-color: var(--pulse-blue);
+  border-color: var(--pulse-blue);
+  color: var(--pulse-white);
+}
+
+.productgrid .productgrid-btn:hover {
+  background-color: var(--pulse-blue);
+  border-color: var(--pulse-blue);
+  color: var(--pulse-white);
+}
+
+@media (width <= 900px) {
+  .productgrid ul {
+    grid-template-columns: 1fr;
+  }
+}

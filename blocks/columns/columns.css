@@ -31,3 +31,87 @@
     order: unset;
   }
 }
+
+/* ==========================================================================
+   PULSE columns.culture — text column + media column, brand type + spacing.
+   ========================================================================== */
+
+/* stylelint-disable no-descending-specificity -- culture/schedule variants share element selectors */
+.columns.culture > div {
+  gap: var(--pulse-space-6);
+}
+
+.columns.culture .columns-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pulse-space-3);
+}
+
+.columns.culture h2 {
+  margin: 0;
+  font-size: var(--pulse-fs-h2);
+  font-weight: 600;
+}
+
+.columns.culture p:not(.button-container) {
+  margin: 0;
+  color: var(--pulse-ink-70);
+  font-size: var(--pulse-fs-body-lg);
+  line-height: 1.6;
+}
+
+.section.dark .columns.culture p:not(.button-container) {
+  color: var(--pulse-white-70);
+}
+
+.columns.culture .button-container {
+  margin-top: var(--pulse-space-1);
+}
+
+.columns.culture > div img {
+  border-radius: var(--pulse-radius-lg);
+  object-fit: cover;
+}
+
+@media (width >= 900px) {
+  .columns.culture .columns-img-col {
+    flex: 0 0 560px;
+  }
+}
+
+/* PULSE columns.schedule-layout — narrative + image on left, schedule on right */
+.columns.schedule-layout > div {
+  align-items: start;
+  gap: var(--pulse-space-6);
+}
+
+.columns.schedule-layout h2 {
+  margin: 0 0 var(--pulse-space-2);
+  font-size: var(--pulse-fs-h2);
+  font-weight: 600;
+}
+
+.columns.schedule-layout > div p:not(.button-container) {
+  color: var(--pulse-ink-70);
+  font-size: var(--pulse-fs-body-lg);
+  line-height: 1.6;
+}
+
+.columns.schedule-layout > div img {
+  margin-top: var(--pulse-space-3);
+  width: 200px;
+  height: 300px;
+  object-fit: cover;
+  border-radius: var(--pulse-radius-lg);
+}
+
+.columns.schedule-layout em {
+  display: inline-block;
+  color: var(--pulse-blue);
+  font-size: var(--pulse-fs-eyebrow);
+  font-weight: 700;
+  font-style: normal;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+

@@ -1,20 +1,130 @@
+/* PULSE footer */
+/* stylelint-disable no-descending-specificity -- structural nth-child selectors mix specificity by design */
 footer {
-  background-color: var(--light-color);
-  font-size: var(--body-font-size-xs);
+  background-color: var(--pulse-ink);
+  color: var(--pulse-white);
+  font-family: var(--pulse-font);
+  font-size: var(--pulse-fs-small);
 }
 
 footer .footer > div {
   margin: auto;
-  max-width: 1200px;
-  padding: 40px 24px 24px;
+  max-width: var(--pulse-content-max);
+  padding: var(--pulse-space-6);
 }
 
 footer .footer p {
   margin: 0;
 }
 
-@media (width >= 900px) {
+/* first block: the 4 link columns */
+footer .footer > div > div:first-child {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1fr;
+  gap: var(--pulse-space-6);
+  padding: 0;
+  max-width: none;
+}
+
+footer .footer > div > div:first-child > div {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pulse-space-2);
+}
+
+/* brand column wordmark */
+footer .footer > div > div:first-child > div:first-child > p:first-child a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--pulse-white);
+}
+
+footer .footer > div > div:first-child > div:first-child > p:first-child a::before {
+  content: 'P';
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background-color: var(--pulse-orange);
+  color: var(--pulse-white);
+  font-size: 18px;
+  font-weight: 800;
+}
+
+footer .footer > div > div:first-child > div > p {
+  color: var(--pulse-white-70);
+  line-height: 1.5;
+}
+
+/* column headings (PRODUCTS / EXPLORE / JOIN THE PULSE) */
+footer .footer > div > div:first-child > div > p > strong {
+  color: var(--pulse-orange);
+  font-size: var(--pulse-fs-eyebrow);
+  font-weight: 700;
+}
+
+footer .footer > div > div:first-child ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pulse-space-2);
+}
+
+footer .footer a:any-link {
+  color: var(--pulse-white-80);
+  text-decoration: none;
+}
+
+footer .footer a:hover {
+  color: var(--pulse-white);
+  text-decoration: underline;
+}
+
+/* social links row */
+footer .footer > div > div:first-child > div:last-child > p:last-child {
+  display: flex;
+  gap: 12px;
+}
+
+/* bottom bar */
+footer .footer > div > div:last-child {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--pulse-space-3);
+  border-top: 1px solid var(--pulse-white-10);
+  margin-top: var(--pulse-space-6);
+  padding: var(--pulse-space-3) var(--pulse-space-6) 0;
+  max-width: none;
+}
+
+footer .footer > div > div:last-child p {
+  color: var(--pulse-white-50);
+  font-size: var(--pulse-fs-xsmall);
+  text-transform: uppercase;
+}
+
+@media (width <= 900px) {
   footer .footer > div {
-    padding: 40px 32px 24px;
+    padding: var(--pulse-space-5) var(--pulse-content-pad);
+  }
+
+  footer .footer > div > div:first-child {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--pulse-space-5) var(--pulse-space-3);
+  }
+
+  footer .footer > div > div:last-child {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: var(--pulse-space-3) var(--pulse-content-pad) 0;
   }
 }

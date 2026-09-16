@@ -1,0 +1,40 @@
+/* PULSE stats band — blue full-width band of big numbers + orange labels */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--pulse-space-3);
+}
+
+.stats .stats-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--pulse-space-1);
+  text-align: center;
+}
+
+.stats .stats-number,
+.stats .stats-number * {
+  color: var(--pulse-white);
+  font-size: var(--pulse-fs-stat);
+  font-weight: 900;
+  letter-spacing: -0.96px;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.stats .stats-label,
+.stats .stats-label * {
+  color: var(--pulse-orange);
+  font-size: var(--pulse-fs-eyebrow);
+  font-weight: 600;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+@media (width <= 900px) {
+  .stats {
+    grid-template-columns: 1fr;
+    gap: var(--pulse-space-5);
+  }
+}

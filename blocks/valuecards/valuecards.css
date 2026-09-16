@@ -1,0 +1,54 @@
+/* PULSE value cards — white cards with hard 2px ink border and orange-tint icon tile */
+.valuecards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--pulse-space-3);
+}
+
+.valuecards .valuecards-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pulse-space-3);
+  padding: var(--pulse-space-5);
+  border-radius: var(--pulse-radius-xl);
+  background-color: var(--pulse-white);
+  border: 2px solid var(--pulse-ink);
+}
+
+.valuecards .valuecards-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--pulse-radius-md);
+  background-color: var(--pulse-orange-tint);
+  font-size: 26px;
+  line-height: 1;
+}
+
+.valuecards .valuecards-icon p {
+  margin: 0;
+}
+
+.valuecards .valuecards-title,
+.valuecards .valuecards-title * {
+  color: var(--pulse-ink);
+  font-size: var(--pulse-fs-h3);
+  font-weight: 700;
+  margin: 0;
+}
+
+.valuecards .valuecards-body,
+.valuecards .valuecards-body * {
+  color: var(--pulse-ink-80);
+  font-size: var(--pulse-fs-body);
+  line-height: 1.6;
+  margin: 0;
+}
+
+@media (width <= 900px) {
+  .valuecards {
+    grid-template-columns: 1fr;
+  }
+}

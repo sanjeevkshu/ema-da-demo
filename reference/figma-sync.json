@@ -1,0 +1,33 @@
+{
+  "$schema": "figma-sync/v1",
+  "purpose": "Maps EDS pages/blocks to Figma nodes so future runs can detect design changes and re-migrate. Update lastSynced after each sync.",
+  "fileKey": "dbJRnntnVQz6IEF1cqUGeA",
+  "figmaUrl": "https://www.figma.com/design/dbJRnntnVQz6IEF1cqUGeA/Agentic-AI-Delivery",
+  "lastSynced": "2026-09-16",
+  "tokens": {
+    "target": "styles/pulse-tokens.css",
+    "sourceNodes": ["23:3", "2:48", "2:2264"]
+  },
+  "blocks": {
+    "hero.split": { "sourceNode": "2:126", "files": ["blocks/hero/hero.js", "blocks/hero/hero.css"] },
+    "hero.center-hero": { "sourceNode": "2:251", "files": ["blocks/hero/hero.css"] },
+    "timeline": { "sourceNode": "2:143", "files": ["blocks/timeline/timeline.js", "blocks/timeline/timeline.css"] },
+    "valuecards": { "sourceNode": "2:160", "files": ["blocks/valuecards/valuecards.js", "blocks/valuecards/valuecards.css"] },
+    "columns.culture": { "sourceNode": "2:176", "files": ["blocks/columns/columns.js", "blocks/columns/columns.css"] },
+    "stats": { "sourceNode": "2:188", "files": ["blocks/stats/stats.js", "blocks/stats/stats.css"] },
+    "header": { "sourceNode": "2:111", "files": ["content/nav.plain.html", "blocks/header/header.css"] },
+    "footer": { "sourceNode": "2:198", "files": ["content/footer.plain.html", "blocks/footer/footer.css"] }
+  },
+  "pages": {
+    "know-the-brand": { "sourceNode": "23:3", "target": "content/know-the-brand.plain.html", "status": "done", "images": "content/images/know-the-brand" },
+    "lifestyle-vision": { "sourceNode": "2:235", "target": "content/lifestyle-vision.plain.html", "status": "done", "images": "content/images/lifestyle-vision" },
+    "contact": { "sourceNode": "2:417", "target": "content/contact.plain.html", "status": "done", "images": "content/images/contact" },
+    "product-discovery": { "sourceNode": "2:652", "target": "content/product-discovery.plain.html", "status": "done", "images": "content/images/product-discovery" },
+    "product-details": { "sourceNode": "2:796", "target": "content/product-details.plain.html", "status": "done", "images": "content/images/product-details" },
+    "landing-page": { "sourceNode": "1:1413", "target": "content/landing-page.plain.html", "status": "done", "images": "content/images/landing-page", "note": "generic wireframe kit" },
+    "about": { "sourceNode": "1:1140", "target": "content/about.plain.html", "status": "done", "images": "content/images/about", "note": "generic wireframe kit" },
+    "article": { "sourceNode": "1:1214", "target": "content/article.plain.html", "status": "done", "images": "content/images/article", "note": "generic wireframe kit" },
+    "shop": { "sourceNode": "1:1288", "target": "content/shop.plain.html", "status": "done", "images": "content/images/shop", "note": "generic wireframe kit" },
+    "product-detail-page": { "sourceNode": "1:1045", "target": "content/product-detail-page.plain.html", "status": "done", "images": "content/images/product-detail-page", "note": "generic wireframe kit" }
+  }
+}
