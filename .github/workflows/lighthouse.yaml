@@ -1,0 +1,63 @@
+name: Lighthouse
+
+on:
+  pull_request:
+    branches: [main]
+
+# Allow one concurrent run per branch; cancel superseded runs.
+concurrency:
+  group: lighthouse-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lhci:
+    name: Lighthouse CI (block < 90)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Lighthouse CI
+        run: npm install -g @lhci/cli@0.14.x
+
+      - name: Resolve AEM branch preview host
+        id: urls
+        env:
+          # branch--repo--owner.aem.page — owner/repo derived from the GitHub repo.
+          OWNER: ${{ github.repository_owner }}
+          REPO: ${{ github.event.repository.name }}
+          BRANCH: ${{ github.head_ref }}
+        run: |
+          # Branch names are sanitized to lowercase, non-alphanumerics -> hyphen.
+          SAFE_BRANCH=$(echo "$BRANCH" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g')
+          HOST="https://${SAFE_BRANCH}--${REPO}--${OWNER}.aem.page"
+          echo "host=$HOST" >> "$GITHUB_OUTPUT"
+          echo "Preview host: $HOST"
+
+      - name: Wait for preview to be ready
+        env:
+          HOST: ${{ steps.urls.outputs.host }}
+        run: |
+          for i in $(seq 1 20); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' "$HOST/know-the-brand" || echo 000)
+            echo "attempt $i: $code"
+            [ "$code" = "200" ] && exit 0
+            sleep 15
+          done
+          echo "Preview host did not return 200 in time" >&2
+          exit 1
+
+      - name: Run Lighthouse CI
+        env:
+          HOST: ${{ steps.urls.outputs.host }}
+        run: |
+          lhci autorun \
+            --collect.url="$HOST/know-the-brand" \
+            --collect.url="$HOST/lifestyle-vision" \
+            --collect.url="$HOST/contact" \
+            --collect.url="$HOST/product-discovery" \
+            --collect.url="$HOST/product-details"
