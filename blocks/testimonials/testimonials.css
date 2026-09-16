@@ -54,6 +54,28 @@
   color: var(--pulse-ink-70);
 }
 
+/* ---- reviews variant (PDP "Vibe Check") ----
+   No hard border, surface-tinted card, author header on top, orange stars. */
+.testimonials.reviews .testimonials-card {
+  border: 0;
+  background-color: var(--pulse-surface);
+  flex-direction: column-reverse;
+}
+
+.testimonials.reviews .testimonials-quote,
+.testimonials.reviews .testimonials-quote * {
+  font-size: var(--pulse-fs-body);
+  font-weight: 400;
+  color: var(--pulse-ink-80);
+}
+
+/* star rating line (the author's last paragraph) rendered orange */
+.testimonials.reviews .testimonials-author p:last-of-type {
+  color: var(--pulse-orange);
+  font-size: var(--pulse-fs-body);
+  letter-spacing: 2px;
+}
+
 @media (width <= 900px) {
   .testimonials {
     grid-template-columns: 1fr;

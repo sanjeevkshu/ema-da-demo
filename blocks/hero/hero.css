@@ -148,7 +148,7 @@
   gap: var(--pulse-space-3);
 }
 
-.hero.center-hero em {
+.hero.center-hero em:not(:has(a)) {
   display: inline-block;
   padding: 6px 12px;
   border-radius: var(--pulse-radius-sm);
@@ -159,6 +159,12 @@
   font-style: normal;
   letter-spacing: 1px;
   text-transform: uppercase;
+}
+
+/* "drop" variant — orange pill badge (product-discovery) */
+.hero.center-hero.drop em:not(:has(a)) {
+  border-radius: var(--pulse-radius-pill);
+  background-color: var(--pulse-orange);
 }
 
 .hero.center-hero h1 {

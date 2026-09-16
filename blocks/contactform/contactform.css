@@ -45,7 +45,15 @@
   gap: var(--pulse-space-2);
 }
 
+/* label text (before the <br><strong>) is muted; the value is full-strength */
+.contactform .contactform-info ul li {
+  color: var(--pulse-ink-70);
+  font-size: var(--pulse-fs-small);
+}
+
 .contactform .contactform-info ul strong {
+  display: block;
+  margin-top: 2px;
   color: var(--pulse-ink);
   font-size: var(--pulse-fs-body-lg);
 }
@@ -55,8 +63,9 @@
   font-weight: 600;
 }
 
-/* right: form card */
-.contactform .contactform-form > div {
+/* right: form card — the <form> is the card container */
+.contactform .contactform-form > div,
+.contactform .contactform-form form {
   padding: var(--pulse-space-5);
   border-radius: var(--pulse-radius-xl);
   background-color: var(--pulse-surface);

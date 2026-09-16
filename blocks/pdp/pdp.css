@@ -119,6 +119,14 @@
   padding: 16px;
   border-radius: 14px;
   font-size: 20px;
+  background-color: var(--pulse-blue);
+  border-color: var(--pulse-blue);
+  color: var(--pulse-white);
+}
+
+.pdp .pdp-details a.button:hover {
+  background-color: var(--link-hover-color);
+  border-color: var(--link-hover-color);
 }
 
 .pdp .pdp-ship {

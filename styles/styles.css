@@ -318,6 +318,12 @@ main .section.highlight {
    templates via section metadata "style" (e.g. dark, surface, blue, wide).
    ========================================================================== */
 
+/* section headings match the design's 40px (global h2 is 44px) */
+main .section .default-content-wrapper h2 {
+  font-size: var(--pulse-fs-h2);
+  font-weight: 600;
+}
+
 /* vertical spacing between stacked sections */
 main .section.pulse-pad {
   padding: var(--pulse-section-y) 0;
