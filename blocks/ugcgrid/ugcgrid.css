@@ -1,0 +1,45 @@
+/* PULSE UGC grid — 4 translucent cards on dark section, image + handle + caption */
+.ugcgrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--pulse-space-3);
+}
+
+.ugcgrid .ugcgrid-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pulse-space-2);
+  padding: var(--pulse-space-2);
+  border-radius: var(--pulse-radius-lg);
+  background-color: var(--pulse-white-10);
+}
+
+.ugcgrid .ugcgrid-image img {
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+  border-radius: var(--pulse-radius-md);
+  display: block;
+}
+
+.ugcgrid .ugcgrid-handle,
+.ugcgrid .ugcgrid-handle * {
+  margin: 0;
+  color: var(--pulse-white);
+  font-size: var(--pulse-fs-body);
+  font-weight: 700;
+}
+
+.ugcgrid .ugcgrid-caption,
+.ugcgrid .ugcgrid-caption * {
+  margin: 0;
+  color: var(--pulse-white-70);
+  font-size: var(--pulse-fs-small);
+  line-height: 1.4;
+}
+
+@media (width <= 900px) {
+  .ugcgrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}

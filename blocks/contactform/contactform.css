@@ -1,0 +1,135 @@
+/* PULSE contact — info column + bordered form card */
+.contactform > div {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--pulse-space-6);
+  align-items: start;
+}
+
+/* left: contact info */
+.contactform .contactform-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pulse-space-4);
+}
+
+.contactform .contactform-info em {
+  display: inline-block;
+  color: var(--pulse-blue);
+  font-size: var(--pulse-fs-eyebrow);
+  font-weight: 700;
+  font-style: normal;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.contactform .contactform-info h2 {
+  margin: 0;
+  font-size: var(--pulse-fs-h2);
+  font-weight: 600;
+}
+
+.contactform .contactform-info p {
+  margin: 0;
+  color: var(--pulse-ink-70);
+  font-size: var(--pulse-fs-body);
+  line-height: 1.5;
+}
+
+.contactform .contactform-info ul {
+  list-style: none;
+  margin: var(--pulse-space-2) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pulse-space-2);
+}
+
+/* label text (before the <br><strong>) is muted; the value is full-strength */
+.contactform .contactform-info ul li {
+  color: var(--pulse-ink-70);
+  font-size: var(--pulse-fs-small);
+}
+
+.contactform .contactform-info ul strong {
+  display: block;
+  margin-top: 2px;
+  color: var(--pulse-ink);
+  font-size: var(--pulse-fs-body-lg);
+}
+
+.contactform .contactform-info a {
+  color: var(--pulse-blue);
+  font-weight: 600;
+}
+
+/* right: form card — the <form> is the card container */
+.contactform .contactform-form > div,
+.contactform .contactform-form form {
+  padding: var(--pulse-space-5);
+  border-radius: var(--pulse-radius-xl);
+  background-color: var(--pulse-surface);
+  border: 2px solid var(--pulse-ink);
+}
+
+.contactform .contactform-form form h3,
+.contactform .contactform-form form h2 {
+  margin: 0 0 var(--pulse-space-3);
+  font-size: var(--pulse-fs-h3);
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.contactform .contactform-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: var(--pulse-space-2);
+}
+
+.contactform .contactform-field label {
+  font-size: var(--pulse-fs-small);
+  font-weight: 600;
+  color: var(--pulse-ink);
+}
+
+.contactform .contactform-field input,
+.contactform .contactform-field select,
+.contactform .contactform-field textarea {
+  padding: 12px 16px;
+  border-radius: var(--pulse-radius-sm);
+  border: 1.5px solid var(--pulse-ink);
+  background-color: var(--pulse-white);
+  font-family: var(--pulse-font);
+  font-size: var(--pulse-fs-small);
+  color: var(--pulse-ink);
+}
+
+.contactform .contactform-field textarea {
+  resize: vertical;
+}
+
+.contactform .contactform-submit {
+  width: 100%;
+  margin-top: var(--pulse-space-1);
+  padding: 16px;
+  border: 0;
+  border-radius: var(--pulse-radius-sm);
+  background-color: var(--pulse-blue);
+  color: var(--pulse-white);
+  font-family: var(--pulse-font);
+  font-size: var(--pulse-fs-body);
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.contactform .contactform-submit:hover {
+  background-color: var(--link-hover-color);
+}
+
+@media (width <= 900px) {
+  .contactform {
+    grid-template-columns: 1fr;
+  }
+}

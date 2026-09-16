@@ -1,0 +1,71 @@
+/* PULSE scenarios — 2x2 grid of dark rounded cards with numbered labels */
+.scenarios {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--pulse-space-3);
+}
+
+.scenarios .scenarios-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pulse-space-2);
+  min-height: 240px;
+  padding: var(--pulse-space-5);
+  border-radius: var(--pulse-radius-xl);
+  background-color: var(--pulse-ink);
+  color: var(--pulse-white);
+}
+
+.scenarios .scenarios-index,
+.scenarios .scenarios-index * {
+  margin: 0;
+  color: var(--pulse-white);
+  font-size: var(--pulse-fs-body-lg);
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.scenarios .scenarios-title,
+.scenarios .scenarios-title * {
+  margin: 0;
+  color: var(--pulse-white);
+  font-size: var(--pulse-fs-h3);
+  font-weight: 700;
+}
+
+.scenarios .scenarios-body,
+.scenarios .scenarios-body * {
+  margin: 0;
+  color: var(--pulse-white-70);
+  font-size: var(--pulse-fs-body);
+  line-height: 1.5;
+}
+
+.scenarios .scenarios-cta {
+  margin-top: auto;
+}
+
+.scenarios .scenarios-cta a {
+  display: inline-block;
+  color: var(--pulse-white);
+  font-size: var(--pulse-fs-small);
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border: 1px solid var(--pulse-white-50);
+  border-radius: var(--pulse-radius-sm);
+  padding: 8px 16px;
+  text-decoration: none;
+}
+
+.scenarios .scenarios-cta a:hover {
+  background-color: var(--pulse-white);
+  color: var(--pulse-ink);
+}
+
+@media (width <= 900px) {
+  .scenarios {
+    grid-template-columns: 1fr;
+  }
+}

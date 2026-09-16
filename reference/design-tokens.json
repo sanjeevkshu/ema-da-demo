@@ -1,0 +1,40 @@
+{
+  "brand": "PULSE",
+  "source": "Figma dbJRnntnVQz6IEF1cqUGeA",
+  "note": "Extracted from design context; Figma variables API unavailable (token lacks file_variables:read scope), so values derived from computed frame styles.",
+  "colors": {
+    "ink": "#111827",
+    "ink-90": "rgba(17,24,39,0.9)",
+    "ink-80": "rgba(17,24,39,0.8)",
+    "ink-70": "rgba(17,24,39,0.7)",
+    "blue": "#1d4ed8",
+    "orange": "#f97316",
+    "orange-tint": "rgba(249,115,22,0.1)",
+    "white": "#ffffff",
+    "white-80": "rgba(255,255,255,0.8)",
+    "white-70": "rgba(255,255,255,0.7)",
+    "white-50": "rgba(255,255,255,0.5)",
+    "white-10": "rgba(255,255,255,0.1)",
+    "surface": "#f7f8fa"
+  },
+  "typography": {
+    "family": "Inter, sans-serif",
+    "scale": {
+      "display": { "size": 64, "line": 77, "tracking": -1.28, "weight": 700 },
+      "stat": { "size": 48, "line": 58, "tracking": -0.96, "weight": 900 },
+      "h2": { "size": 40, "line": 44, "weight": 600 },
+      "stat-num": { "size": 36, "line": 44, "weight": 900 },
+      "h3": { "size": 24, "line": 29, "weight": 700 },
+      "lead": { "size": 24, "line": 36, "weight": 400 },
+      "card-title": { "size": 22, "line": 27, "weight": 700 },
+      "body-lg": { "size": 18, "line": 29, "weight": 400 },
+      "body": { "size": 16, "line": 26, "weight": 400 },
+      "eyebrow": { "size": 16, "line": 19, "weight": 700, "transform": "uppercase", "tracking": 2 },
+      "small": { "size": 14, "line": 21, "weight": 400 },
+      "xsmall": { "size": 12, "line": 15, "weight": 400 }
+    }
+  },
+  "radii": { "sm": 8, "md": 12, "lg": 16, "xl": 24, "pill": 99 },
+  "spacing": { "base": 8, "section-x": 48, "section-y-lg": 112, "section-y": 96, "gap": 24 },
+  "layout": { "maxWidth": 1440, "contentPad": 48 }
+}

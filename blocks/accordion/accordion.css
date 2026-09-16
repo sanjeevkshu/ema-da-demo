@@ -1,0 +1,58 @@
+/* PULSE FAQ accordion */
+.accordion {
+  max-width: 760px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pulse-space-2);
+}
+
+.accordion .accordion-item {
+  border: 1.5px solid var(--pulse-ink);
+  border-radius: var(--pulse-radius-md);
+  background-color: var(--pulse-white);
+  overflow: hidden;
+}
+
+.accordion .accordion-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--pulse-space-2);
+  padding: var(--pulse-space-3);
+  cursor: pointer;
+  list-style: none;
+  font-size: var(--pulse-fs-body-lg);
+  font-weight: 700;
+  color: var(--pulse-ink);
+}
+
+.accordion .accordion-summary::-webkit-details-marker {
+  display: none;
+}
+
+.accordion .accordion-summary::after {
+  content: '';
+  flex: 0 0 auto;
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid var(--pulse-ink);
+  border-bottom: 2px solid var(--pulse-ink);
+  transform: rotate(45deg);
+  transition: transform 0.2s ease;
+}
+
+.accordion .accordion-item[open] .accordion-summary::after {
+  transform: rotate(-135deg);
+}
+
+.accordion .accordion-body {
+  padding: 0 var(--pulse-space-3) var(--pulse-space-3);
+}
+
+.accordion .accordion-body p {
+  margin: 0;
+  color: var(--pulse-ink-70);
+  font-size: var(--pulse-fs-body);
+  line-height: 1.6;
+}

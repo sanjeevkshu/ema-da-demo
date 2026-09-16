@@ -1,6 +1,8 @@
-/* header and nav layout */
+/* PULSE header and nav layout */
+/* stylelint-disable no-descending-specificity -- nav state selectors mix specificity by design */
 header .nav-wrapper {
-  background-color: var(--background-color);
+  background-color: var(--pulse-white);
+  border-bottom: 1px solid var(--pulse-ink);
   width: 100%;
   z-index: 2;
   position: fixed;
@@ -15,10 +17,10 @@ header nav {
   align-items: center;
   gap: 0 24px;
   margin: auto;
-  max-width: 1248px;
+  max-width: var(--pulse-content-max);
   height: var(--nav-height);
-  padding: 0 24px;
-  font-family: var(--body-font-family);
+  padding: 0 var(--pulse-content-pad);
+  font-family: var(--pulse-font);
 }
 
 header nav[aria-expanded='true'] {
@@ -39,8 +41,6 @@ header nav[aria-expanded='true'] {
     display: flex;
     justify-content: space-between;
     gap: 0 32px;
-    max-width: 1264px;
-    padding: 0 32px;
   }
 
   header nav[aria-expanded='true'] {
@@ -55,7 +55,7 @@ header nav p {
 }
 
 header nav a:any-link {
-  color: currentcolor;
+  color: var(--pulse-ink);
 }
 
 /* hamburger */
@@ -72,7 +72,7 @@ header nav .nav-hamburger button {
   border: 0;
   border-radius: 0;
   padding: 0;
-  background-color: var(--background-color);
+  background-color: var(--pulse-white);
   color: inherit;
   overflow: initial;
   text-overflow: initial;
@@ -142,10 +142,33 @@ header nav[aria-expanded='true'] .nav-hamburger-icon::after {
 /* brand */
 header .nav-brand {
   grid-area: brand;
-  flex-basis: 128px;
-  font-size: var(--heading-font-size-s);
-  font-weight: 700;
+  font-family: var(--pulse-font);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
   line-height: 1;
+}
+
+header .nav-brand a:any-link {
+  color: var(--pulse-ink);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* PULSE logo mark before the wordmark */
+header .nav-brand a::before {
+  content: 'P';
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background-color: var(--pulse-blue);
+  color: var(--pulse-white);
+  font-size: 18px;
+  font-weight: 800;
 }
 
 header nav .nav-brand img {
@@ -170,7 +193,7 @@ header nav[aria-expanded='true'] .nav-sections {
 header nav .nav-sections ul {
   list-style: none;
   padding-left: 0;
-  font-size: var(--body-font-size-s);
+  font-size: var(--pulse-fs-body);
 }
 
 header nav .nav-sections ul > li {
@@ -185,6 +208,18 @@ header nav .nav-sections ul > li > ul > li {
   font-weight: 400;
 }
 
+header nav .nav-sections a:hover {
+  color: var(--pulse-blue);
+  text-decoration: none;
+}
+
+/* active nav item — blue text (orange underline added at desktop below) */
+header nav .nav-sections .default-content-wrapper > ul > li[aria-current='page'],
+header nav .nav-sections .default-content-wrapper > ul > li[aria-current='page'] a {
+  color: var(--pulse-blue);
+  font-weight: 700;
+}
+
 @media (width >= 900px) {
   header nav .nav-sections {
     display: block;
@@ -196,77 +231,54 @@ header nav .nav-sections ul > li > ul > li {
     align-self: unset;
   }
 
-  header nav .nav-sections .nav-drop {
-    position: relative;
-    padding-right: 16px;
-    cursor: pointer;
-  }
-
-  header nav .nav-sections .nav-drop::after {
-    content: '';
-    display: inline-block;
-    position: absolute;
-    top: 0.5em;
-    right: 2px;
-    transform: rotate(135deg);
-    width: 6px;
-    height: 6px;
-    border: 2px solid currentcolor;
-    border-radius: 0 1px 0 0;
-    border-width: 2px 2px 0 0;
-  }
-
-  header nav .nav-sections .nav-drop[aria-expanded='true']::after {
-    top: unset;
-    bottom: 0.5em;
-    transform: rotate(315deg);
-  }
-
   header nav .nav-sections ul {
     display: flex;
-    gap: 24px;
+    justify-content: center;
+    gap: 32px;
     margin: 0;
   }
 
   header nav .nav-sections .default-content-wrapper > ul > li {
     flex: 0 1 auto;
     position: relative;
+    font-weight: 500;
+    padding-bottom: 4px;
   }
 
-  header nav .nav-sections .default-content-wrapper > ul > li > ul {
-    display: none;
-    position: relative;
-  }
-
-  header nav .nav-sections .default-content-wrapper > ul > li[aria-expanded='true'] > ul {
-    display: block;
-    position: absolute;
-    left: -24px;
-    width: 200px;
-    top: 150%;
-    padding: 16px;
-    background-color: var(--light-color);
-    white-space: initial;
-  }
-
-  header nav .nav-sections .default-content-wrapper > ul > li > ul::before {
+  /* active/hover underline accent */
+  header nav .nav-sections .default-content-wrapper > ul > li:hover::after,
+  header nav .nav-sections .default-content-wrapper > ul > li[aria-current='page']::after {
     content: '';
     position: absolute;
-    top: -8px;
-    left: 16px;
-    width: 0;
-    height: 0;
-    border-left: 8px solid transparent;
-    border-right: 8px solid transparent;
-    border-bottom: 8px solid var(--light-color);
-  }
-
-  header nav .nav-sections .default-content-wrapper > ul > li > ul > li {
-    padding: 8px 0;
+    bottom: 0;
+    left: 0;
+    width: 16px;
+    height: 3px;
+    border-radius: 2px;
+    background-color: var(--pulse-orange);
   }
 }
 
-/* tools */
+/* tools — SHOP NOW CTA */
 header nav .nav-tools {
   grid-area: tools;
+}
+
+header nav .nav-tools a:any-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  border-radius: var(--pulse-radius-sm);
+  background-color: var(--pulse-ink);
+  border: 2px solid var(--pulse-blue);
+  color: var(--pulse-white);
+  font-size: var(--pulse-fs-small);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+header nav .nav-tools a:hover {
+  background-color: var(--pulse-blue);
+  text-decoration: none;
 }

@@ -139,8 +139,18 @@ export default async function decorate(block) {
 
   const navSections = nav.querySelector('.nav-sections');
   if (navSections) {
+    // normalize a path for comparison: drop .html, trailing slash, and the
+    // local preview's /content prefix so matching works in preview and prod.
+    const norm = (p) => p.replace(/\.html$/, '').replace(/^\/content(?=\/)/, '').replace(/\/$/, '');
+    const currentPath = norm(window.location.pathname);
     navSections.querySelectorAll(':scope .default-content-wrapper > ul > li').forEach((navSection) => {
       if (navSection.querySelector('ul')) navSection.classList.add('nav-drop');
+      // mark the nav item matching the current page as active
+      const link = navSection.querySelector('a');
+      if (link) {
+        const linkPath = norm(new URL(link.href, window.location).pathname);
+        if (linkPath && linkPath === currentPath) navSection.setAttribute('aria-current', 'page');
+      }
       navSection.addEventListener('click', () => {
         if (isDesktop.matches) {
           const expanded = navSection.getAttribute('aria-expanded') === 'true';

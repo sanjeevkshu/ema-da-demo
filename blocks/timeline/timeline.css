@@ -1,0 +1,63 @@
+/* PULSE timeline — row of surface cards with big orange year numbers */
+.timeline {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--pulse-space-3);
+}
+
+.timeline .timeline-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pulse-space-2);
+  padding: var(--pulse-space-4);
+  border-radius: var(--pulse-radius-lg);
+  background-color: var(--pulse-surface);
+}
+
+/* on dark sections, cards use a subtle translucent surface */
+.section.dark .timeline .timeline-card {
+  background-color: var(--pulse-white-10);
+}
+
+.timeline .timeline-year,
+.timeline .timeline-year * {
+  color: var(--pulse-orange);
+  font-size: var(--pulse-fs-stat-num);
+  font-weight: 900;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.timeline .timeline-title,
+.timeline .timeline-title * {
+  color: var(--pulse-ink);
+  font-size: var(--pulse-fs-card-title);
+  font-weight: 700;
+  margin: 0;
+}
+
+.timeline .timeline-body,
+.timeline .timeline-body * {
+  color: var(--pulse-ink-70);
+  font-size: var(--pulse-fs-body);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.section.dark .timeline .timeline-title,
+.section.dark .timeline .timeline-title *,
+.section.dark .timeline .timeline-body,
+.section.dark .timeline .timeline-body * {
+  color: var(--pulse-white);
+}
+
+.section.dark .timeline .timeline-body,
+.section.dark .timeline .timeline-body * {
+  color: var(--pulse-white-70);
+}
+
+@media (width <= 900px) {
+  .timeline {
+    grid-template-columns: 1fr;
+  }
+}
