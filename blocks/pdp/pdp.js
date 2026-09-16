@@ -36,6 +36,20 @@ export default function decorate(block) {
 
   if (details) {
     details.classList.add('pdp-details');
+    // tag price (first bare <p> right after the h1) and shipping note (last <p>).
+    // DA strips authored classes, so derive these structurally.
+    const h1 = details.querySelector('h1');
+    if (h1) {
+      const price = h1.nextElementSibling;
+      if (price && price.tagName === 'P') price.classList.add('pdp-price');
+      const desc = price && price.nextElementSibling;
+      if (desc && desc.tagName === 'P') desc.classList.add('pdp-desc');
+    }
+    const paras = [...details.querySelectorAll(':scope > p')];
+    const last = paras[paras.length - 1];
+    // shipping note = last paragraph that isn't a decorated button wrapper
+    if (last && !last.querySelector('a')) last.classList.add('pdp-ship');
+
     // interactive size buttons
     const sizeList = [...details.querySelectorAll('ul')].find((ul) => ul.previousElementSibling && /shell size/i.test(ul.previousElementSibling.textContent));
     if (sizeList) {

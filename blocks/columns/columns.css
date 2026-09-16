@@ -53,18 +53,18 @@
   font-weight: 600;
 }
 
-.columns.culture p:not(.button-container) {
+.columns.culture p:not(.button-wrapper) {
   margin: 0;
   color: var(--pulse-ink-70);
   font-size: var(--pulse-fs-body-lg);
   line-height: 1.6;
 }
 
-.section.dark .columns.culture p:not(.button-container) {
+.section.dark .columns.culture p:not(.button-wrapper) {
   color: var(--pulse-white-70);
 }
 
-.columns.culture .button-container {
+.columns.culture .button-wrapper {
   margin-top: var(--pulse-space-1);
 }
 
@@ -91,7 +91,7 @@
   font-weight: 600;
 }
 
-.columns.schedule-layout > div p:not(.button-container) {
+.columns.schedule-layout > div p:not(.button-wrapper) {
   color: var(--pulse-ink-70);
   font-size: var(--pulse-fs-body-lg);
   line-height: 1.6;

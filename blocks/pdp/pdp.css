@@ -110,7 +110,7 @@
 }
 
 /* add to cart */
-.pdp .pdp-details .button-container {
+.pdp .pdp-details .button-wrapper {
   margin: var(--pulse-space-1) 0 0;
 }
 
