@@ -1,5 +1,5 @@
 /* PULSE footer */
-/* stylelint-disable no-descending-specificity -- structural nth-child selectors mix specificity by design */
+/* stylelint-disable no-descending-specificity -- structural footer selectors mix specificity by design */
 footer {
   background-color: var(--pulse-ink);
   color: var(--pulse-white);
@@ -17,23 +17,36 @@ footer .footer p {
   margin: 0;
 }
 
-/* first block: the 4 link columns */
-footer .footer > div > div:first-child {
-  display: grid;
-  grid-template-columns: 1.4fr 1fr 1fr 1fr;
-  gap: var(--pulse-space-6);
-  padding: 0;
-  max-width: none;
+footer .footer a:any-link {
+  color: var(--pulse-white-80);
+  text-decoration: none;
 }
 
-footer .footer > div > div:first-child > div {
+footer .footer a:hover {
+  color: var(--pulse-white);
+  text-decoration: underline;
+}
+
+/* ---- column row ---- */
+footer .footer-columns {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr 1fr;
+  gap: var(--pulse-space-6);
+}
+
+footer .footer-col {
   display: flex;
   flex-direction: column;
-  gap: var(--pulse-space-2);
+  gap: var(--pulse-space-3);
 }
 
-/* brand column wordmark */
-footer .footer > div > div:first-child > div:first-child > p:first-child a {
+/* brand column: wordmark + tagline */
+footer .footer-col-brand {
+  gap: var(--pulse-space-2);
+  max-width: 320px;
+}
+
+footer .footer-col-brand > p:first-child a {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -43,7 +56,7 @@ footer .footer > div > div:first-child > div:first-child > p:first-child a {
   color: var(--pulse-white);
 }
 
-footer .footer > div > div:first-child > div:first-child > p:first-child a::before {
+footer .footer-col-brand > p:first-child a::before {
   content: 'P';
   display: inline-flex;
   align-items: center;
@@ -57,46 +70,41 @@ footer .footer > div > div:first-child > div:first-child > p:first-child a::befo
   font-weight: 800;
 }
 
-footer .footer > div > div:first-child > div > p {
+footer .footer-col-brand > p:not(:first-child) {
   color: var(--pulse-white-70);
   line-height: 1.5;
 }
 
-/* column headings (PRODUCTS / EXPLORE / JOIN THE PULSE) */
-footer .footer > div > div:first-child > div > p > strong {
+/* link column headings (PRODUCTS / EXPLORE / JOIN THE PULSE) */
+footer .footer-col > p > strong {
   color: var(--pulse-orange);
   font-size: var(--pulse-fs-eyebrow);
   font-weight: 700;
 }
 
-footer .footer > div > div:first-child ul {
+footer .footer-col ul {
   list-style: none;
-  margin: 8px 0 0;
+  margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
   gap: var(--pulse-space-3);
 }
 
-footer .footer a:any-link {
-  color: var(--pulse-white-80);
-  text-decoration: none;
+/* "JOIN THE PULSE" body copy */
+footer .footer-col > p:not(:has(strong), .footer-socials) {
+  color: var(--pulse-white-70);
+  line-height: 1.5;
 }
 
-footer .footer a:hover {
-  color: var(--pulse-white);
-  text-decoration: underline;
-}
-
-/* social links row — render each link as a circular icon chip (design shows
-   4 dark circles). Label text is visually hidden but kept for accessibility. */
-footer .footer > div > div:first-child > div:last-child > p:last-child {
+/* social icons row — circular chips */
+footer .footer-socials {
   display: flex;
   gap: 12px;
   margin-top: 4px;
 }
 
-footer .footer > div > div:first-child > div:last-child > p:last-child a {
+footer .footer-socials a {
   display: inline-block;
   width: 40px;
   height: 40px;
@@ -110,31 +118,29 @@ footer .footer > div > div:first-child > div:last-child > p:last-child a {
   overflow: hidden;
 }
 
-/* show only the platform's first initial, centered in the circle */
-footer .footer > div > div:first-child > div:last-child > p:last-child a::first-letter {
+footer .footer-socials a::first-letter {
   color: var(--pulse-white);
   font-size: 16px;
   font-weight: 700;
 }
 
-footer .footer > div > div:first-child > div:last-child > p:last-child a:hover {
+footer .footer-socials a:hover {
   background-color: var(--pulse-orange);
   text-decoration: none;
 }
 
-/* bottom bar */
-footer .footer > div > div:last-child {
+/* ---- bottom bar ---- */
+footer .footer-bottom {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: var(--pulse-space-3);
   border-top: 1px solid var(--pulse-white-10);
   margin-top: var(--pulse-space-6);
-  padding: var(--pulse-space-3) var(--pulse-space-6) 0;
-  max-width: none;
+  padding-top: var(--pulse-space-3);
 }
 
-footer .footer > div > div:last-child p {
+footer .footer-bottom p {
   color: var(--pulse-white-50);
   font-size: var(--pulse-fs-xsmall);
   text-transform: uppercase;
@@ -145,14 +151,17 @@ footer .footer > div > div:last-child p {
     padding: var(--pulse-space-5) var(--pulse-content-pad);
   }
 
-  footer .footer > div > div:first-child {
+  footer .footer-columns {
     grid-template-columns: 1fr 1fr;
     gap: var(--pulse-space-5) var(--pulse-space-3);
   }
 
-  footer .footer > div > div:last-child {
+  footer .footer-col-brand {
+    grid-column: 1 / -1;
+  }
+
+  footer .footer-bottom {
     flex-direction: column;
     align-items: flex-start;
-    padding: var(--pulse-space-3) var(--pulse-content-pad) 0;
   }
 }
