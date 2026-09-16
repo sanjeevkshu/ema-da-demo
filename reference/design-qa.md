@@ -97,3 +97,27 @@ Reinforced lesson: **always do the final measured verification on the published
 `{branch}--…aem.page` URL**, not just local. Nested structural divs in default
 content do not survive DA; use flat sequences + nth-child, or build structure in
 block JS (which runs post-delivery and is safe).
+
+## Round-4 — blocks dropped by DA (single-cell / no row wrapper)
+
+Production check of the 3 remaining pages found blocks whose class was STRIPPED
+by DA (flattened to default content) — invisible locally, only on published:
+- contactform (contact): authored block>cell>cell (no row) → dropped
+- newsletter (product-discovery): block>cell>cell (no row) → dropped
+- hero.center-hero (lifestyle-vision + product-discovery): block>cell (single
+  cell) → dropped
+
+**Definitive rule:** a block survives DA only with canonical `block › row ›
+cell(s)` structure. `block › cell` or `block › cell › cell` (missing the row
+wrapper) gets its class stripped and content flattened. Blocks that already had
+a row wrapper (hero.split, timeline, cards, columns, stats, valuecards,
+scenarios, testimonials, ugcgrid, locations, accordion, productgrid, filterbar,
+pdp, specs) were unaffected.
+
+Fix: wrap cells in a single row div; read cells from the row in JS; move grid to
+`.block > div`. Verified a FULL block-survival audit across all 5 pages
+(authored vs published class lists) — after fixes, every authored block class
+survives on production.
+
+All 5 PULSE pages now verified on the published `…aem.page` site with measured
+computed styles. SIGNED OFF.
