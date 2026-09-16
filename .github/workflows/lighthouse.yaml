@@ -60,4 +60,9 @@ jobs:
             --collect.url="$HOST/lifestyle-vision" \
             --collect.url="$HOST/contact" \
             --collect.url="$HOST/product-discovery" \
-            --collect.url="$HOST/product-details"
+            --collect.url="$HOST/product-details" \
+            --collect.url="$HOST/landing-page" \
+            --collect.url="$HOST/about" \
+            --collect.url="$HOST/article" \
+            --collect.url="$HOST/shop" \
+            --collect.url="$HOST/product-detail-page"
