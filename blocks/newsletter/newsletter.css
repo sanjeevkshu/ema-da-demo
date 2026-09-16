@@ -1,5 +1,5 @@
 /* PULSE newsletter — light-blue band, heading/copy left, email form right */
-.newsletter {
+.newsletter > div {
   display: grid;
   grid-template-columns: 1fr 1fr;
   align-items: center;

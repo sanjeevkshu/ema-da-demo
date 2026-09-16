@@ -59,11 +59,12 @@ function buildForm(cell) {
 }
 
 export default function decorate(block) {
-  const rows = [...block.children];
-  // Row 1 = contact info (left), Row 2 = form definition (right)
-  if (rows[0]) rows[0].classList.add('contactform-info');
-  if (rows[1]) {
-    rows[1].classList.add('contactform-form');
-    buildForm(rows[1]);
+  // Single row, two cells: cell 0 = contact info (left), cell 1 = form (right).
+  const row = block.firstElementChild;
+  const cells = row ? [...row.children] : [];
+  if (cells[0]) cells[0].classList.add('contactform-info');
+  if (cells[1]) {
+    cells[1].classList.add('contactform-form');
+    buildForm(cells[1]);
   }
 }

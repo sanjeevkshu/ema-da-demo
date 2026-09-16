@@ -1,5 +1,5 @@
 /* PULSE contact — info column + bordered form card */
-.contactform {
+.contactform > div {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--pulse-space-6);
