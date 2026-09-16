@@ -1,4 +1,5 @@
 /* PULSE header and nav layout */
+/* stylelint-disable no-descending-specificity -- nav state selectors mix specificity by design */
 header .nav-wrapper {
   background-color: var(--pulse-white);
   border-bottom: 1px solid var(--pulse-ink);
@@ -210,6 +211,13 @@ header nav .nav-sections ul > li > ul > li {
 header nav .nav-sections a:hover {
   color: var(--pulse-blue);
   text-decoration: none;
+}
+
+/* active nav item — blue text (orange underline added at desktop below) */
+header nav .nav-sections .default-content-wrapper > ul > li[aria-current='page'],
+header nav .nav-sections .default-content-wrapper > ul > li[aria-current='page'] a {
+  color: var(--pulse-blue);
+  font-weight: 700;
 }
 
 @media (width >= 900px) {

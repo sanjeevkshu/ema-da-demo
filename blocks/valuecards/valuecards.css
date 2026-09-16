@@ -23,8 +23,12 @@
   height: 56px;
   border-radius: var(--pulse-radius-md);
   background-color: var(--pulse-orange-tint);
+  color: var(--pulse-orange);
   font-size: 26px;
   line-height: 1;
+
+  /* render glyphs as monochrome text so the orange color applies */
+  font-variant-emoji: text;
 }
 
 .valuecards .valuecards-icon p {
