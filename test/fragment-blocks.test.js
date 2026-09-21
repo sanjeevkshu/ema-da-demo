@@ -80,7 +80,7 @@ describe('header', () => {
     assert.ok(nav.querySelector('.nav-hamburger'), 'hamburger button');
   });
 
-  test('marks a nav item with a nested list as a dropdown', async () => {
+  test('marks a nav item with a nested list as a dropdown, collapsed by default', async () => {
     const navHtml = '<div><p><a href="/">PULSE</a></p></div>'
       + '<div><ul>'
       + '<li><a href="/products">Products</a><ul><li><a href="/a">Arc</a></li></ul></li>'
@@ -90,7 +90,52 @@ describe('header', () => {
     mockFetch({ '/nav.plain.html': navHtml });
     const block = document.createElement('div');
     await decorateHeader(block);
-    assert.ok(block.querySelector('.nav-drop'), 'nav-drop marked');
+    const drop = block.querySelector('.nav-drop');
+    assert.ok(drop, 'nav-drop marked');
+    assert.equal(drop.getAttribute('aria-expanded'), 'false', 'starts collapsed');
+  });
+
+  test('clicking a Products dropdown toggles it open then closed', async () => {
+    const navHtml = '<div><p><a href="/">PULSE</a></p></div>'
+      + '<div><ul>'
+      + '<li><a href="/product-discovery">Products</a><ul>'
+      + '<li><a href="/pulse-loop">PULSE Loop</a></li>'
+      + '<li><a href="/pulse-band-neo">PULSE Band Neo</a></li>'
+      + '</ul></li>'
+      + '<li><a href="/contact">Contact</a></li>'
+      + '</ul></div>'
+      + '<div><p><a href="/shop">Shop</a></p></div>';
+    mockFetch({ '/nav.plain.html': navHtml });
+    const block = document.createElement('div');
+    await decorateHeader(block);
+    const drop = block.querySelector('.nav-drop');
+    const topLink = drop.querySelector(':scope > a');
+    // click the top-level label → expands
+    topLink.dispatchEvent(new window.MouseEvent('click', { bubbles: true, cancelable: true }));
+    assert.equal(drop.getAttribute('aria-expanded'), 'true', 'opens on click');
+    // click again → collapses
+    topLink.dispatchEvent(new window.MouseEvent('click', { bubbles: true, cancelable: true }));
+    assert.equal(drop.getAttribute('aria-expanded'), 'false', 'closes on second click');
+  });
+
+  test('clicking a submenu link does not toggle the dropdown (lets it navigate)', async () => {
+    const navHtml = '<div><p><a href="/">PULSE</a></p></div>'
+      + '<div><ul>'
+      + '<li><a href="/product-discovery">Products</a><ul>'
+      + '<li><a href="/pulse-loop">PULSE Loop</a></li>'
+      + '</ul></li>'
+      + '</ul></div>'
+      + '<div><p><a href="/shop">Shop</a></p></div>';
+    mockFetch({ '/nav.plain.html': navHtml });
+    const block = document.createElement('div');
+    await decorateHeader(block);
+    const drop = block.querySelector('.nav-drop');
+    drop.querySelector(':scope > a').dispatchEvent(new window.MouseEvent('click', { bubbles: true, cancelable: true }));
+    assert.equal(drop.getAttribute('aria-expanded'), 'true');
+    // clicking a submenu item should NOT collapse (handler returns early)
+    const submenuLink = drop.querySelector(':scope > ul a');
+    submenuLink.dispatchEvent(new window.MouseEvent('click', { bubbles: true, cancelable: true }));
+    assert.equal(drop.getAttribute('aria-expanded'), 'true', 'submenu click leaves dropdown open');
   });
 
   test('hamburger click toggles the nav expanded state', async () => {
