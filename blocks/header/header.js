@@ -144,19 +144,30 @@ export default async function decorate(block) {
     const norm = (p) => p.replace(/\.html$/, '').replace(/^\/content(?=\/)/, '').replace(/\/$/, '');
     const currentPath = norm(window.location.pathname);
     navSections.querySelectorAll(':scope .default-content-wrapper > ul > li').forEach((navSection) => {
-      if (navSection.querySelector('ul')) navSection.classList.add('nav-drop');
+      const isDrop = !!navSection.querySelector('ul');
+      if (isDrop) {
+        navSection.classList.add('nav-drop');
+        // start collapsed; click toggles open/closed on all viewports
+        navSection.setAttribute('aria-expanded', 'false');
+      }
       // mark the nav item matching the current page as active
       const link = navSection.querySelector('a');
       if (link) {
         const linkPath = norm(new URL(link.href, window.location).pathname);
         if (linkPath && linkPath === currentPath) navSection.setAttribute('aria-current', 'page');
       }
-      navSection.addEventListener('click', () => {
-        if (isDesktop.matches) {
-          const expanded = navSection.getAttribute('aria-expanded') === 'true';
-          toggleAllNavSections(navSections);
-          navSection.setAttribute('aria-expanded', expanded ? 'false' : 'true');
-        }
+      navSection.addEventListener('click', (e) => {
+        if (!isDrop) return;
+        // only toggle when the click is on the top-level item itself (its label
+        // or the row), not when a submenu link is clicked — let those navigate.
+        const submenu = navSection.querySelector(':scope > ul');
+        if (submenu && submenu.contains(e.target)) return;
+        // the top-level anchor acts as the toggle rather than navigating
+        e.preventDefault();
+        const expanded = navSection.getAttribute('aria-expanded') === 'true';
+        // close sibling dropdowns, then toggle this one
+        toggleAllNavSections(navSections);
+        navSection.setAttribute('aria-expanded', expanded ? 'false' : 'true');
       });
     });
   }
