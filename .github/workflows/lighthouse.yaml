@@ -65,4 +65,8 @@ jobs:
             --collect.url="$HOST/about" \
             --collect.url="$HOST/article" \
             --collect.url="$HOST/shop" \
-            --collect.url="$HOST/product-detail-page"
+            --collect.url="$HOST/product-detail-page" \
+            --collect.url="$HOST/discover" \
+            --collect.url="$HOST/pulse-vision-ar" \
+            --collect.url="$HOST/pulse-loop" \
+            --collect.url="$HOST/pulse-band-neo"
