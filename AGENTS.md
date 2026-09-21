@@ -19,4 +19,6 @@ Edge Delivery Services. Read a block first. Omissions are in the repo or known.
 - Merging `main` ships code; content publishes separately.
 - A PR without a `{branch}--{repo}--{owner}.aem.page/{path}` link is rejected.
 - All committed files are served. Use `.hlxignore`.
+- New/changed blocks MUST ship tests at ≥80% coverage (lines/branches/funcs).
+  `npm run test:coverage` is a CI gate. See `reference/testing-and-coverage.md`.
 - Skills: `/plugin marketplace add adobe/skills`, then `aem-edge-delivery-services` (24 skills, incl. `docs-search`).
