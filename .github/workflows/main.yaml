@@ -12,3 +12,7 @@ jobs:
         node-version: 24
     - run: npm ci
     - run: npm run lint
+    # Functional test coverage gate: every block must stay at 80%+ line,
+    # branch and function coverage or the build fails. See test/README.md.
+    - name: Test + coverage gate (80%+)
+      run: npm run test:coverage
