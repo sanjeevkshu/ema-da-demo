@@ -1,0 +1,189 @@
+{
+  "org": "sanjeevkshu",
+  "site": "ema-da-demo",
+  "libraryPath": "docs/library",
+  "excludedPages": [
+    "nav",
+    "footer"
+  ],
+  "excludedBlocks": {
+    "header": "Loaded automatically on every page from /nav; authors never insert it.",
+    "footer": "Loaded automatically on every page from /footer; authors never insert it.",
+    "widget": "Needs widget code under /widgets/, which this site does not ship."
+  },
+  "sectionStyles": [
+    "surface",
+    "pulse-pad",
+    "pulse-pad-lg",
+    "light",
+    "dark",
+    "blue",
+    "blue-tint",
+    "highlight",
+    "center"
+  ],
+  "blocks": {
+    "accordion": {
+      "name": "Accordion",
+      "description": "Expandable question-and-answer list. One row per item: the question in the first cell, the answer in the second."
+    },
+    "cards": {
+      "name": "Cards",
+      "description": "Grid of cards. One row per card: an image cell and a text cell (heading, copy, optional link)."
+    },
+    "carousel": {
+      "name": "Carousel",
+      "description": "Full-bleed image slideshow with a frosted copy overlay, arrows, dots and autoplay. One row per slide: an image cell and a copy cell (title, lead, price, text, CTA).",
+      "variants": {
+        "thumbnails": "Adds a thumbnail rail under the slides. Use on product pages."
+      }
+    },
+    "columns": {
+      "name": "Columns",
+      "description": "Side-by-side content. One row, one cell per column; a cell holding only an image becomes an image column.",
+      "variants": {
+        "culture": "Brand text column next to a media column, with PULSE type and spacing.",
+        "schedule-layout": "Narrative and image on the left, a schedule list on the right."
+      }
+    },
+    "contactform": {
+      "name": "Contact form",
+      "description": "Builds a form from a list. One cell: a heading, then one line per field (\"Label | type\" or \"Label | select | option 1, option 2\"), then the submit label. The form does not submit anywhere yet."
+    },
+    "filterbar": {
+      "name": "Filter bar",
+      "description": "Product filter pills and a sort label above a product grid. One row: a list of filters in the first cell, the sort label in the second."
+    },
+    "fragment": {
+      "name": "Fragment",
+      "description": "Includes another page (for example a shared promo) in place. One cell with a link to the fragment path; replace the sample link with a real fragment.",
+      "example": [
+        [
+          [
+            "<a href=\"/fragments/your-fragment\">/fragments/your-fragment</a>"
+          ]
+        ]
+      ]
+    },
+    "hero": {
+      "name": "Hero",
+      "description": "Page-opening banner with heading, copy and call to action over or next to an image.",
+      "variants": {
+        "center-hero": "Centred heading and copy with no side image.",
+        "drop": "Adds an orange pill badge above the heading (product launches).",
+        "split": "Two columns: text in the first cell, media in the second.",
+        "backdrop": "Image behind the text as a full backdrop."
+      }
+    },
+    "locations": {
+      "name": "Locations",
+      "description": "Store or office locations. One row per location: image, city, locale code (for example en-US), address, phone."
+    },
+    "newsletter": {
+      "name": "Newsletter",
+      "description": "Email sign-up band. One row: heading and copy in the first cell, the email placeholder and button text in the second. The form does not submit anywhere yet."
+    },
+    "pdp": {
+      "name": "Product detail",
+      "description": "Product detail hero: image gallery on the left; badges, title, price, description, colour and size options, add to cart and shipping note on the right."
+    },
+    "productgrid": {
+      "name": "Product grid",
+      "description": "Grid of product cards. One row per product: image, name, price, tagline, CTA link. The first card is highlighted in brand blue.",
+      "variants": {
+        "related": "Related-products grid: no highlighted first card. Use at the foot of product pages."
+      }
+    },
+    "scenarios": {
+      "name": "Scenarios",
+      "description": "Numbered lifestyle scenarios. One row per scenario: number and title, a one-line summary, the detail, and a link label."
+    },
+    "schedule": {
+      "name": "Schedule",
+      "description": "Timed agenda. One row per slot: the time in the first cell, the detail in the second. Must be a top-level block; it is not decorated inside another block.",
+      "example": [
+        [
+          [
+            "<p>09:00</p>",
+            "<p>Doors open and product demos</p>"
+          ],
+          [
+            "<p>11:00</p>",
+            "<p>Coaching session with a PULSE trainer</p>"
+          ]
+        ]
+      ]
+    },
+    "specs": {
+      "name": "Specs",
+      "description": "Technical specification list for a product. One row per spec: label and value."
+    },
+    "stats": {
+      "name": "Stats",
+      "description": "Headline figures. One row per figure: the number with its unit (for example 500K+ USERS), then a short caption."
+    },
+    "testimonials": {
+      "name": "Testimonials",
+      "description": "Customer quotes as cards. One row per quote: optional avatar, the quote, and the name.",
+      "variants": {
+        "reviews": "Review cards with the author on top and star ratings. Use on product pages."
+      }
+    },
+    "timeline": {
+      "name": "Timeline",
+      "description": "Brand milestones in order. One row per milestone: the year, a title, and the story."
+    },
+    "ugcgrid": {
+      "name": "UGC grid",
+      "description": "Grid of customer posts (user-generated content). One row per post: image, social handle, caption."
+    },
+    "valuecards": {
+      "name": "Value cards",
+      "description": "Brand values as cards. One row per value: an icon glyph (emoji or text), a title and a short body."
+    }
+  },
+  "extraBlocks": {
+    "section-metadata": {
+      "name": "Section metadata",
+      "description": "Styles the section it sits in. Put it at the end of a section. Styles: surface, pulse-pad, pulse-pad-lg, light, dark, blue, blue-tint, highlight, center (combine with commas).",
+      "example": [
+        [
+          [
+            "<p>style</p>",
+            "<p>surface, pulse-pad</p>"
+          ]
+        ]
+      ]
+    },
+    "metadata": {
+      "name": "Metadata",
+      "description": "Page title and description for search engines and social sharing. One per page, at the very end.",
+      "example": [
+        [
+          [
+            "<p>title</p>",
+            "<p>Page title</p>"
+          ],
+          [
+            "<p>description</p>",
+            "<p>One or two sentences that describe the page.</p>"
+          ]
+        ]
+      ]
+    }
+  },
+  "templates": {
+    "index": "Home",
+    "discover": "Discover",
+    "pulse-band-neo": "Product (Pulse range)",
+    "product-details": "Product details",
+    "product-discovery": "Product listing",
+    "know-the-brand": "Brand story",
+    "lifestyle-vision": "Lifestyle",
+    "contact": "Contact",
+    "landing-page": "Landing page",
+    "about": "About",
+    "article": "Article",
+    "shop": "Shop"
+  }
+}

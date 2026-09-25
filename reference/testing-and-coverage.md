@@ -86,7 +86,8 @@ are hardest to see.
 
 ## Current coverage (baseline)
 
-All 23 block files pass the per-file gate (98 tests). Aggregate: 100% lines,
+All 23 block files pass the per-file gate (109 tests, including 11 for the
+DA library in `test/library.test.js`). Aggregate: 100% lines,
 ~94% branches, ~99% functions. The lowest files, still above 80%:
 
 | file | lines | branches | funcs |
