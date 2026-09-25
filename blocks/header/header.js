@@ -130,11 +130,14 @@ export default async function decorate(block) {
     if (section) section.classList.add(`nav-${c}`);
   });
 
+  // a bold/italic logo link gets button-decorated by scripts.js
+  // (p.button-wrapper > a.button); undo that so the logo renders as a logo
   const navBrand = nav.querySelector('.nav-brand');
-  const brandLink = navBrand.querySelector('.button');
+  const brandLink = navBrand?.querySelector('.button');
   if (brandLink) {
     brandLink.className = '';
-    brandLink.closest('.button-container').className = '';
+    const wrapper = brandLink.closest('.button-wrapper');
+    if (wrapper) wrapper.className = '';
   }
 
   const navSections = nav.querySelector('.nav-sections');
