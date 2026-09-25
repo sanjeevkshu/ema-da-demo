@@ -28,6 +28,17 @@ describe('fragment: loadFragment', () => {
     mockFetch({}); // 404 for everything
     assert.equal(await loadFragment('/missing'), null);
   });
+
+  test('rebases relative ./media_ image paths onto the fragment path', async () => {
+    mockFetch({
+      '/fragments/promo.plain.html': '<div><picture>'
+        + '<source srcset="./media_abc.png"><img src="./media_abc.png" alt="promo">'
+        + '</picture></div>',
+    });
+    const main = await loadFragment('/fragments/promo');
+    assert.equal(main.querySelector('img').src, 'http://localhost/fragments/media_abc.png');
+    assert.equal(main.querySelector('source').srcset, 'http://localhost/fragments/media_abc.png');
+  });
 });
 
 describe('fragment: decorate', () => {
@@ -50,6 +61,29 @@ describe('fragment: decorate', () => {
     await decorate(block);
     // section replaced by the fragment's content
     assert.ok(document.body.querySelector('h2'));
+  });
+
+  test('inlines fragment content when the section has other children', async () => {
+    mockFetch({ '/frag.plain.html': '<div><h2>Injected</h2></div>' });
+
+    const section = document.createElement('div');
+    section.className = 'section';
+    section.innerHTML = '<p>Intro</p>';
+    const wrapper = document.createElement('div');
+    wrapper.className = 'fragment-wrapper';
+    const block = document.createElement('div');
+    block.className = 'fragment';
+    block.innerHTML = '<a href="/frag">/frag</a>';
+    wrapper.append(block);
+    section.append(wrapper);
+    document.body.append(section);
+
+    await decorate(block);
+    // the section survives; its intro stays and the fragment content lands in place
+    assert.ok(section.isConnected, 'section kept');
+    assert.equal(section.querySelector('p').textContent, 'Intro');
+    assert.ok(section.querySelector('h2'), 'fragment content inlined');
+    assert.equal(section.querySelector('.fragment-wrapper'), null, 'wrapper removed');
   });
 
   test('is a no-op when the fragment cannot be loaded', async () => {

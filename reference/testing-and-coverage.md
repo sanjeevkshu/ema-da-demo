@@ -19,10 +19,16 @@ are hardest to see.
 
 - Runner: Node's built-in `node:test` + `--experimental-test-coverage` (Node
   20+; CI pins 24). DOM via `jsdom` (devDependency only — no build step).
-- Command: `npm run test:coverage`
-  - `--test-coverage-lines=80 --test-coverage-branches=80
-    --test-coverage-functions=80` → non-zero exit below any threshold.
-  - scoped to `blocks/**/*.js` (excludes `test/**`).
+- Command: `npm run test:coverage`. It runs the suite, writes
+  `coverage/lcov.info` (gitignored), then runs `test/check-coverage.js`.
+- **The threshold applies to each file, not the total.** Node's own
+  `--test-coverage-*` flags only check the aggregate, which let `header.js`
+  (62.5% functions) and `widget.js` (69% branches) pass while the total read
+  93%. `check-coverage.js` fails the build when any `blocks/**/*.js` file is
+  under 80% on lines, branches or functions.
+- **A block no test loads fails too.** Node leaves unloaded files out of the
+  report, so the checker compares it with the files on disk and reports
+  "no coverage data" for any it can't find.
 - CI: `.github/workflows/main.yaml` runs it on every push, after lint.
 
 ## Workflow for a new/changed block
@@ -60,10 +66,17 @@ are hardest to see.
   `setup.js` falls back to `Object.defineProperty`.
 - **Use real `aem.js` exports only.** `fetchPlaceholders` does not exist in
   the vendored `aem.js`. Check the export list at the bottom of the file first.
-- **Module-scoped `matchMedia` handles can't be switched per test.**
-  `header.js` reads `isDesktop` once at load, so its desktop/mobile keyboard
-  branches stay uncovered. That is why `header.js` sits near 72% lines. To
-  make that logic testable, read the query inside functions.
+- **Module-scoped `matchMedia` handles need stubbing before import.**
+  `header.js` calls `matchMedia('(min-width: 900px)')` once, at load. Install
+  a stub that returns an object you keep a reference to, then import the block
+  and flip `.matches` in each test. `test/header.test.js` does this to cover
+  the desktop and mobile keyboard/focus paths.
+- **jsdom never fires stylesheet `load` events**, so `loadCSS()` waits
+  forever. Before decorating anything that loads CSS (such as `widget`), put a
+  `<link>` with that exact `href` in `<head>`; `loadCSS` then resolves at once.
+- **Real modules for dynamic `import()`:** point `window.hlx.codeBasePath` at
+  `new URL('./fixtures', import.meta.url).href` and put the modules in
+  `test/fixtures/` (not served; `.hlxignore` covers `test/`).
 - **Timers keep the process alive.** Expose `stop()` from `decorate` and call it
   when a test ends. Also `unref()` intervals in the block.
 - **Network-backed blocks** (header, footer, fragment, widget) need
@@ -73,20 +86,13 @@ are hardest to see.
 
 ## Current coverage (baseline)
 
-All 23 blocks now have functional tests (81 tests total). Aggregate:
+All 23 block files pass the per-file gate (98 tests). Aggregate: 100% lines,
+~94% branches, ~99% functions. The lowest files, still above 80%:
 
-| scope     | lines | branches | funcs |
-|-----------|-------|----------|-------|
-| all files | ~93%  | ~92%     | ~92%  |
+| file | lines | branches | funcs |
+|------|-------|----------|-------|
+| `contactform.js` | 100% | ~83% | 100% |
+| `header.js` | 100% | ~85% | ~94% |
+| `footer.js` | 100% | ~87% | 100% |
 
-Most blocks sit at 100%. A few remain partially covered where behaviour is
-hard to reach headlessly:
-
-- `header.js` — mobile/desktop toggle helpers depend on a module-scoped
-  `matchMedia` handle captured at load, so some keyboard/focus branches aren't
-  exercised. Decorate, dropdown detection, hamburger toggle and Escape are.
-- `widget.js` / `fragment.js` — the dynamic-`import()` failure paths and a
-  couple of guard branches.
-
-When you touch any of these, raise their coverage. New blocks must ship at
-≥ 80% from the start.
+New blocks must ship at ≥ 80% per file from the start.

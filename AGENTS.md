@@ -29,6 +29,7 @@ Edge Delivery Services. Read a block first. Omissions are in the repo or known.
 - Content isn't in git. Publish with `.claude/skills/da-publish`. Local
   preview can't show nav/footer edits; verify those on the published site.
 - All committed files are served. Use `.hlxignore`.
-- New/changed blocks MUST ship tests at ≥80% coverage (lines/branches/funcs).
-  `npm run test:coverage` is a CI gate. See `reference/testing-and-coverage.md`.
+- New/changed blocks MUST ship tests at ≥80% coverage (lines/branches/funcs)
+  **per file**. `npm run test:coverage` is a CI gate, and a block no test
+  loads fails it. See `reference/testing-and-coverage.md`.
 - Skills: `/plugin marketplace add adobe/skills`, then `aem-edge-delivery-services` (24 skills, incl. `docs-search`).
