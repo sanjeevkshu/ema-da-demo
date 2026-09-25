@@ -12,8 +12,9 @@ import { createOptimizedPicture } from '../../scripts/aem.js';
 export const MIN_CHARS = 2;
 const DEBOUNCE_MS = 200;
 const WEIGHTS = {
-  title: 10, headings: 5, description: 3, path: 1,
+  title: 10, headings: 5, description: 3, path: 1, content: 1,
 };
+const EXCERPT_RADIUS = 80;
 const indexCache = new Map();
 
 export function fetchIndex(source) {
@@ -29,6 +30,16 @@ export function fetchIndex(source) {
 
 export function clearIndexCache() {
   indexCache.clear();
+}
+
+const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+/**
+ * Matches terms at the start of a word only: "return" finds "returns", but
+ * "arc" doesn't find "Marcus".
+ */
+export function termPattern(terms, flags = 'iu') {
+  return new RegExp(`(?<![\\p{L}\\p{N}])(${terms.map(escapeRe).join('|')})`, flags);
 }
 
 export function toTerms(query) {
@@ -47,17 +58,41 @@ export function toList(value) {
   }
 }
 
+/** Page text (an array of section chunks in the index) as one plain string. */
+export function toText(value) {
+  return toList(value).join(' ').replace(/\s+/g, ' ').trim();
+}
+
+/**
+ * About EXCERPT_RADIUS characters either side of the first term found in the
+ * page text, cut on word boundaries; '' when no term is in the text.
+ */
+export function excerpt(text, terms) {
+  const source = toText(text);
+  const match = terms.length ? termPattern(terms).exec(source) : null;
+  if (!match) return '';
+  const hit = { at: match.index, len: match[1].length };
+  let start = Math.max(0, hit.at - EXCERPT_RADIUS);
+  let end = Math.min(source.length, hit.at + hit.len + EXCERPT_RADIUS);
+  // cut on spaces, but never inside the matched term
+  if (start > 0) start = Math.min(source.indexOf(' ', start) + 1 || hit.at, hit.at);
+  if (end < source.length) end = Math.max(source.lastIndexOf(' ', end), hit.at + hit.len);
+  return `${start > 0 ? '… ' : ''}${source.slice(start, end).trim()}${end < source.length ? ' …' : ''}`;
+}
+
 /** 0 unless every term matches somewhere; title hits outrank the rest. */
 export function scoreRow(row, terms) {
   const fields = {
-    title: (row.title || '').toLowerCase(),
-    headings: toList(row.headings).join(' ').toLowerCase(),
-    description: (row.description || '').toLowerCase(),
-    path: (row.path || '').toLowerCase(),
+    title: row.title || '',
+    headings: toList(row.headings).join(' '),
+    description: row.description || '',
+    path: (row.path || '').replace(/[/-]/g, ' '),
+    content: toText(row.content),
   };
   let total = 0;
   const allMatch = terms.every((term) => {
-    const hits = Object.entries(fields).filter(([, text]) => text.includes(term));
+    const re = termPattern([term]);
+    const hits = Object.entries(fields).filter(([, text]) => re.test(text));
     hits.forEach(([field]) => { total += WEIGHTS[field]; });
     return hits.length > 0;
   });
@@ -79,13 +114,11 @@ export function searchIndex(rows, query) {
 export function highlight(text, terms) {
   const fragment = document.createDocumentFragment();
   const source = String(text || '');
-  const escaped = terms.map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
-  if (!escaped.length) {
+  if (!terms.length) {
     fragment.append(source);
     return fragment;
   }
-  const re = new RegExp(`(${escaped.join('|')})`, 'gi');
-  source.split(re).forEach((part, i) => {
+  source.split(termPattern(terms, 'giu')).forEach((part, i) => {
     if (!part) return;
     if (i % 2) {
       const mark = document.createElement('mark');
@@ -116,10 +149,15 @@ function renderResult(row, terms) {
   title.className = 'search-result-title';
   title.append(highlight(row.title || row.path, terms));
   body.append(title);
-  if (row.description) {
+  // show the description, unless the match is only in the page text: then an
+  // excerpt around it, so the visitor sees why the page came up
+  const inDescription = terms.length > 0 && termPattern(terms).test(row.description || '');
+  const snippet = inDescription ? '' : excerpt(row.content, terms);
+  const text = snippet || row.description;
+  if (text) {
     const description = document.createElement('p');
     description.className = 'search-result-description';
-    description.append(highlight(row.description, terms));
+    description.append(highlight(text, terms));
     body.append(description);
   }
   link.append(body);
