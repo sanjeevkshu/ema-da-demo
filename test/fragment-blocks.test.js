@@ -202,4 +202,54 @@ describe('widget', () => {
     await decorateWidget(block);
     assert.ok(true);
   });
+
+  // Serve widget modules from test/fixtures/widgets. A <link> for the widget CSS
+  // is added up front because jsdom never fires stylesheet load events, so
+  // loadCSS would otherwise wait forever.
+  function mountWidget(name) {
+    const base = new URL('./fixtures', import.meta.url).href;
+    window.hlx.codeBasePath = base;
+    const css = document.createElement('link');
+    css.rel = 'stylesheet';
+    css.href = `${base}/widgets/${name}.css`;
+    document.head.append(css);
+    mockFetch({ [`/widgets/${name}.html`]: `<p class="${name}-html">loaded</p>` });
+
+    const container = document.createElement('div');
+    container.className = 'widget-container';
+    const wrapper = document.createElement('div');
+    wrapper.className = 'widget-wrapper';
+    const block = document.createElement('div');
+    block.className = 'widget block';
+    block.innerHTML = `<a href="http://localhost/widgets/${name}.html">${name}</a>`;
+    wrapper.append(block);
+    container.append(wrapper);
+    document.body.append(container);
+    return { block, container };
+  }
+
+  test('runs the widget module default export and reclasses the container', async () => {
+    const { block, container } = mountWidget('demo');
+    await decorateWidget(block);
+    assert.equal(block.dataset.decorated, 'true', 'module decorate ran');
+    assert.ok(container.classList.contains('demo-container'));
+    assert.equal(container.classList.contains('widget-container'), false);
+  });
+
+  test('accepts a widget module without a default export', async () => {
+    const { block } = mountWidget('plain');
+    await decorateWidget(block);
+    assert.ok(block.querySelector('.plain-html'), 'widget html injected');
+    assert.equal(block.dataset.decorated, undefined);
+  });
+
+  test('resolves widgets in a subfolder under /widgets/', async () => {
+    const calls = mockFetch({ '/widgets/promos/banner.html': '<p>banner</p>' });
+    const block = document.createElement('div');
+    block.className = 'widget block';
+    block.innerHTML = '<a href="http://localhost/widgets/promos/banner.html">banner</a>';
+    await decorateWidget(block);
+    assert.ok(block.classList.contains('banner'));
+    assert.ok(calls.includes('/widgets/promos/banner.html'), 'fetched from the subfolder');
+  });
 });

@@ -12,8 +12,10 @@ npm run test:coverage # run tests AND enforce the 80% coverage gate
 ```
 
 `test:coverage` fails (non-zero exit) if **line, branch, or function** coverage
-of any loaded `blocks/**/*.js` drops below **80%**. CI runs this on every push
-(`.github/workflows/main.yaml`), so a regression blocks the merge.
+of **any single** `blocks/**/*.js` file drops below **80%**, or if a block file
+isn't loaded by any test. `test/check-coverage.js` enforces this from
+`coverage/lcov.info`. CI runs it on every push (`.github/workflows/main.yaml`),
+so a regression blocks the merge.
 
 ## How it works
 
@@ -40,7 +42,7 @@ This is a hard CI gate, not a guideline.
 5. Factor non-DOM logic into small pure exported helpers (e.g. `wrapIndex`) —
    they are trivial to test and lift branch coverage cheaply.
 
-> Node only reports coverage for files a test actually loads. So the real
-> enforcement is social + reviewed: a new block without a test file simply is
-> not exercised. Reviewers must reject a block PR that adds no `test/*.test.js`.
+> Node only reports coverage for files a test actually loads. The checker
+> compares the report with `blocks/` on disk, so a new block without a test
+> fails the build with "no coverage data" instead of slipping through.
 > See `reference/testing-and-coverage.md` for the full policy.
