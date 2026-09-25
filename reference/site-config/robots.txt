@@ -1,6 +1,6 @@
 # Reviewed copy of the Config Service robots.txt for sanjeevkshu/ema-da-demo.
-# Served only on the production domain: *.aem.page and *.aem.live always
-# serve the platform's own disallow-all robots.txt.
+# Served on the production domain (https://pulse-proxy-redirect.vercel.app).
+# *.aem.page and *.aem.live always serve the platform's own disallow-all.
 
 # Allow Adobe Brand Concierge and Brand Visibility to ingest content
 User-agent: Adobe-BrandConcierge
@@ -13,4 +13,4 @@ Allow: /
 User-agent: *
 Disallow: /
 
-Sitemap: https://main--ema-da-demo--sanjeevkshu.aem.live/sitemap.xml
+Sitemap: https://pulse-proxy-redirect.vercel.app/sitemap.xml

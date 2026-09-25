@@ -42,6 +42,7 @@ describe('brand concierge: settings', () => {
     assert.equal(environment('feat-x--ema-da-demo--sanjeevkshu.aem.page'), 'dev');
     assert.equal(environment('main--ema-da-demo--sanjeevkshu.aem.live'), 'stage');
     assert.equal(environment('www.pulse.example'), 'prod');
+    assert.equal(environment('pulse-proxy-redirect.vercel.app'), 'prod', 'the production domain');
   });
 
   test('matches surface paths exactly or by prefix', () => {

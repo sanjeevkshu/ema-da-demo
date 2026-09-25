@@ -22,6 +22,11 @@ Edge Delivery Services. Read a block first. Omissions are in the repo or known.
   (`POST admin.hlx.page/index/.../main/<path>`) or regenerate the sitemap
   (`POST admin.hlx.page/sitemap/.../main/sitemap.xml`). A sitemap without
   `origin` or `cdn.prod.host` writes `https://undefined/` URLs.
+- Production domain: `https://pulse-proxy-redirect.vercel.app`, a Vercel reverse
+  proxy to `main--…aem.live` (`cdn.prod.host`). Only that domain serves the
+  custom `robots.txt` (`reference/site-config/robots.txt`), which allows the
+  Adobe crawlers and disallows everyone else until launch. `*.aem.page` and
+  `*.aem.live` always serve the platform's disallow-all and `noindex, nofollow`.
 
 ## Remember
 - `npx -y @adobe/aem-cli up`: local code, previewed content.

@@ -13,7 +13,7 @@
     "privacyNotice": {
       "title": "Privacy notice",
       "text": "This chat is automated. What you type may be collected, used and kept by PULSE and its service providers under the {Privacy Policy}. Please don't share sensitive information such as health or payment details.",
-      "links": [{ "text": "Privacy Policy", "url": "https://main--ema-da-demo--sanjeevkshu.aem.live/contact" }]
+      "links": [{ "text": "Privacy Policy", "url": "https://pulse-proxy-redirect.vercel.app/contact" }]
     },
     "productCard": { "actionButtonSize": "S" }
   },
@@ -39,25 +39,25 @@
         "text": "Which PULSE fits my training?",
         "systemPrompt": "Which PULSE device is best for heavy training?",
         "backgroundColor": "#1d4ed8",
-        "image": "https://main--ema-da-demo--sanjeevkshu.aem.live/media_1fa58945572445d2b9bfc2d642d4a497af1c54ba9.png"
+        "image": "https://pulse-proxy-redirect.vercel.app/media_1fa58945572445d2b9bfc2d642d4a497af1c54ba9.png"
       },
       {
         "text": "PULSE Loop vs PULSE Arc",
         "systemPrompt": "Compare PULSE Loop and PULSE Arc.",
         "backgroundColor": "#111827",
-        "image": "https://main--ema-da-demo--sanjeevkshu.aem.live/media_1512711ff3affa66d4ecb7b4a1c26253a4e9019f1.png"
+        "image": "https://pulse-proxy-redirect.vercel.app/media_1512711ff3affa66d4ecb7b4a1c26253a4e9019f1.png"
       },
       {
         "text": "How long does the battery last?",
         "systemPrompt": "How long does the battery last on each PULSE device?",
         "backgroundColor": "#f97316",
-        "image": "https://main--ema-da-demo--sanjeevkshu.aem.live/media_1872ab27825301e75d12fc45b3b8db368509d5f27.png"
+        "image": "https://pulse-proxy-redirect.vercel.app/media_1872ab27825301e75d12fc45b3b8db368509d5f27.png"
       },
       {
         "text": "Shipping and returns",
         "systemPrompt": "What are the PULSE shipping and return policies?",
         "backgroundColor": "#1e40af",
-        "image": "https://main--ema-da-demo--sanjeevkshu.aem.live/media_17e4fd20f5ddbc16a69df0ab771cb9f4657691c62.png"
+        "image": "https://pulse-proxy-redirect.vercel.app/media_17e4fd20f5ddbc16a69df0ab771cb9f4657691c62.png"
       }
     ]
   },

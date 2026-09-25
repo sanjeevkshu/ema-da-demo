@@ -22,7 +22,7 @@ export const CONFIG = {
   datastreams: {
     dev: '', // *.aem.page and localhost (branch previews)
     stage: '', // *.aem.live (pre-launch site)
-    prod: '', // production domain, once it exists
+    prod: '', // production domain: pulse-proxy-redirect.vercel.app
   },
   // conversation.region from the install snippet Composer generates
   region: 'va7',
