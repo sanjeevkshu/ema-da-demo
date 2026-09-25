@@ -73,6 +73,23 @@ Also note the **IMS Org ID** (`…@AdobeOrg`, shown in the Admin Console). It go
 
 **Check:** the preview answers "How long does the PULSE Loop battery last?" with about 7 days.
 
+> **Known issue on `.aem.live` (seen 2026-09-25):** the concierge is created with a brand profile, but with **no integrations, no skills and no working preview**.
+>
+> **Why:**
+> - The profile is drafted from one fetch of the URL you enter.
+> - The knowledge base, the Knowledge Base Search integration and the Site Advisory skill all depend on a background crawl of the site's top pages.
+> - `*.aem.live` and `*.aem.page` always serve `robots.txt` `Disallow: /` and `x-robots-tag: noindex, nofollow`. The platform forces both.
+> - A custom `robots.txt` (Config Service) is **not** served on these hosts; this was tested. It applies only on a production domain.
+>
+> **Recovery, in order:**
+> 1. **Knowledge Sources:** check the auto-created source's status and **Fix Issues** file.
+> 2. **Add a Website Links source by hand.** Upload the CSV `knowledge-source-urls.csv`, so no link-following is needed. Then add the **Knowledge Base Search** integration pointing at it, and turn on **Site Advisory** (Modify → Use recommended).
+> 3. **If it's still refused (robots):** upload a PDF/DOCX knowledge document, plus the Product Catalog sheet. Neither needs a crawl.
+> 4. **Lasting fix:** serve the site on a production or pre-launch domain through your CDN.
+>    - That domain gets `reference/site-config/robots.txt` (already applied), which allows the Adobe crawlers and disallows everyone else.
+>    - Confirm the crawler user-agent tokens with Adobe first; they aren't in the public docs.
+>    - Re-point the knowledge source at that domain.
+
 ## 4. Knowledge sources, skills, visual style (Marketer)
 
 1. **Knowledge source → Website Links → Sitemap URL:** `https://main--ema-da-demo--sanjeevkshu.aem.live/sitemap.xml`, 10 pages. Schedule a weekly refresh.
