@@ -81,3 +81,5 @@ jobs:
           path: .lighthouseci/
           retention-days: 30
           if-no-files-found: ignore
+          # .lighthouseci is a dot-folder; upload-artifact skips those by default
+          include-hidden-files: true
