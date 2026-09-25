@@ -85,5 +85,12 @@
       "pulse-loop",
       "pulse-vision-ar"
     ]
+  },
+  {
+    "name": "Search results",
+    "path": "/search",
+    "pages": [
+      "search"
+    ]
   }
 ]
