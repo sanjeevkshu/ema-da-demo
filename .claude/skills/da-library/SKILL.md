@@ -11,10 +11,13 @@ generated, not hand-edited:
 - `library.config.json` holds the author-facing name and description of every
   block and variant, the section styles, and the template names.
 - `build-library.mjs` takes one real example of each supported variant from
-  `content/*.plain.html` and groups pages into page types (the same ordered set
+  the DA source of each page (step 2) and groups pages into page types (the same ordered set
   of blocks = one type). The first named page of each type becomes its template.
 - `test/library.test.js` fails CI when a block in `blocks/`, or a variant its
   CSS/JS styles, has no entry in the config.
+- The build also rewrites `.github/page-types.json`: one representative page
+  per type. The experience audit on `main` (`.github/workflows/experience-audit.yaml`)
+  runs Lighthouse on exactly these pages. Commit the file whenever it changes.
 
 ## When it runs (no request needed)
 
