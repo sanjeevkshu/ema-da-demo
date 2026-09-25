@@ -32,6 +32,16 @@ indices:
       headings:
         select: main h1, main h2, main h3
         values: textContent(el)
+      # page body for search recall (spec tables, FAQs), one entry per
+      # top-level element. Product grids are skipped: every product page ends
+      # with a "Complete Your Setup" grid naming the other products, which
+      # would make each product match every other product's name.
+      # Section metadata is already turned into classes server-side.
+      # Pages here run 400-1,600 chars. (words(...) on a multi-element select
+      # merges the matches into one capped string, dropping later sections.)
+      content:
+        select: main > div > :not(.productgrid)
+        values: textContent(el)
       robots:
         select: head > meta[name="robots"]
         value: attribute(el, "content")

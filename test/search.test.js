@@ -9,7 +9,7 @@ window.hlx = { codeBasePath: '' };
 
 const {
   default: decorate, clearIndexCache, fetchIndex, highlight, scoreRow, searchIndex,
-  statusText, toList, toTerms, MIN_CHARS,
+  statusText, toList, toTerms, toText, excerpt, MIN_CHARS,
 } = await import('../blocks/search/search.js');
 
 const ROWS = [
@@ -90,6 +90,53 @@ describe('search: matching', () => {
     assert.equal(statusText(1, 'loop'), '1 result for “loop”');
     assert.equal(statusText(3, 'ring'), '3 results for “ring”');
     assert.match(statusText(0, 'zzz'), /^No results for “zzz”/);
+  });
+});
+
+describe('search: page text', () => {
+  const words = (n, w = 'word') => Array.from({ length: n }, (_, i) => `${w}${i}`).join(' ');
+
+  test('page text chunks become one normalised string', () => {
+    assert.equal(toText(['Specs\n\nBattery', '  12 hours ']), 'Specs Battery 12 hours');
+    assert.equal(toText('["a","b"]'), 'a b');
+    assert.equal(toText(undefined), '');
+  });
+
+  test('excerpt centres the first match and cuts on word boundaries', () => {
+    const text = `${words(40)} Battery 12 hours mixed AR use ${words(40, 'tail')}`;
+    const out = excerpt([text], ['battery']);
+    assert.match(out, /^… word\d+ .*Battery 12 hours .* tail\d+ …$/);
+    assert.ok(out.length < 200);
+    assert.equal(excerpt(['Battery lasts 7 days'], ['battery']), 'Battery lasts 7 days');
+    assert.equal(excerpt(['no match here'], ['zzz']), '');
+    assert.equal(excerpt(undefined, ['x']), '');
+  });
+
+  test('excerpt never cuts through the matched term', () => {
+    const long = `${'x'.repeat(200)} needle${'y'.repeat(200)}`;
+    const out = excerpt([long], ['needle']);
+    assert.ok(out.includes('needle'));
+    assert.match(out, /^… .*needle.* …$/);
+  });
+
+  test('terms match at word starts only', () => {
+    assert.equal(excerpt(['Marcus T. loves it'], ['arc']), '');
+    assert.equal(scoreRow({ path: '/x', title: 'Marcus', content: ['search'] }, ['arc']), 0);
+    assert.ok(scoreRow({ path: '/x', title: 'PULSE Arc' }, ['arc']) > 0);
+    assert.ok(scoreRow({ path: '/pulse-band-neo' }, ['neo']) > 0, 'path words count');
+    assert.ok(scoreRow({ path: '/x', description: 'Returns within 30 days' }, ['return']) > 0);
+    const host = document.createElement('p');
+    host.append(highlight('Marcus wears the Arc', ['arc']));
+    assert.equal(host.innerHTML, 'Marcus wears the <mark>Arc</mark>');
+  });
+
+  test('a page-text-only hit is found, and ranks below title hits', () => {
+    const rows = [
+      { path: '/arc', title: 'PULSE Arc', content: ['Battery 7 days continuous tracking'] },
+      { path: '/battery-guide', title: 'Battery guide' },
+    ];
+    assert.deepEqual(searchIndex(rows, 'battery').map((r) => r.path), ['/battery-guide', '/arc']);
+    assert.equal(scoreRow(rows[0], ['battery']), 1);
   });
 });
 
@@ -203,6 +250,32 @@ describe('search: block', () => {
     await wait(10);
     assert.equal(block.querySelectorAll('.search-results li').length, 0);
     assert.equal(block.querySelector('.search-status').textContent, '');
+  });
+
+  test('shows an excerpt when only the page text matches, else the description', async () => {
+    reset('?q=hours');
+    mockFetch({
+      '/query-index.json': indexRoute([
+        {
+          path: '/pulse-vision-ar',
+          title: 'PULSE Vision AR',
+          description: 'Featherweight AR lens.',
+          content: ['Battery', '12 hours mixed AR use'],
+        },
+        {
+          path: '/hours', title: 'Opening hours', description: 'Our lab hours.', content: ['hours text'],
+        },
+      ]),
+    });
+    const block = buildBlock('search');
+    document.body.append(block);
+    await decorate(block);
+    const [first, second] = [...block.querySelectorAll('.search-result')];
+    assert.equal(first.getAttribute('href'), '/hours');
+    assert.equal(first.querySelector('.search-result-description').textContent, 'Our lab hours.');
+    const snippet = second.querySelector('.search-result-description');
+    assert.equal(snippet.textContent, 'Battery 12 hours mixed AR use');
+    assert.equal(snippet.querySelector('mark').textContent, 'hours');
   });
 
   test('no results shows the suggestion', async () => {
