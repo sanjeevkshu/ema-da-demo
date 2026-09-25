@@ -16,6 +16,12 @@ Edge Delivery Services. Read a block first. Omissions are in the repo or known.
 
 ## Outdated
 - `fstab.yaml`, `helix-query.yaml`, `paths.json` are retired. Config lives at tools.aem.live.
+  The index and sitemap live in the Config Service. `reference/site-config/*.yaml`
+  are the reviewed copies: edit one, `POST` it to
+  `admin.hlx.page/config/sanjeevkshu/sites/ema-da-demo/content/<file>`, then reindex
+  (`POST admin.hlx.page/index/.../main/<path>`) or regenerate the sitemap
+  (`POST admin.hlx.page/sitemap/.../main/sitemap.xml`). A sitemap without
+  `origin` or `cdn.prod.host` writes `https://undefined/` URLs.
 
 ## Remember
 - `npx -y @adobe/aem-cli up`: local code, previewed content.
@@ -32,4 +38,10 @@ Edge Delivery Services. Read a block first. Omissions are in the repo or known.
 - New/changed blocks MUST ship tests at ≥80% coverage (lines/branches/funcs)
   **per file**. `npm run test:coverage` is a CI gate, and a block no test
   loads fails it. See `reference/testing-and-coverage.md`.
+- The DA block/template library is generated. When you add or change a block,
+  variant, content model or page type, update the library in the same change,
+  unasked: `.claude/skills/da-library`. `test/library.test.js` fails CI when a
+  block or styled variant has no library entry. The same run rewrites
+  `.github/page-types.json`, the page list for the report-only experience
+  audit on `main`. Commit it.
 - Skills: `/plugin marketplace add adobe/skills`, then `aem-edge-delivery-services` (24 skills, incl. `docs-search`).
