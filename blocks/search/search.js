@@ -32,6 +32,16 @@ export function clearIndexCache() {
   indexCache.clear();
 }
 
+const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+/**
+ * Matches terms at the start of a word only: "return" finds "returns", but
+ * "arc" doesn't find "Marcus".
+ */
+export function termPattern(terms, flags = 'iu') {
+  return new RegExp(`(?<![\\p{L}\\p{N}])(${terms.map(escapeRe).join('|')})`, flags);
+}
+
 export function toTerms(query) {
   return [...new Set(String(query).toLowerCase().split(/\s+/).filter(Boolean))];
 }
@@ -59,12 +69,9 @@ export function toText(value) {
  */
 export function excerpt(text, terms) {
   const source = toText(text);
-  const lower = source.toLowerCase();
-  const [hit] = terms
-    .map((t) => ({ at: lower.indexOf(t), len: t.length }))
-    .filter(({ at }) => at >= 0)
-    .sort((a, b) => a.at - b.at);
-  if (!hit) return '';
+  const match = terms.length ? termPattern(terms).exec(source) : null;
+  if (!match) return '';
+  const hit = { at: match.index, len: match[1].length };
   let start = Math.max(0, hit.at - EXCERPT_RADIUS);
   let end = Math.min(source.length, hit.at + hit.len + EXCERPT_RADIUS);
   // cut on spaces, but never inside the matched term
@@ -76,15 +83,16 @@ export function excerpt(text, terms) {
 /** 0 unless every term matches somewhere; title hits outrank the rest. */
 export function scoreRow(row, terms) {
   const fields = {
-    title: (row.title || '').toLowerCase(),
-    headings: toList(row.headings).join(' ').toLowerCase(),
-    description: (row.description || '').toLowerCase(),
-    path: (row.path || '').toLowerCase(),
-    content: toText(row.content).toLowerCase(),
+    title: row.title || '',
+    headings: toList(row.headings).join(' '),
+    description: row.description || '',
+    path: (row.path || '').replace(/[/-]/g, ' '),
+    content: toText(row.content),
   };
   let total = 0;
   const allMatch = terms.every((term) => {
-    const hits = Object.entries(fields).filter(([, text]) => text.includes(term));
+    const re = termPattern([term]);
+    const hits = Object.entries(fields).filter(([, text]) => re.test(text));
     hits.forEach(([field]) => { total += WEIGHTS[field]; });
     return hits.length > 0;
   });
@@ -106,13 +114,11 @@ export function searchIndex(rows, query) {
 export function highlight(text, terms) {
   const fragment = document.createDocumentFragment();
   const source = String(text || '');
-  const escaped = terms.map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
-  if (!escaped.length) {
+  if (!terms.length) {
     fragment.append(source);
     return fragment;
   }
-  const re = new RegExp(`(${escaped.join('|')})`, 'gi');
-  source.split(re).forEach((part, i) => {
+  source.split(termPattern(terms, 'giu')).forEach((part, i) => {
     if (!part) return;
     if (i % 2) {
       const mark = document.createElement('mark');
@@ -145,7 +151,7 @@ function renderResult(row, terms) {
   body.append(title);
   // show the description, unless the match is only in the page text: then an
   // excerpt around it, so the visitor sees why the page came up
-  const inDescription = terms.some((t) => (row.description || '').toLowerCase().includes(t));
+  const inDescription = terms.length > 0 && termPattern(terms).test(row.description || '');
   const snippet = inDescription ? '' : excerpt(row.content, terms);
   const text = snippet || row.description;
   if (text) {

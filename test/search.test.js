@@ -113,10 +113,21 @@ describe('search: page text', () => {
   });
 
   test('excerpt never cuts through the matched term', () => {
-    const long = `${'x'.repeat(200)}needle${'y'.repeat(200)}`;
+    const long = `${'x'.repeat(200)} needle${'y'.repeat(200)}`;
     const out = excerpt([long], ['needle']);
     assert.ok(out.includes('needle'));
     assert.match(out, /^… .*needle.* …$/);
+  });
+
+  test('terms match at word starts only', () => {
+    assert.equal(excerpt(['Marcus T. loves it'], ['arc']), '');
+    assert.equal(scoreRow({ path: '/x', title: 'Marcus', content: ['search'] }, ['arc']), 0);
+    assert.ok(scoreRow({ path: '/x', title: 'PULSE Arc' }, ['arc']) > 0);
+    assert.ok(scoreRow({ path: '/pulse-band-neo' }, ['neo']) > 0, 'path words count');
+    assert.ok(scoreRow({ path: '/x', description: 'Returns within 30 days' }, ['return']) > 0);
+    const host = document.createElement('p');
+    host.append(highlight('Marcus wears the Arc', ['arc']));
+    assert.equal(host.innerHTML, 'Marcus wears the <mark>Arc</mark>');
   });
 
   test('a page-text-only hit is found, and ranks below title hits', () => {
