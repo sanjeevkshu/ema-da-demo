@@ -22,6 +22,11 @@ Edge Delivery Services. Read a block first. Omissions are in the repo or known.
   (`POST admin.hlx.page/index/.../main/<path>`) or regenerate the sitemap
   (`POST admin.hlx.page/sitemap/.../main/sitemap.xml`). A sitemap without
   `origin` or `cdn.prod.host` writes `https://undefined/` URLs.
+- Production domain: `https://pulse-proxy-redirect.vercel.app`, a Vercel reverse
+  proxy to `main--…aem.live` (`cdn.prod.host`). Only that domain serves the
+  custom `robots.txt` (`reference/site-config/robots.txt`), which allows the
+  Adobe crawlers and disallows everyone else until launch. `*.aem.page` and
+  `*.aem.live` always serve the platform's disallow-all and `noindex, nofollow`.
 
 ## Remember
 - `npx -y @adobe/aem-cli up`: local code, previewed content.
@@ -44,4 +49,9 @@ Edge Delivery Services. Read a block first. Omissions are in the repo or known.
   block or styled variant has no library entry. The same run rewrites
   `.github/page-types.json`, the page list for the report-only experience
   audit on `main`. Commit it.
+- Brand Concierge (`scripts/brand-concierge.js`) loads only via `consented.js`,
+  and its SDKs load only on the first launcher open. Never move it into
+  `head.html` or the eager/lazy phases. `CONFIG.paths` must match the Composer
+  surface rules. Pin the Web SDK version. `brand-concierge-styles.json` is the
+  Composer export. Setup: `reference/brand-concierge/INTEGRATION.md`.
 - Skills: `/plugin marketplace add adobe/skills`, then `aem-edge-delivery-services` (24 skills, incl. `docs-search`).
