@@ -9,6 +9,11 @@ Allow: /
 User-agent: Adobe-Extractor
 Allow: /
 
+# Adobe's SpaceCat scanner (LLM Optimizer / Sites Optimizer): the documented
+# token is "Spacecat/1.0"; robots.txt matches the product token "Spacecat".
+User-agent: Spacecat
+Allow: /
+
 # Block all public search crawlers until launch
 User-agent: *
 Disallow: /
