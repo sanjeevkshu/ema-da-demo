@@ -12,8 +12,9 @@ import { createOptimizedPicture } from '../../scripts/aem.js';
 export const MIN_CHARS = 2;
 const DEBOUNCE_MS = 200;
 const WEIGHTS = {
-  title: 10, headings: 5, description: 3, path: 1,
+  title: 10, headings: 5, description: 3, path: 1, content: 1,
 };
+const EXCERPT_RADIUS = 80;
 const indexCache = new Map();
 
 export function fetchIndex(source) {
@@ -47,6 +48,31 @@ export function toList(value) {
   }
 }
 
+/** Page text (an array of section chunks in the index) as one plain string. */
+export function toText(value) {
+  return toList(value).join(' ').replace(/\s+/g, ' ').trim();
+}
+
+/**
+ * About EXCERPT_RADIUS characters either side of the first term found in the
+ * page text, cut on word boundaries; '' when no term is in the text.
+ */
+export function excerpt(text, terms) {
+  const source = toText(text);
+  const lower = source.toLowerCase();
+  const [hit] = terms
+    .map((t) => ({ at: lower.indexOf(t), len: t.length }))
+    .filter(({ at }) => at >= 0)
+    .sort((a, b) => a.at - b.at);
+  if (!hit) return '';
+  let start = Math.max(0, hit.at - EXCERPT_RADIUS);
+  let end = Math.min(source.length, hit.at + hit.len + EXCERPT_RADIUS);
+  // cut on spaces, but never inside the matched term
+  if (start > 0) start = Math.min(source.indexOf(' ', start) + 1 || hit.at, hit.at);
+  if (end < source.length) end = Math.max(source.lastIndexOf(' ', end), hit.at + hit.len);
+  return `${start > 0 ? '… ' : ''}${source.slice(start, end).trim()}${end < source.length ? ' …' : ''}`;
+}
+
 /** 0 unless every term matches somewhere; title hits outrank the rest. */
 export function scoreRow(row, terms) {
   const fields = {
@@ -54,6 +80,7 @@ export function scoreRow(row, terms) {
     headings: toList(row.headings).join(' ').toLowerCase(),
     description: (row.description || '').toLowerCase(),
     path: (row.path || '').toLowerCase(),
+    content: toText(row.content).toLowerCase(),
   };
   let total = 0;
   const allMatch = terms.every((term) => {
@@ -116,10 +143,15 @@ function renderResult(row, terms) {
   title.className = 'search-result-title';
   title.append(highlight(row.title || row.path, terms));
   body.append(title);
-  if (row.description) {
+  // show the description, unless the match is only in the page text: then an
+  // excerpt around it, so the visitor sees why the page came up
+  const inDescription = terms.some((t) => (row.description || '').toLowerCase().includes(t));
+  const snippet = inDescription ? '' : excerpt(row.content, terms);
+  const text = snippet || row.description;
+  if (text) {
     const description = document.createElement('p');
     description.className = 'search-result-description';
-    description.append(highlight(row.description, terms));
+    description.append(highlight(text, terms));
     body.append(description);
   }
   link.append(body);
