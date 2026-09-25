@@ -27,19 +27,18 @@ the affected pages out of the knowledge source.
 
 | # | Conflict | Where | Decide |
 |---|---|---|---|
-| 1 | **Shipping.** "Free express priority shipping. Ships within 24 hours." versus "Free shipping on all orders over $100." | Contact FAQ and PULSE Arc page, versus the Loop, Band Neo and Vision AR pages | One policy |
-| 2 | **Returns.** "Returns accepted within 30 days on unworn devices in original packaging" versus "30-day money back guarantee" | Contact FAQ, versus product pages | One wording |
-| 3 | **PULSE Arc Slim price.** $219 versus $229 | Products page, versus "Complete Your Setup" grids | One price |
-| 4 | **PULSE Loop Gold price.** $229 versus $259 | Products page, versus "Complete Your Setup" grids | One price |
+| 1 | **Shipping.** "Free express priority shipping" versus "Free shipping on all orders over $100." | Contact FAQ, PULSE Arc page | **Fixed 2026-09-25:** "free on all orders over $100" everywhere |
+| 2 | **Returns.** "Returns accepted within 30 days…" versus "30-day money back guarantee" | Contact FAQ | **Fixed:** FAQ now says "30-day money back guarantee on unworn devices in original packaging" |
+| 3 | **PULSE Arc Slim price.** $219 versus $229 | "Complete Your Setup" grids | **Fixed:** $219 everywhere |
+| 4 | **PULSE Loop Gold price.** $229 versus $259 | "Complete Your Setup" grids | **Fixed:** $229 everywhere |
 | 5 | **Product name.** The FAQ asks about "the Pulse Ring"; the product is **PULSE Loop** | Contact FAQ | Rename |
 | 6 | **Breadcrumbs.** Loop (ring), Vision AR (glasses) and Band Neo sit under "Products > Smartwatches" | Product pages | Fix categories |
-| 7 | **Placeholder pages** (lorem ipsum): `/about`, `/article`, `/landing-page`, `/shop`, `/product-detail-page` | Published, and in the sitemap | Unpublish, or add `robots: noindex` (that also drops them from the sitemap and search) |
+| 7 | **Placeholder pages** (lorem ipsum): `/about`, `/article`, `/landing-page`, `/shop`, `/product-detail-page` | Were in the sitemap | **Fixed:** `robots: noindex`, so they're out of the sitemap (now 10 pages) and site search |
 | 8 | **Accessories with no page:** Arc Slim, Loop Gold, Charge Dock ($49), Loop Case ($29), Neo Straps ($19), Studio ($349) | "Complete Your Setup" grids only | Add pages, or accept mention-only |
 | 9 | **Forms that don't submit:** "Launch Ticket" (Contact) and newsletter "Subscribe" | Contact, Products | Wire them up, or keep instruction I-6 below |
 | 10 | **Typo:** "Three college drops out" → "dropouts" | Know the Brand timeline | Fix |
 
-`CSV` upload (below) already leaves out the placeholder pages, so #7 doesn't
-block the first crawl.
+Still open: #5, #6, #8, #9 and #10.
 
 ---
 
@@ -72,10 +71,10 @@ a fashion statement, co-designed with its community.
 | PULSE Loop | $199 | Grade-5 titanium smart ring, 7-day battery, 100 m water rating, HRV, skin temp, SpO2, sleep stages; no screen | `/pulse-loop` |
 | PULSE Band Neo | $129 | 19 g band, 1.1" AMOLED strip, 5-day battery, 5ATM; six neon strap finishes | `/pulse-band-neo` |
 | PULSE Vision AR | $499 | 58 g titanium AR glasses, dual 4K micro-OLED, 12 h battery, ECG, SpO2, IP68 | `/pulse-vision-ar` |
-| PULSE Arc Slim | $219 / $229 (**conflict #3**) | Thinner Arc, Midnight finish | none |
-| PULSE Loop Gold | $229 / $259 (**conflict #4**) | Loop in brushed gold | none |
+| PULSE Arc Slim | $219 | Thinner Arc, Midnight finish | none |
+| PULSE Loop Gold | $229 | Loop in brushed gold | none |
 | Accessories | $19–$349 | Neo Straps 3-pack, Loop Case, Charge Dock, Studio desk hub | none |
-| Services | none | Free shipping (**conflict #1**), 30-day returns (**#2**), trade-in for store credit, 50+ countries, PULSE app sync | `/contact`, `/know-the-brand` |
+| Services | none | Free shipping on orders over $100, 30-day money back guarantee (unworn, original packaging), trade-in for store credit, 50+ countries, PULSE app sync | `/contact`, `/know-the-brand` |
 
 **Target audience**
 Gen Z (the footer says it outright; reviewers are 21–27) who treat tech as
@@ -169,7 +168,7 @@ Follow-ups:
 
 | Item | Setting |
 |---|---|
-| Website Links | **CSV upload** of `knowledge-source-urls.csv`: the 10 real pages. Don't use the sitemap until conflict #7 is fixed, because it still lists the 5 placeholder pages. Refresh weekly. |
+| Website Links | **Sitemap URL** `https://main--ema-da-demo--sanjeevkshu.aem.live/sitemap.xml`. Since the noindex fix it lists exactly the 10 real pages, and new pages join automatically. `knowledge-source-urls.csv` has the same 10 pages as a fallback. Refresh weekly. |
 | Product Catalog | `product-catalog.csv`: the 4 products with pages. This enables product cards and deep links. Add the 6 products without pages once they have pages. |
 | Skills | Site Advisory (default). Product Advisory, using Knowledge Base Search and Entity Linking. |
 | Not applicable | Commerce MCP (the site isn't on Adobe Commerce); Meeting Booking and Live Chat (B2C, no sales team) |
@@ -184,9 +183,7 @@ Follow-ups:
 - 4 out of scope
 - 4 safeguard
 
-Expected answers that depend on conflicts #1–#4 are marked `PENDING`. Update
-them after the fix, then run each type before go-live and after every
-configuration change.
+Run each type before go-live and after every configuration change.
 
 ---
 
