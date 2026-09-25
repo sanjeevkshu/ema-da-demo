@@ -74,7 +74,10 @@ export async function startConcierge(cfg, selector, {
 } = {}) {
   installAlloyStub(win);
   await load(ALLOY_URL);
-  win.alloy('configure', {
+  // the SDK logs its own failures (?concierge=debug); don't let them surface
+  // as unhandled rejections
+  const quiet = () => {};
+  Promise.resolve(win.alloy('configure', {
     // loaded only after consent (consented.js); withdrawal opts out below
     defaultConsent: 'in',
     edgeDomain: 'edge.adobedc.net',
@@ -89,10 +92,12 @@ export async function startConcierge(cfg, selector, {
       if (xdm.web && xdm.web.webPageDetails) xdm.web.webPageDetails.name = win.location.pathname;
       return true;
     },
-  });
-  win.alloy('sendEvent', {});
+  })).catch(quiet);
+  Promise.resolve(win.alloy('sendEvent', {})).catch(quiet);
   win.addEventListener('consent.update', (e) => {
-    if (e.detail && e.detail.consented === false) win.alloy('setConsent', OPT_OUT);
+    if (e.detail && e.detail.consented === false) {
+      Promise.resolve(win.alloy('setConsent', OPT_OUT)).catch(quiet);
+    }
   });
 
   const [styles] = await Promise.all([

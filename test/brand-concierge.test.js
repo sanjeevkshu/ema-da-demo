@@ -125,6 +125,24 @@ describe('brand concierge: Web SDK', () => {
     listeners['consent.update']({});
   });
 
+  test('a rejected Web SDK command is swallowed, not left unhandled', async () => {
+    const { win, load } = fakeWindow();
+    const unhandled = [];
+    const onUnhandled = (reason) => unhandled.push(reason);
+    process.on('unhandledRejection', onUnhandled);
+    const failingLoad = async (src) => {
+      await load(src);
+      if (src === ALLOY_URL) win.alloy = async () => { throw new Error('400 from edge'); };
+    };
+    const listeners = {};
+    win.addEventListener = (type, fn) => { listeners[type] = fn; };
+    await startConcierge({ ...configured, datastreamId: 'd' }, '#m', { win, load: failingLoad, fetchImpl: async () => ({ ok: false }) });
+    listeners['consent.update']({ detail: { consented: false } });
+    await flush();
+    process.off('unhandledRejection', onUnhandled);
+    assert.deepEqual(unhandled, []);
+  });
+
   test('boots with empty styles when the styles file is missing or unreachable', async () => {
     const failures = [async () => ({ ok: false }), async () => { throw new Error('offline'); }];
     await Promise.all(failures.map(async (fetchImpl) => {
