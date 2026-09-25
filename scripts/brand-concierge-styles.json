@@ -1,0 +1,96 @@
+{
+  "name": "PULSE draft (replace with the Composer export)",
+  "metadata": {
+    "brandName": "PULSE",
+    "version": "1.0.0",
+    "language": "en-US",
+    "namespace": "brand-concierge"
+  },
+  "behavior": {
+    "multimodalCarousel": { "cardClickAction": "openLink" },
+    "input": { "enableVoiceInput": false, "disableMultiline": true },
+    "chat": { "messageAlignment": "normal", "messageWidth": "100%" },
+    "privacyNotice": {
+      "title": "Privacy notice",
+      "text": "This chat is automated. What you type may be collected, used and kept by PULSE and its service providers under the {Privacy Policy}. Please don't share sensitive information such as health or payment details.",
+      "links": [{ "text": "Privacy Policy", "url": "https://main--ema-da-demo--sanjeevkshu.aem.live/contact" }]
+    },
+    "productCard": { "actionButtonSize": "S" }
+  },
+  "disclaimer": {
+    "text": "AI answers can be wrong. Check the product page for final prices and policies."
+  },
+  "text": {
+    "welcome.heading": "What's your frequency?",
+    "welcome.subheading": "Ask about PULSE devices, specs, shipping, or which wearable fits your day.",
+    "input.placeholder": "Ask PULSE anything",
+    "input.messageInput.aria": "Type your message",
+    "input.send.aria": "Send message",
+    "input.mic.aria": "Start voice input",
+    "error.network": "Connection lost. Please try again.",
+    "loading.message": "Thinking…",
+    "feedback.toast.success": "Thanks for the feedback!",
+    "feedback.thumbsUp.aria": "Helpful",
+    "feedback.thumbsDown.aria": "Not helpful"
+  },
+  "arrays": {
+    "welcome.examples": [
+      {
+        "text": "Which PULSE fits my training?",
+        "systemPrompt": "Which PULSE device is best for heavy training?",
+        "backgroundColor": "#1d4ed8",
+        "image": "https://main--ema-da-demo--sanjeevkshu.aem.live/media_1fa58945572445d2b9bfc2d642d4a497af1c54ba9.png"
+      },
+      {
+        "text": "PULSE Loop vs PULSE Arc",
+        "systemPrompt": "Compare PULSE Loop and PULSE Arc.",
+        "backgroundColor": "#111827",
+        "image": "https://main--ema-da-demo--sanjeevkshu.aem.live/media_1512711ff3affa66d4ecb7b4a1c26253a4e9019f1.png"
+      },
+      {
+        "text": "How long does the battery last?",
+        "systemPrompt": "How long does the battery last on each PULSE device?",
+        "backgroundColor": "#f97316",
+        "image": "https://main--ema-da-demo--sanjeevkshu.aem.live/media_1872ab27825301e75d12fc45b3b8db368509d5f27.png"
+      },
+      {
+        "text": "Shipping and returns",
+        "systemPrompt": "What are the PULSE shipping and return policies?",
+        "backgroundColor": "#1e40af",
+        "image": "https://main--ema-da-demo--sanjeevkshu.aem.live/media_17e4fd20f5ddbc16a69df0ab771cb9f4657691c62.png"
+      }
+    ]
+  },
+  "theme": {
+    "--font-family": "'Inter', 'Inter-fallback', sans-serif",
+    "--color-primary": "#1d4ed8",
+    "--color-primary-hover": "#1e40af",
+    "--color-text": "#111827",
+    "--color-text-muted": "rgb(17 24 39 / 70%)",
+    "--color-accent": "#f97316",
+    "--line-height-body": "1.6",
+    "--main-container-background": "#f7f8fa",
+    "--welcome-heading-weight": "800",
+    "--welcome-heading-text-align": "center",
+    "--welcome-subheading-text-align": "center",
+    "--input-border-radius": "8px",
+    "--input-background": "#ffffff",
+    "--input-outline-color": "#111827",
+    "--input-focus-outline-color": "#1d4ed8",
+    "--color-button-submit": "#1d4ed8",
+    "--color-button-submit-hover": "#1e40af",
+    "--submit-button-fill-color": "#ffffff",
+    "--message-user-background": "#1d4ed8",
+    "--message-user-text": "#ffffff",
+    "--message-concierge-background": "#ffffff",
+    "--message-concierge-text": "#111827",
+    "--message-border-radius": "12px",
+    "--border-radius-card": "12px",
+    "--button-primary-background": "#1d4ed8",
+    "--button-primary-text": "#ffffff",
+    "--button-primary-hover": "#1e40af",
+    "--prompt-suggestion-border-color": "#111827",
+    "--prompt-suggestion-text-color": "#111827",
+    "--disclaimer-color": "rgb(17 24 39 / 70%)"
+  }
+}
