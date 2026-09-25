@@ -189,16 +189,14 @@ Run each type before go-live and after every configuration change.
 
 ## 9. Website integration (Edge Delivery)
 
-Needed from the Adobe/IT team:
-- the **IMS Org ID**
-- a **datastream ID** enabled for Brand Concierge
-- the **production domain**, for surface rules
+Built. See [`INTEGRATION.md`](INTEGRATION.md) for the step-by-step setup with
+the Web SDK and AEP (access, datastreams, Composer, evaluations, deployment,
+website config, surface rules, go-live, operations).
 
-How it fits this codebase:
-
-- **Load late.** Load the Web SDK (`alloy`) and the Brand Concierge Web Client in the delayed phase. Adobe's snippet puts them in `<head>`, which would cost LCP on every page. `scripts/scripts.js` → `loadDelayed()` → `consent-check.js` → `consented.js` is the existing hook.
-- **Decide: consent.** Loading from `consented.js` means the concierge only appears after consent, which is declined by default today. Loading it outside consent needs legal sign-off, because the Web SDK sends data to Adobe Experience Platform.
-- **Content Security Policy.** `head.html` enforces `require-trusted-types-for 'script'`. Test the Web SDK and Web Client on a branch first. If they fail Trusted Types, the options are a Trusted Types policy or relaxing that one directive.
-- **Mount point.** For a component install, create `#brand-concierge-mount` in JS. For a dedicated page, use a `concierge` block on a `/concierge` page. The styling configuration (section 6) lives in a JSON file in the repo.
-- **Surface rules.** Start with product and brand pages. Exclude `/search` and `/contact` until the forms work.
-- **Analytics.** Use the `onEvent` callback, for example forwarding `card:clicked` and `query:submitted`, without blocking.
+- **Code:** `scripts/brand-concierge.js`, imported from `scripts/consented.js`.
+- **Behaviour:** an "Ask PULSE" launcher on the surface pages. The Web SDK and Web Client load on the first open, with one datastream per environment. It stays off until `CONFIG.orgId` and the datastream are set.
+- **Preflight (2026-09-25):**
+  - both Adobe scripts load under the site's security policy with no violations
+  - the site's default Trusted Types policy passes script URLs through
+  - the Web SDK reaches `edge.adobedc.net`
+- **Still to verify with real IDs:** the chat renders and answers (INTEGRATION.md step 7).

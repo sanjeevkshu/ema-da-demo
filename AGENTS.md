@@ -44,4 +44,9 @@ Edge Delivery Services. Read a block first. Omissions are in the repo or known.
   block or styled variant has no library entry. The same run rewrites
   `.github/page-types.json`, the page list for the report-only experience
   audit on `main`. Commit it.
+- Brand Concierge (`scripts/brand-concierge.js`) loads only via `consented.js`,
+  and its SDKs load only on the first launcher open. Never move it into
+  `head.html` or the eager/lazy phases. `CONFIG.paths` must match the Composer
+  surface rules. Pin the Web SDK version. `brand-concierge-styles.json` is the
+  Composer export. Setup: `reference/brand-concierge/INTEGRATION.md`.
 - Skills: `/plugin marketplace add adobe/skills`, then `aem-edge-delivery-services` (24 skills, incl. `docs-search`).
