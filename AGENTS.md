@@ -35,5 +35,7 @@ Edge Delivery Services. Read a block first. Omissions are in the repo or known.
 - The DA block/template library is generated. When you add or change a block,
   variant, content model or page type, update the library in the same change,
   unasked: `.claude/skills/da-library`. `test/library.test.js` fails CI when a
-  block or styled variant has no library entry.
+  block or styled variant has no library entry. The same run rewrites
+  `.github/page-types.json`, the page list for the report-only experience
+  audit on `main`. Commit it.
 - Skills: `/plugin marketplace add adobe/skills`, then `aem-edge-delivery-services` (24 skills, incl. `docs-search`).
