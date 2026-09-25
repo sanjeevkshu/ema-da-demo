@@ -7,7 +7,7 @@ local `aem up` server but rendered differently on the published
 not. These rules make future Figma→EDS migrations produce identical local and
 published output.
 
-## The 4 DA transformations that bit us
+## The DA/authoring traps that bit us
 
 1. **Inline `class` attributes on content elements are stripped.**
    `<a class="button primary">` / `<p class="pdp-price">` lose their class on
@@ -33,6 +33,29 @@ published output.
 4. **DA source API needs a full HTML document** (`<body><header></header>
    <main>…</main><footer></footer></body>`), not the bare `.plain.html`
    fragment. Uploading a fragment stores an empty page.
+
+5. **Every top-level `<div>` in `.plain.html` is a section.** A block has to
+   sit *inside* one: `<div><div class="carousel">…</div></div>`. Writing
+   `<div class="carousel">` at the top level turns the class into a section
+   class (`section carousel`) and the block never decorates.
+
+6. **One missing `</div>` merges every section after it.** The unclosed section
+   swallows the ones that follow: they lose their own section-metadata styles,
+   take on the parent's, and their blocks render unstyled. This hit the home
+   page ("What they are saying" rendered plain) and then `/discover`, because
+   the same columns snippet was copied between generators. Before publishing,
+   check that `<div` and `</div>` counts match and that the rendered
+   `main > .section` count equals the number of authored sections:
+
+   ```sh
+   for f in content/*.plain.html; do
+     o=$(grep -o '<div' "$f" | wc -l); c=$(grep -o '</div>' "$f" | wc -l)
+     [ "$o" = "$c" ] || echo "UNBALANCED $f ($o open / $c close)"
+   done
+   ```
+
+   A zero net count is not enough: an extra close later in the file can cancel
+   a missing one earlier. When a page looks wrong, count each section separately.
 
 ## Non-negotiable verification step
 
@@ -60,3 +83,34 @@ Uploading to DA + calling `admin.hlx.page/preview/...` puts content on the
 PREVIEW tier only. Going live needs the **publish** step
 (`admin.hlx.page/live/...`) — and code needs the **PR merged to `main`**. Until
 both happen, `…aem.live/<page>` returns 404 and the UI sync counter stays > 0.
+
+Order: upload source (`admin.da.live/source/{org}/{site}/{path}.html`) →
+preview (`POST admin.hlx.page/preview/{org}/{site}/main/{path}`) → live
+(`POST admin.hlx.page/live/…`) → block-class audit. The `da-publish` skill
+(`.claude/skills/da-publish/SKILL.md`) has the full runbook.
+
+## Reading DA responses correctly
+
+Each of these was misread at least once during a publish:
+
+- **`201 Created` is success.** New assets return 201; overwritten documents
+  return 200. Accept both.
+- **`401` from `content.da.live` does not mean the file is missing.** Reads there
+  need auth too. Check existence with a `GET` on `admin.da.live/source/...`,
+  the same auth path the upload used.
+- **A `401` on upload means the credential opt-in is off**, or it was just
+  enabled and hasn't taken effect yet. It applies from the next turn. Never ask
+  for a token in chat.
+- **DA rewrites image references** to content-addressed `./media_<hash>.png`.
+  Images published seconds ago can fail to load until the media is optimized.
+  Before reporting broken images, re-check the `media_` URLs on the live host
+  about a minute later.
+- **The home page is `/`.** `/index` returns 404 on `.aem.live`, and that is expected.
+
+## Local preview limits
+
+- Pages are served at `/content/<slug>` with no extension. `/content/<slug>.html`
+  returns 404. New pages render without restarting the server.
+- The header and footer fetch `/nav` and `/footer` from the site root, which the
+  local server can serve from the published `--url` host. **Local preview can't
+  confirm nav/footer edits.** Verify them on `.aem.page` after publishing.

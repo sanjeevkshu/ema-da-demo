@@ -47,6 +47,30 @@ are hardest to see.
   interval in the block as a belt-and-braces measure.
 - Control media queries with the `setReducedMotion()` helper.
 
+## Harness gotchas (each cost a debugging round)
+
+- **Importing any block runs `scripts/scripts.js`**, and its `loadPage()`
+  executes at import. Against an empty jsdom document it rejects
+  asynchronously, and Node marks the whole test file failed even when every
+  assertion passes. `test/setup.js` installs a page skeleton
+  (`header`, `main > .section`, `footer`) so the bootstrap finishes cleanly.
+  Keep the skeleton.
+- **Set `window.hlx` before importing** any block that pulls in `scripts.js`.
+- **`navigator` is a read-only getter in Node 24.** Assigning to it throws;
+  `setup.js` falls back to `Object.defineProperty`.
+- **Use real `aem.js` exports only.** `fetchPlaceholders` does not exist in
+  the vendored `aem.js`. Check the export list at the bottom of the file first.
+- **Module-scoped `matchMedia` handles can't be switched per test.**
+  `header.js` reads `isDesktop` once at load, so its desktop/mobile keyboard
+  branches stay uncovered. That is why `header.js` sits near 72% lines. To
+  make that logic testable, read the query inside functions.
+- **Timers keep the process alive.** Expose `stop()` from `decorate` and call it
+  when a test ends. Also `unref()` intervals in the block.
+- **Network-backed blocks** (header, footer, fragment, widget) need
+  `mockFetch()` from `setup.js`. The header expects the nav fragment as three
+  sibling top-level divs (brand, sections, tools), the same shape as
+  `nav.plain.html`.
+
 ## Current coverage (baseline)
 
 All 23 blocks now have functional tests (81 tests total). Aggregate:

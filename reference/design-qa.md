@@ -121,3 +121,17 @@ survives on production.
 
 All 5 PULSE pages now verified on the published `…aem.page` site with measured
 computed styles. SIGNED OFF.
+
+## Round-5: Hero Carousel release (home, discover, 3 PDPs)
+
+| # | Area | Build issue | Root cause | Fix | Verified |
+|---|------|-------------|------------|-----|----------|
+| 1 | `carousel` block | Never decorated; slides stacked as plain content | Authored as a top-level `<div class="carousel">`, so it became a section class | Wrap the block in a section div | ✅ region, 3 slides, counter, dots |
+| 2 | `carousel` block | Module failed to load | Imported `fetchPlaceholders`, which the vendored `aem.js` doesn't export | Removed the import; label comes from `data-label` | ✅ |
+| 3 | Home "What they are saying" | Unstyled; 4 of 6 sections rendered | Missing `</div>` in the columns section merged testimonials and CTA into it | Close the section; rule 6 in `da-authoring-rules.md` | ✅ 6 sections, cards 2px border / 24px radius, on live |
+| 4 | `/discover` | Same as #3 (CTA absorbed) | Columns snippet copied from the home generator | Same fix | ✅ 6 sections |
+| 5 | Header Products | Submenu always open, no toggle | No collapse CSS; toggle was desktop-only | Click toggle on all viewports, caret, desktop panel | ✅ 3 tests |
+| 6 | Home images | 3 images "broken" just after publish | **False positive**: media optimization lag after publish | None; all 10 `media_` assets returned 200 a minute later | ✅ 0 broken on reload |
+
+Lesson: #3 and #4 are the same defect, copied. When a structural bug is fixed in
+one generator, grep the other generators for the same snippet before closing it.
