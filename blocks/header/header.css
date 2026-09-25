@@ -316,9 +316,99 @@ header nav .nav-sections .default-content-wrapper > ul > li[aria-current='page']
   }
 }
 
-/* tools — SHOP NOW CTA */
+/* tools — search toggle + SHOP NOW CTA */
 header nav .nav-tools {
   grid-area: tools;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+header nav .nav-search-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--pulse-radius-pill);
+  background: transparent;
+  cursor: pointer;
+}
+
+header nav .nav-search-toggle:hover,
+header nav .nav-search-toggle[aria-expanded='true'] {
+  border-color: var(--pulse-ink);
+  background-color: var(--pulse-surface);
+}
+
+header nav .nav-search-toggle:focus-visible {
+  outline: 3px solid var(--pulse-blue);
+  outline-offset: 2px;
+}
+
+header nav .nav-search-toggle .icon,
+header nav .nav-search-toggle img {
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+
+/* inline search form under the bar */
+header .nav-search {
+  box-sizing: border-box;
+  display: flex;
+  gap: 12px;
+  max-width: var(--pulse-content-max);
+  margin: auto;
+  padding: 12px var(--pulse-content-pad) 16px;
+  font-family: var(--pulse-font);
+}
+
+header .nav-search[hidden] {
+  display: none;
+}
+
+header .nav-search-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+header .nav-search input {
+  flex: 1;
+  min-width: 0;
+  padding: 12px 16px;
+  border: 1px solid var(--pulse-ink);
+  border-radius: var(--pulse-radius-sm);
+  background-color: var(--pulse-white);
+  color: var(--pulse-ink);
+  font-family: inherit;
+  font-size: var(--pulse-fs-body);
+}
+
+header .nav-search button {
+  padding: 12px 24px;
+  border: 0;
+  border-radius: var(--pulse-radius-sm);
+  background-color: var(--pulse-blue);
+  color: var(--pulse-white);
+  font-family: inherit;
+  font-size: var(--pulse-fs-small);
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+header .nav-search input:focus-visible,
+header .nav-search button:focus-visible {
+  outline: 3px solid var(--pulse-blue);
+  outline-offset: 2px;
 }
 
 header nav .nav-tools a:any-link {

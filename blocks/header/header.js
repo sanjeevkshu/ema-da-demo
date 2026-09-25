@@ -1,4 +1,4 @@
-import { getMetadata } from '../../scripts/aem.js';
+import { decorateIcons, getMetadata } from '../../scripts/aem.js';
 import { loadFragment } from '../fragment/fragment.js';
 
 // media query match that indicates mobile/tablet width
@@ -109,6 +109,61 @@ function toggleMenu(nav, navSections, forceExpanded = null) {
 }
 
 /**
+ * Adds a search toggle to the nav tools and an inline search form under the
+ * bar. The form is a plain GET to /search, so it works before search.js loads.
+ * @param {Element} nav The nav element
+ * @returns {Element} The search form, to be placed after the nav
+ */
+function buildSearch(nav) {
+  let tools = nav.querySelector('.nav-tools');
+  if (!tools) {
+    tools = document.createElement('div');
+    tools.className = 'nav-tools';
+    nav.append(tools);
+  }
+
+  const form = document.createElement('form');
+  form.id = 'nav-search';
+  form.className = 'nav-search';
+  form.setAttribute('role', 'search');
+  form.action = '/search';
+  form.method = 'get';
+  form.hidden = true;
+  form.innerHTML = `<label class="nav-search-label" for="nav-search-input">Search the site</label>
+    <input id="nav-search-input" type="search" name="q" autocomplete="off"
+      enterkeyhint="search" placeholder="Search products and pages">
+    <button type="submit">Search</button>`;
+  const input = form.querySelector('input');
+  const current = new URLSearchParams(window.location.search).get('q');
+  if (current) input.value = current;
+
+  const toggle = document.createElement('button');
+  toggle.type = 'button';
+  toggle.className = 'nav-search-toggle';
+  toggle.setAttribute('aria-controls', form.id);
+  toggle.setAttribute('aria-expanded', 'false');
+  toggle.setAttribute('aria-label', 'Search');
+  toggle.innerHTML = '<span class="icon icon-search"></span>';
+  decorateIcons(toggle);
+
+  const setOpen = (open) => {
+    form.hidden = !open;
+    toggle.setAttribute('aria-expanded', String(open));
+    if (open) input.focus();
+  };
+  toggle.addEventListener('click', () => setOpen(form.hidden));
+  form.addEventListener('keydown', (e) => {
+    if (e.code !== 'Escape') return;
+    e.stopPropagation();
+    setOpen(false);
+    toggle.focus();
+  });
+
+  tools.prepend(toggle);
+  return form;
+}
+
+/**
  * loads and decorates the header, mainly the nav
  * @param {Element} block The header block element
  */
@@ -188,8 +243,10 @@ export default async function decorate(block) {
   toggleMenu(nav, navSections, isDesktop.matches);
   isDesktop.addEventListener('change', () => toggleMenu(nav, navSections, isDesktop.matches));
 
+  const searchForm = buildSearch(nav);
+
   const navWrapper = document.createElement('div');
   navWrapper.className = 'nav-wrapper';
-  navWrapper.append(nav);
+  navWrapper.append(nav, searchForm);
   block.append(navWrapper);
 }

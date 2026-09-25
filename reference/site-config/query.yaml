@@ -1,0 +1,40 @@
+# Query index for sanjeevkshu/ema-da-demo (Config Service: content/query.yaml).
+# This file is the reviewed copy; the live config is set with
+# `POST https://admin.hlx.page/config/sanjeevkshu/sites/ema-da-demo/content/query.yaml`.
+# Pages are indexed when published. The sitemap (sitemap.yaml) and the search
+# block both read /query-index.json.
+version: 1
+indices:
+  site:
+    target: /query-index.json
+    include:
+      - /**
+    exclude:
+      - /docs/**
+      - /fragments/**
+      - /drafts/**
+      - /nav
+      - /footer
+      - /search
+    properties:
+      title:
+        select: head > meta[property="og:title"]
+        value: replace(attribute(el, "content"), " — PULSE", "")
+      description:
+        select: head > meta[name="description"]
+        value: attribute(el, "content")
+      image:
+        select: head > meta[property="og:image"]
+        value: match(attribute(el, "content"), "https:\/\/[^/]+(\/[^?]*)")
+      imageAlt:
+        select: head > meta[property="og:image:alt"]
+        value: attribute(el, "content")
+      headings:
+        select: main h1, main h2, main h3
+        values: textContent(el)
+      robots:
+        select: head > meta[name="robots"]
+        value: attribute(el, "content")
+      lastModified:
+        select: none
+        value: parseTimestamp(headers["last-modified"], "ddd, DD MMM YYYY hh:mm:ss GMT")
