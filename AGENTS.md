@@ -16,6 +16,12 @@ Edge Delivery Services. Read a block first. Omissions are in the repo or known.
 
 ## Outdated
 - `fstab.yaml`, `helix-query.yaml`, `paths.json` are retired. Config lives at tools.aem.live.
+  The index and sitemap live in the Config Service. `reference/site-config/*.yaml`
+  are the reviewed copies: edit one, `POST` it to
+  `admin.hlx.page/config/sanjeevkshu/sites/ema-da-demo/content/<file>`, then reindex
+  (`POST admin.hlx.page/index/.../main/<path>`) or regenerate the sitemap
+  (`POST admin.hlx.page/sitemap/.../main/sitemap.xml`). A sitemap without
+  `origin` or `cdn.prod.host` writes `https://undefined/` URLs.
 
 ## Remember
 - `npx -y @adobe/aem-cli up`: local code, previewed content.

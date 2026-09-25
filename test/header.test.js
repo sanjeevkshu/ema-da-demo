@@ -138,3 +138,61 @@ describe('header: mobile', () => {
     assert.equal(nav.getAttribute('aria-expanded'), 'true');
   });
 });
+
+describe('header: search', () => {
+  beforeEach(() => {
+    installDom();
+    window.hlx = { codeBasePath: '', lighthouse: false };
+    desktop.matches = true;
+  });
+
+  const parts = (root) => ({
+    toggle: root.querySelector('.nav-search-toggle'),
+    form: root.querySelector('#nav-search'),
+  });
+
+  test('adds a labelled toggle to the tools and a hidden GET form to /search', async () => {
+    const { nav } = await mountHeader();
+    const { toggle, form } = parts(nav.parentElement);
+    assert.equal(toggle.closest('.nav-tools'), nav.querySelector('.nav-tools'));
+    assert.equal(toggle.getAttribute('aria-controls'), 'nav-search');
+    assert.equal(toggle.getAttribute('aria-expanded'), 'false');
+    assert.equal(toggle.getAttribute('aria-label'), 'Search');
+    assert.ok(toggle.querySelector('img[src$="/icons/search.svg"]'));
+    assert.equal(form.hidden, true);
+    assert.equal(new URL(form.action).pathname, '/search');
+    assert.equal(form.method, 'get');
+    assert.equal(form.querySelector('label').htmlFor, form.querySelector('input').id);
+  });
+
+  test('the toggle opens the form and focuses the field; clicking again closes it', async () => {
+    const { nav } = await mountHeader();
+    const { toggle, form } = parts(nav.parentElement);
+    toggle.click();
+    assert.equal(form.hidden, false);
+    assert.equal(toggle.getAttribute('aria-expanded'), 'true');
+    assert.equal(document.activeElement, form.querySelector('input'));
+    toggle.click();
+    assert.equal(form.hidden, true);
+    assert.equal(toggle.getAttribute('aria-expanded'), 'false');
+  });
+
+  test('Escape in the form closes it and returns focus to the toggle', async () => {
+    const { nav } = await mountHeader();
+    const { toggle, form } = parts(nav.parentElement);
+    toggle.click();
+    form.dispatchEvent(new window.KeyboardEvent('keydown', { code: 'KeyA', bubbles: true }));
+    assert.equal(form.hidden, false, 'other keys leave it open');
+    form.dispatchEvent(new window.KeyboardEvent('keydown', { code: 'Escape', bubbles: true }));
+    assert.equal(form.hidden, true);
+    assert.equal(document.activeElement, toggle);
+  });
+
+  test('prefills the current ?q= and creates tools when the nav has none', async () => {
+    window.history.replaceState(null, '', '/search?q=loop');
+    const { nav } = await mountHeader(NAV.replace('<div><p><a href="/product-discovery">Shop Now</a></p></div>', ''));
+    const { toggle, form } = parts(nav.parentElement);
+    assert.equal(form.querySelector('input').value, 'loop');
+    assert.ok(toggle.closest('.nav-tools'));
+  });
+});

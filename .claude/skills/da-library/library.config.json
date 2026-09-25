@@ -114,6 +114,10 @@
         ]
       ]
     },
+    "search": {
+      "name": "Search",
+      "description": "Site search box and results, filtered as the visitor types. Use once, on the /search page. Leave the cell empty to search the whole site, or put a link to another index (for example /products/query-index.json)."
+    },
     "specs": {
       "name": "Specs",
       "description": "Technical specification list for a product. One row per spec: label and value."
@@ -184,6 +188,7 @@
     "landing-page": "Landing page",
     "about": "About",
     "article": "Article",
-    "shop": "Shop"
+    "shop": "Shop",
+    "search": "Search results"
   }
 }
