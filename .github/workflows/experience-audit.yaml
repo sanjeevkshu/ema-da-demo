@@ -1,0 +1,83 @@
+name: Experience audit
+
+# Lighthouse on the live site after every push to main: one page per page type
+# (.github/page-types.json, generated with the DA library), mobile and desktop.
+# Report only: scores land in the run summary and as warnings, never as a
+# failed build. PRs keep their own gate in lighthouse.yaml.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: experience-audit-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    name: Experience audit (${{ matrix.form-factor }}, report only)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        form-factor: [mobile, desktop]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Resolve live host
+        id: host
+        env:
+          OWNER: ${{ github.repository_owner }}
+          REPO: ${{ github.event.repository.name }}
+          BRANCH: ${{ github.ref_name }}
+        run: |
+          SAFE_BRANCH=$(echo "$BRANCH" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g')
+          echo "url=https://${SAFE_BRANCH}--${REPO}--${OWNER}.aem.live" >> "$GITHUB_OUTPUT"
+
+      - name: Wait for the live host to serve this push
+        if: github.event_name == 'push'
+        env:
+          HOST: ${{ steps.host.outputs.url }}
+          BEFORE: ${{ github.event.before }}
+        run: |
+          files=$(git diff --name-only "$BEFORE" "$GITHUB_SHA" || git diff --name-only HEAD~1 HEAD)
+          node .github/scripts/wait-for-code.mjs "$HOST" $files
+
+      - name: Install Lighthouse CI
+        run: npm install -g @lhci/cli@0.14.x
+
+      # is-crawlable is skipped in the config: *.aem.live sends
+      # "x-robots-tag: noindex" on purpose, which would cost every page SEO points.
+      - name: Audit one page per page type
+        continue-on-error: true
+        env:
+          HOST: ${{ steps.host.outputs.url }}
+          FORM_FACTOR: ${{ matrix.form-factor }}
+        run: |
+          urls=()
+          for p in $(node -e "require('./.github/page-types.json').forEach((t) => console.log(t.path))"); do
+            urls+=("--url=${HOST}${p}")
+          done
+          preset=()
+          [ "$FORM_FACTOR" = desktop ] && preset=(--settings.preset=desktop)
+          lhci collect --config=.github/lighthouserc-audit.json "${preset[@]}" "${urls[@]}"
+          lhci upload --config=.github/lighthouserc-audit.json || echo "::warning title=Experience audit::report upload failed; scores are still in the summary"
+
+      - name: Summarise
+        if: always()
+        run: node .github/scripts/audit-summary.mjs .lighthouseci "${{ matrix.form-factor }}"
+
+      - name: Keep the raw reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: experience-audit-${{ matrix.form-factor }}
+          path: .lighthouseci/
+          retention-days: 30
+          if-no-files-found: ignore

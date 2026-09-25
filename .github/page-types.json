@@ -1,0 +1,89 @@
+[
+  {
+    "name": "Home",
+    "path": "/",
+    "pages": [
+      "index"
+    ]
+  },
+  {
+    "name": "About",
+    "path": "/about",
+    "pages": [
+      "about"
+    ]
+  },
+  {
+    "name": "Article",
+    "path": "/article",
+    "pages": [
+      "article"
+    ]
+  },
+  {
+    "name": "Contact",
+    "path": "/contact",
+    "pages": [
+      "contact"
+    ]
+  },
+  {
+    "name": "Discover",
+    "path": "/discover",
+    "pages": [
+      "discover"
+    ]
+  },
+  {
+    "name": "Brand story",
+    "path": "/know-the-brand",
+    "pages": [
+      "know-the-brand"
+    ]
+  },
+  {
+    "name": "Landing page",
+    "path": "/landing-page",
+    "pages": [
+      "landing-page"
+    ]
+  },
+  {
+    "name": "Lifestyle",
+    "path": "/lifestyle-vision",
+    "pages": [
+      "lifestyle-vision"
+    ]
+  },
+  {
+    "name": "Shop",
+    "path": "/shop",
+    "pages": [
+      "product-detail-page",
+      "shop"
+    ]
+  },
+  {
+    "name": "Product details",
+    "path": "/product-details",
+    "pages": [
+      "product-details"
+    ]
+  },
+  {
+    "name": "Product listing",
+    "path": "/product-discovery",
+    "pages": [
+      "product-discovery"
+    ]
+  },
+  {
+    "name": "Product (Pulse range)",
+    "path": "/pulse-band-neo",
+    "pages": [
+      "pulse-band-neo",
+      "pulse-loop",
+      "pulse-vision-ar"
+    ]
+  }
+]

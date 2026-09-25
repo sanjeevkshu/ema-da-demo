@@ -20,6 +20,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '../../..');
 const PAGE_BLOCKS_IGNORED = ['metadata', 'section-metadata', 'library-metadata'];
+export const PAGE_TYPES_FILE = path.join(ROOT, '.github', 'page-types.json');
 
 export function loadConfig(file = path.join(HERE, 'library.config.json')) {
   return JSON.parse(fs.readFileSync(file, 'utf8'));
@@ -145,6 +146,11 @@ export function placeholderMetadata(html) {
   const row = /(<div>\s*<div>\s*(?:<p>)?\s*(title|description)\s*(?:<\/p>)?\s*<\/div>\s*<div>)[\s\S]*?(?=<\/div>)/g;
   const replaced = meta.html.replace(row, (all, prefix, key) => `${prefix}<p>${values[key]}</p>`);
   return html.replace(meta.html, replaced);
+}
+
+/** URL path a page is served at; the home page is `/`, not `/index`. */
+export function pagePath(slug) {
+  return slug === 'index' ? '/' : `/${slug}`;
 }
 
 /** Home first, then pages alphabetically. */
@@ -285,7 +291,7 @@ export function build({
       pageTypes: pageTypes.map(({
         name, representative, pages: members, signature,
       }) => ({
-        name, representative, pages: members, blocks: signature,
+        name, representative, path: pagePath(representative), pages: members, blocks: signature,
       })),
       blocks: blockReport,
       warnings,
@@ -321,6 +327,10 @@ function main() {
     fs.writeFileSync(f, body);
   });
   fs.writeFileSync(path.join(out, 'report.json'), `${JSON.stringify(report, null, 2)}\n`);
+  // committed: the experience audit on main audits one page per type
+  const types = report.pageTypes.map(({ name, path: p, pages }) => ({ name, path: p, pages }));
+  fs.writeFileSync(PAGE_TYPES_FILE, `${JSON.stringify(types, null, 2)}\n`);
+  console.log(`${path.relative(ROOT, PAGE_TYPES_FILE)}: ${types.length} page types (commit it if it changed)`);
   console.log(`${Object.keys(docs).length} files in ${path.relative(ROOT, out)}/`);
   report.pageTypes.forEach((t) => console.log(`  template ${t.name}: ${t.representative} (${t.pages.join(', ')})`));
   report.warnings.forEach((w) => console.log(`  ! ${w}`));
