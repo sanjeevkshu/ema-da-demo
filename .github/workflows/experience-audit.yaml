@@ -6,7 +6,7 @@ name: Experience audit
 # failed build. PRs keep their own gate in lighthouse.yaml.
 on:
   push:
-    branches: [main, feat/experience-audit] # TEMP: trial run, reverted before PR
+    branches: [main]
   workflow_dispatch:
 
 concurrency:
