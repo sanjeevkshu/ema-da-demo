@@ -1,5 +1,5 @@
 # Reviewed copy of the Config Service robots.txt for sanjeevkshu/ema-da-demo.
-# Served on the production domain (https://pulse-proxy-redirect.vercel.app).
+# Served on the production domain (https://pulse-portal-ivory.vercel.app).
 # *.aem.page and *.aem.live always serve the platform's own disallow-all.
 
 # Allow Adobe Brand Concierge and Brand Visibility to ingest content
@@ -18,4 +18,4 @@ Allow: /
 User-agent: *
 Disallow: /
 
-Sitemap: https://pulse-proxy-redirect.vercel.app/sitemap.xml
+Sitemap: https://pulse-portal-ivory.vercel.app/sitemap.xml
