@@ -85,15 +85,17 @@ Also note the **IMS Org ID** (`…@AdobeOrg`, shown in the Admin Console). It go
 > 1. **Knowledge Sources:** check the auto-created source's status and **Fix Issues** file.
 > 2. **Add a Website Links source by hand.** Upload the CSV `knowledge-source-urls.csv`, so no link-following is needed. Then add the **Knowledge Base Search** integration pointing at it, and turn on **Site Advisory** (Modify → Use recommended).
 > 3. **If it's still refused (robots):** upload a PDF/DOCX knowledge document, plus the Product Catalog sheet. Neither needs a crawl.
-> 4. **Lasting fix (done 2026-09-25):** the site is served on `https://pulse-portal-ivory.vercel.app`, a Vercel reverse proxy, and `cdn.prod.host` is set. Recreate the concierge from that URL.
->    - That domain gets `reference/site-config/robots.txt` (already applied), which allows the Adobe crawlers and disallows everyone else.
->    - Confirm the crawler user-agent tokens with Adobe first; they aren't in the public docs.
->    - Re-point the knowledge source at that domain.
+> 4. **Lasting fix (done, and it works):**
+>    - The site is served on `https://pulse-portal-ivory.vercel.app`, a Vercel reverse proxy, and `cdn.prod.host` is set.
+>    - The domain's `robots.txt` (`reference/site-config/robots.txt`) must allow **`AdobeAgentComposer`**. That's Composer's crawler, verified on 2026-09-26 in the Vercel request logs: `Mozilla/5.0 (compatible; AdobeAgentComposer/1.0)`.
+>    - With that group in place, the concierge was created with its knowledge base, integration and skills.
+>    - The names first guessed (`Adobe-BrandConcierge`, `Adobe-Extractor`) weren't what Composer sent, so it fell into `User-agent: *` / `Disallow: /`.
+>    - **If Adobe changes the crawler:** a new *"couldn't process your website content"* error means checking the Vercel logs for the user agent on `/robots.txt`, then adding it.
 
 ## 4. Knowledge sources, skills, visual style (Marketer)
 
 1. **Knowledge source → Website Links → Sitemap URL:** `https://pulse-portal-ivory.vercel.app/sitemap.xml`, 10 pages. Schedule a weekly refresh.
-2. **Watch the first crawl status.** It shows whether the Adobe crawler identifies itself with one of the allowed user agents.
+2. **Watch the first crawl status.** It needs `AdobeAgentComposer` allowed in `robots.txt`, as it already is.
    - **Success:** done. Public search engines stay out: the domain's `robots.txt` disallows every other crawler, and `.aem.live` stays blocked by the platform.
    - **Partial success, or fails:** use **Fix Issues** to download the error list. If it's a robots block, ask Adobe for the crawler's exact user-agent token, and add it to `reference/site-config/robots.txt` and the Config Service.
 3. **Knowledge source → Product Catalog:** pick a schema, download Adobe's sample sheet, copy in `product-catalog.csv`, and upload it.

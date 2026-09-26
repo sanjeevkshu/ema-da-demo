@@ -172,7 +172,7 @@ Follow-ups:
 | Product Catalog | `product-catalog.csv`: the 4 products with pages. This enables product cards and deep links. Add the 6 products without pages once they have pages. |
 | Skills | Site Advisory (default). Product Advisory, using Knowledge Base Search and Entity Linking. |
 | Not applicable | Commerce MCP (the site isn't on Adobe Commerce); Meeting Booking and Live Chat (B2C, no sales team) |
-| Host | **Production domain `https://pulse-portal-ivory.vercel.app`**, a Vercel reverse proxy in front of `main--ema-da-demo--sanjeevkshu.aem.live`. It serves the custom `robots.txt`, which allows `Adobe-BrandConcierge` and `Adobe-Extractor` and disallows everyone else, and it sends no `noindex` header. Point Brand Concierge here, not at `.aem.live`. For history: **Check the first crawl.** The `.aem.live` hosts send `x-robots-tag: noindex` and a disallow-all `robots.txt`, and Adobe doesn't document whether its crawler honours them. If the source shows *Partial success*, use **Fix Issues** to see the failures, or crawl the production domain. |
+| Host | **Production domain `https://pulse-portal-ivory.vercel.app`**, a Vercel reverse proxy in front of `main--ema-da-demo--sanjeevkshu.aem.live`. It serves the custom `robots.txt`, which allows Brand Concierge's crawler **`AdobeAgentComposer`** (verified in the Vercel logs) and `Spacecat`, and disallows everyone else. It sends no `noindex` header. Point Brand Concierge here, not at `.aem.live`. For history: **Check the first crawl.** The `.aem.live` hosts send `x-robots-tag: noindex` and a disallow-all `robots.txt`, and Adobe doesn't document whether its crawler honours them. If the source shows *Partial success*, use **Fix Issues** to see the failures, or crawl the production domain. |
 
 ---
 
