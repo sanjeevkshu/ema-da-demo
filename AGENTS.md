@@ -25,7 +25,9 @@ Edge Delivery Services. Read a block first. Omissions are in the repo or known.
 - Production domain: `https://pulse-portal-ivory.vercel.app`, a Vercel reverse
   proxy to `main--…aem.live` (`cdn.prod.host`). Only that domain serves the
   custom `robots.txt` (`reference/site-config/robots.txt`), which allows the
-  Adobe crawlers and disallows everyone else until launch. `*.aem.page` and
+  Adobe crawlers and disallows everyone else until launch. Brand Concierge's
+  crawler is `AdobeAgentComposer` (verified in the Vercel logs); without it
+  Composer can't process the site. `*.aem.page` and
   `*.aem.live` always serve the platform's disallow-all and `noindex, nofollow`.
 
 ## Remember
