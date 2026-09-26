@@ -1,14 +1,14 @@
 # Sitemap for sanjeevkshu/ema-da-demo (Config Service: content/sitemap.yaml).
 # Built from the query index, so it lists published site pages only (no nav,
 # footer, fragments or library docs) and skips pages with robots: noindex.
-# URLs use the production domain (cdn.prod.host = pulse-proxy-redirect.vercel.app,
+# URLs use the production domain (cdn.prod.host = pulse-portal-ivory.vercel.app,
 # a Vercel reverse proxy in front of main--ema-da-demo--sanjeevkshu.aem.live).
 # `origin` is kept explicit: without it and without cdn.prod.host, every URL
 # reads https://undefined/.
 version: 1
 sitemaps:
   site:
-    origin: https://pulse-proxy-redirect.vercel.app
+    origin: https://pulse-portal-ivory.vercel.app
     source: /query-index.json
     destination: /sitemap.xml
     lastmod: YYYY-MM-DD

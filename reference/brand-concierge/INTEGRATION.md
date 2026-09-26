@@ -25,7 +25,7 @@ Sources:
 | 6 | Deployment config in Composer | Marketer + IT | Steps 2, 5 |
 | 7 | Website config and branch test | Web team | Steps 2, 6 |
 | 8 | Surface rules | Marketer | Step 7 |
-| 9 | Go live on `.aem.live`, then `pulse-proxy-redirect.vercel.app` | All | Steps 1–8 |
+| 9 | Go live on `.aem.live`, then `pulse-portal-ivory.vercel.app` | All | Steps 1–8 |
 | 10 | Operate | Marketer | Live |
 
 ---
@@ -53,7 +53,7 @@ In the right sandbox, go to **Data Collection → Datastreams → New datastream
 |---|---|---|---|
 | `pulse-bc-dev` | development | `*.aem.page` branch previews, `localhost` | `dev` |
 | `pulse-bc-stage` | development (or a stage sandbox) | `main--ema-da-demo--sanjeevkshu.aem.live` | `stage` |
-| `pulse-bc-prod` | production | `pulse-proxy-redirect.vercel.app` (production domain) | `prod` |
+| `pulse-bc-prod` | production | `pulse-portal-ivory.vercel.app` (production domain) | `prod` |
 
 Also note the **IMS Org ID** (`…@AdobeOrg`, shown in the Admin Console). It goes in `CONFIG.orgId`.
 
@@ -65,7 +65,7 @@ Also note the **IMS Org ID** (`…@AdobeOrg`, shown in the Admin Console). It go
 
 ## 3. Create the concierge (Marketer, Composer)
 
-1. In the **development** sandbox, open Brand Concierge → create a concierge from **`https://pulse-proxy-redirect.vercel.app/`**, the production domain. Its `robots.txt` admits the Adobe crawlers. Don't use `.aem.live`: see the known issue below.
+1. In the **development** sandbox, open Brand Concierge → create a concierge from **`https://pulse-portal-ivory.vercel.app/`**, the production domain. Its `robots.txt` admits the Adobe crawlers. Don't use `.aem.live`: see the known issue below.
 2. Review each generated draft against `README.md`, and correct it before selecting **Continue**:
    - brand expression (§1)
    - brand profile (§2)
@@ -85,14 +85,14 @@ Also note the **IMS Org ID** (`…@AdobeOrg`, shown in the Admin Console). It go
 > 1. **Knowledge Sources:** check the auto-created source's status and **Fix Issues** file.
 > 2. **Add a Website Links source by hand.** Upload the CSV `knowledge-source-urls.csv`, so no link-following is needed. Then add the **Knowledge Base Search** integration pointing at it, and turn on **Site Advisory** (Modify → Use recommended).
 > 3. **If it's still refused (robots):** upload a PDF/DOCX knowledge document, plus the Product Catalog sheet. Neither needs a crawl.
-> 4. **Lasting fix (done 2026-09-25):** the site is served on `https://pulse-proxy-redirect.vercel.app`, a Vercel reverse proxy, and `cdn.prod.host` is set. Recreate the concierge from that URL.
+> 4. **Lasting fix (done 2026-09-25):** the site is served on `https://pulse-portal-ivory.vercel.app`, a Vercel reverse proxy, and `cdn.prod.host` is set. Recreate the concierge from that URL.
 >    - That domain gets `reference/site-config/robots.txt` (already applied), which allows the Adobe crawlers and disallows everyone else.
 >    - Confirm the crawler user-agent tokens with Adobe first; they aren't in the public docs.
 >    - Re-point the knowledge source at that domain.
 
 ## 4. Knowledge sources, skills, visual style (Marketer)
 
-1. **Knowledge source → Website Links → Sitemap URL:** `https://pulse-proxy-redirect.vercel.app/sitemap.xml`, 10 pages. Schedule a weekly refresh.
+1. **Knowledge source → Website Links → Sitemap URL:** `https://pulse-portal-ivory.vercel.app/sitemap.xml`, 10 pages. Schedule a weekly refresh.
 2. **Watch the first crawl status.** It shows whether the Adobe crawler identifies itself with one of the allowed user agents.
    - **Success:** done. Public search engines stay out: the domain's `robots.txt` disallows every other crawler, and `.aem.live` stays blocked by the platform.
    - **Partial success, or fails:** use **Fix Issues** to download the error list. If it's a robots block, ask Adobe for the crawler's exact user-agent token, and add it to `reference/site-config/robots.txt` and the Config Service.
@@ -155,7 +155,7 @@ To turn it on:
    datastreams: { dev: '<pulse-bc-dev id>', stage: '<pulse-bc-stage id>', prod: '' },
    region: '<conversation.region from the snippet>',
    ```
-   - Set `prod` (the `pulse-bc-prod` datastream) only when the concierge should go live on `pulse-proxy-redirect.vercel.app`. While it's empty, the production domain simply doesn't load the concierge.
+   - Set `prod` (the `pulse-bc-prod` datastream) only when the concierge should go live on `pulse-portal-ivory.vercel.app`. While it's empty, the production domain simply doesn't load the concierge.
    - If the snippet uses a newer Web SDK, update `ALLOY_URL`. Keep the version **pinned** (never "latest"), so an SDK update can't change the site without a PR.
 3. Replace `scripts/brand-concierge-styles.json` with the Composer export (step 4.5).
 4. Run `npm run lint && npm test`. `test/brand-concierge.test.js` checks the environment mapping, surface paths, consent opt-out and lazy loading.
@@ -176,7 +176,7 @@ To turn it on:
 In **Composer → Surface**, add these domains:
 - `main--ema-da-demo--sanjeevkshu.aem.live` (stage)
 - any branch hosts used for testing
-- `pulse-proxy-redirect.vercel.app`, the production domain, at go-live
+- `pulse-portal-ivory.vercel.app`, the production domain, at go-live
 
 Path rules must **match `CONFIG.paths`**:
 - equals `/`, `/know-the-brand`, `/lifestyle-vision`, `/discover`, `/product-discovery`, `/product-details`
@@ -193,7 +193,7 @@ Leave `/contact` and `/search` out until the contact form works.
 1. Work through [`go-live-checklist.md`](https://github.com/AdobeDocs/brand-concierge.en/blob/main/help/documentation/go-live-checklist/go-live-checklist.md): knowledge sources processed, profile approved, evaluations clean, datastream set, surface reviewed, script installed, analytics access.
 2. **Legal:** approve the privacy-notice text and link (the repo draft points to `/contact`, because the site has no privacy page yet), the disclaimer, and the consent approach (loaded only after consent).
 3. Merge `develop` → `main` with a merge commit. The concierge goes live on `.aem.live`, in the stage environment. **After the merge,** check that the live site serves the new `scripts/brand-concierge.js`. On 2026-09-25 the CDN served a stale `header.js` after a merge; `POST https://admin.hlx.page/code/sanjeevkshu/ema-da-demo/main/*` fixed it.
-4. **Production domain `pulse-proxy-redirect.vercel.app`.**
+4. **Production domain `pulse-portal-ivory.vercel.app`.**
    - **Done (2026-09-25):**
      - `cdn.prod.host` set
      - sitemap `origin` switched, so all 10 URLs are on the domain
