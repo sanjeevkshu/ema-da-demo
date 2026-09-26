@@ -2,16 +2,24 @@
 # Served on the production domain (https://pulse-portal-ivory.vercel.app).
 # *.aem.page and *.aem.live always serve the platform's own disallow-all.
 
-# Allow Adobe Brand Concierge and Brand Visibility to ingest content
+# Adobe Brand Concierge (Composer) crawler. Verified 2026-09-26 in the Vercel
+# request logs: "Mozilla/5.0 (compatible; AdobeAgentComposer/1.0)".
+# Without this group, Composer reports "We couldn't process your website
+# content" and creates no knowledge base, integration or skill.
+User-agent: AdobeAgentComposer
+Allow: /
+
+# Adobe's SpaceCat scanner (LLM Optimizer / Sites Optimizer, "Brand
+# Visibility"): documented token "Spacecat/1.0".
+User-agent: Spacecat
+Allow: /
+
+# Unverified names, kept from the original request; no Adobe docs or logs
+# show them yet.
 User-agent: Adobe-BrandConcierge
 Allow: /
 
 User-agent: Adobe-Extractor
-Allow: /
-
-# Adobe's SpaceCat scanner (LLM Optimizer / Sites Optimizer): the documented
-# token is "Spacecat/1.0"; robots.txt matches the product token "Spacecat".
-User-agent: Spacecat
 Allow: /
 
 # Block all public search crawlers until launch
