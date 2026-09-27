@@ -54,8 +54,10 @@ describe('brand concierge: settings', () => {
     assert.equal(isSurface('/search', paths), false);
   });
 
-  test('stays off until IDs are set, off-surface, or with ?concierge=off', () => {
-    assert.equal(resolveConfig(at('https://main--x--y.aem.live/'), CONFIG), null, 'shipped without IDs');
+  test('stays off without IDs, off-surface, or with ?concierge=off', () => {
+    const unset = { ...CONFIG, orgId: '', datastreams: { dev: '', stage: '', prod: '' } };
+    assert.equal(resolveConfig(at('https://main--x--y.aem.live/'), unset), null, 'no IDs');
+    assert.equal(resolveConfig(at('https://main--x--y.aem.live/'), { ...configured, orgId: '' }), null);
     assert.equal(resolveConfig(at('https://main--x--y.aem.live/contact'), configured), null);
     assert.equal(resolveConfig(at('https://main--x--y.aem.live/?concierge=off'), configured), null);
     const noProd = { ...configured, datastreams: { ...configured.datastreams, prod: '' } };
@@ -70,6 +72,16 @@ describe('brand concierge: settings', () => {
     const preview = resolveConfig(at('https://b--x--y.aem.page/?concierge=debug'), configured);
     assert.equal(preview.datastreamId, 'ds-dev');
     assert.equal(preview.debug, true);
+  });
+
+  test('the shipped config is set for every environment', () => {
+    assert.match(CONFIG.orgId, /^[0-9A-F]{24}@AdobeOrg$/);
+    const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+    Object.values(CONFIG.datastreams).forEach((id) => assert.match(id, uuid));
+    assert.equal(CONFIG.region, 'va7');
+    const live = resolveConfig(at('https://main--ema-da-demo--sanjeevkshu.aem.live/pulse-loop'), CONFIG);
+    assert.equal(live.env, 'stage');
+    assert.equal(resolveConfig(at('https://pulse-portal-ivory.vercel.app/pulse-loop'), CONFIG).env, 'prod');
   });
 
   test('the shipped surface list leaves out search and contact', () => {
@@ -220,7 +232,16 @@ describe('brand concierge: launcher', () => {
   });
   /* eslint-enable no-console */
 
-  test('init does nothing while the IDs are unset', () => {
+  test('init mounts the launcher and its styles on a surface page', () => {
+    const { launcher } = init();
+    assert.equal(document.querySelector('.concierge-launcher'), launcher);
+    assert.ok(document.querySelector('link[href$="/styles/brand-concierge.css"]'));
+  });
+
+  test('init does nothing with ?concierge=off or off-surface', () => {
+    window.history.replaceState(null, '', '/?concierge=off');
+    assert.equal(init(), null);
+    window.history.replaceState(null, '', '/contact');
     assert.equal(init(), null);
     assert.equal(document.querySelector('.concierge-launcher'), null);
   });
