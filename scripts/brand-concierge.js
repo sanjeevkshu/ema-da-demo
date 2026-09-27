@@ -17,12 +17,14 @@ export const WEB_CLIENT_URL = 'https://experience.adobe.net/solutions/experience
 
 export const CONFIG = {
   // IMS Org ID (Adobe Admin Console), e.g. '1234567890ABCDEF@AdobeOrg'
-  orgId: '',
-  // one datastream per environment: AEP > Data Collection > Datastreams
+  orgId: 'D1D7123F524450A60A490D45@AdobeOrg',
+  // one datastream per environment: AEP > Data Collection > Datastreams.
+  // For now all three share one datastream (one sandbox), so test traffic
+  // lands in the same datasets as real visits; split them before launch.
   datastreams: {
-    dev: '', // *.aem.page and localhost (branch previews)
-    stage: '', // *.aem.live (pre-launch site)
-    prod: '', // production domain: pulse-portal-ivory.vercel.app
+    dev: '80c63552-5c28-48a4-9b5c-812e3e859d16', // *.aem.page and localhost (branch previews)
+    stage: '80c63552-5c28-48a4-9b5c-812e3e859d16', // *.aem.live (pre-launch site)
+    prod: '80c63552-5c28-48a4-9b5c-812e3e859d16', // production domain: pulse-portal-ivory.vercel.app
   },
   // conversation.region from the install snippet Composer generates
   region: 'va7',
@@ -132,9 +134,16 @@ export function mountLauncher(cfg, { doc = document, start = startConcierge } = 
   close.className = 'concierge-close';
   close.setAttribute('aria-label', 'Close chat');
   close.textContent = '×';
+  // header bar above the chat, so the Web Client's layers can't cover close
+  const header = doc.createElement('div');
+  header.className = 'concierge-header';
+  const title = doc.createElement('span');
+  title.className = 'concierge-title';
+  title.textContent = cfg.label;
+  header.append(title, close);
   const mount = doc.createElement('div');
   mount.id = 'brand-concierge-mount';
-  panel.append(close, mount);
+  panel.append(header, mount);
 
   let started;
   const setOpen = (open) => {
