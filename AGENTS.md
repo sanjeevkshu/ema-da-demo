@@ -61,6 +61,12 @@ Edge Delivery Services. Read a block first. Omissions are in the repo or known.
 - Brand Concierge (`scripts/brand-concierge.js`) loads only via `consented.js`,
   and its SDKs load only on the first launcher open. Never move it into
   `head.html` or the eager/lazy phases. `CONFIG.paths` must match the Composer
-  surface rules. Pin the Web SDK version. `brand-concierge-styles.json` is the
-  Composer export. Setup: `reference/brand-concierge/INTEGRATION.md`.
+  surface rules. Pin the Web SDK version. `brand-concierge-styles.json` holds
+  the Composer text and arrays plus the site's own accessible theme; theme keys
+  must be in `reference/brand-concierge/supported-theme-variables.json`.
+  Setup: `reference/brand-concierge/INTEGRATION.md`.
+- Reusable prompts live in `reference/delivery-playbook/PROMPT-LIBRARY.md`
+  (ADLC phase, Frontier level, role). At the end of each session, or when a
+  prompt pattern proves reusable, update it unasked: `.claude/skills/prompt-library`.
+  The repo is public, so no prices, client names, credentials or IDs go in it.
 - Skills: `/plugin marketplace add adobe/skills`, then `aem-edge-delivery-services` (24 skills, incl. `docs-search`).
