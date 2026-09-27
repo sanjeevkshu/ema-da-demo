@@ -91,6 +91,32 @@ describe('brand concierge: settings', () => {
   });
 });
 
+describe('brand concierge: styling config', () => {
+  // The Web Client fails with "Unexpected error during rendering / No chat
+  // history element found in container" when any of these strings is missing
+  // (found on the branch preview, 2026-09-27). Keep them in the Composer export.
+  const REQUIRED_TEXT = [
+    'welcome.heading', 'welcome.subheading', 'input.placeholder', 'input.messageInput.aria',
+    'input.send.aria', 'input.aiChatIcon.tooltip', 'input.mic.aria', 'card.aria.select',
+    'carousel.prev.aria', 'carousel.next.aria', 'scroll.bottom.aria', 'error.network',
+    'loading.message', 'feedback.dialog.title.positive', 'feedback.dialog.title.negative',
+    'feedback.dialog.question.positive', 'feedback.dialog.question.negative',
+    'feedback.dialog.notes', 'feedback.dialog.submit', 'feedback.dialog.cancel',
+    'feedback.dialog.notes.placeholder', 'feedback.toast.success', 'feedback.thumbsUp.aria',
+    'feedback.thumbsDown.aria', 'feedback.title', 'feedback.positive.title',
+    'feedback.negative.title', 'feedback.submitButton', 'feedback.positive.options',
+    'feedback.negative.options',
+  ];
+
+  test('has every text string the Web Client needs to render', async () => {
+    const fs = await import('node:fs');
+    const styles = JSON.parse(fs.readFileSync('scripts/brand-concierge-styles.json', 'utf8'));
+    const missing = REQUIRED_TEXT.filter((key) => !(key in styles.text));
+    assert.deepEqual(missing, []);
+    assert.ok(styles.metadata && styles.theme && styles.arrays['welcome.examples'].length > 0);
+  });
+});
+
 describe('brand concierge: Web SDK', () => {
   test('the base code queues calls until the SDK loads, and is installed once', async () => {
     const win = {};

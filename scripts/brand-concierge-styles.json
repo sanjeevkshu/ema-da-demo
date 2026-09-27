@@ -7,15 +7,30 @@
     "namespace": "brand-concierge"
   },
   "behavior": {
-    "multimodalCarousel": { "cardClickAction": "openLink" },
-    "input": { "enableVoiceInput": false, "disableMultiline": true },
-    "chat": { "messageAlignment": "normal", "messageWidth": "100%" },
+    "multimodalCarousel": {
+      "cardClickAction": "openLink"
+    },
+    "input": {
+      "enableVoiceInput": false,
+      "disableMultiline": true
+    },
+    "chat": {
+      "messageAlignment": "normal",
+      "messageWidth": "100%"
+    },
     "privacyNotice": {
       "title": "Privacy notice",
       "text": "This chat is automated. What you type may be collected, used and kept by PULSE and its service providers under the {Privacy Policy}. Please don't share sensitive information such as health or payment details.",
-      "links": [{ "text": "Privacy Policy", "url": "https://pulse-portal-ivory.vercel.app/contact" }]
+      "links": [
+        {
+          "text": "Privacy Policy",
+          "url": "https://pulse-portal-ivory.vercel.app/contact"
+        }
+      ]
     },
-    "productCard": { "actionButtonSize": "S" }
+    "productCard": {
+      "actionButtonSize": "S"
+    }
   },
   "disclaimer": {
     "text": "AI answers can be wrong. Check the product page for final prices and policies."
@@ -31,7 +46,26 @@
     "loading.message": "Thinking…",
     "feedback.toast.success": "Thanks for the feedback!",
     "feedback.thumbsUp.aria": "Helpful",
-    "feedback.thumbsDown.aria": "Not helpful"
+    "feedback.thumbsDown.aria": "Not helpful",
+    "input.aiChatIcon.tooltip": "Ask PULSE",
+    "card.aria.select": "Select this option",
+    "carousel.prev.aria": "Previous",
+    "carousel.next.aria": "Next",
+    "scroll.bottom.aria": "Scroll to the latest message",
+    "feedback.dialog.title.positive": "Glad that helped",
+    "feedback.dialog.title.negative": "Sorry that missed",
+    "feedback.dialog.question.positive": "What worked for you?",
+    "feedback.dialog.question.negative": "What could we do better?",
+    "feedback.dialog.notes": "Anything else?",
+    "feedback.dialog.submit": "Send",
+    "feedback.dialog.cancel": "Cancel",
+    "feedback.dialog.notes.placeholder": "Tell us more (optional)",
+    "feedback.title": "Share your feedback",
+    "feedback.positive.title": "What worked for you?",
+    "feedback.negative.title": "What could we do better?",
+    "feedback.submitButton": "Send feedback",
+    "feedback.positive.options": "",
+    "feedback.negative.options": ""
   },
   "arrays": {
     "welcome.examples": [
@@ -59,6 +93,20 @@
         "backgroundColor": "#1e40af",
         "image": "https://pulse-portal-ivory.vercel.app/media_17e4fd20f5ddbc16a69df0ab771cb9f4657691c62.png"
       }
+    ],
+    "feedback.positive.options": [
+      "Helpful and relevant",
+      "Clear and easy to understand",
+      "Right tone for PULSE",
+      "Useful product suggestions",
+      "Other"
+    ],
+    "feedback.negative.options": [
+      "Not helpful or relevant",
+      "Confusing or unclear",
+      "Wrong product information",
+      "Too formal or robotic",
+      "Other"
     ]
   },
   "theme": {
