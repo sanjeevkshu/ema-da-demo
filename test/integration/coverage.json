@@ -1,0 +1,28 @@
+{
+  "$comment": "Every system integration, the code it lives in, and the spec that covers it. test/integration-coverage.test.js fails npm test when an integration file has no entry. See .claude/skills/integration-coverage.",
+  "integrations": {
+    "consent-gate": {
+      "code": ["scripts/consent-check.js", "scripts/consented.js"],
+      "spec": "consent.spec.js"
+    },
+    "brand-concierge": {
+      "description": "Adobe Brand Concierge Web Client + Web SDK (alloy) + AEP datastream",
+      "code": ["scripts/brand-concierge.js", "scripts/brand-concierge-styles.json", "styles/brand-concierge.css"],
+      "spec": "brand-concierge.spec.js"
+    },
+    "search-and-index": {
+      "code": ["blocks/search/search.js", "blocks/search/search.css", "reference/site-config/query.yaml"],
+      "spec": "search.spec.js"
+    },
+    "crawl-rules": {
+      "description": "Config Service robots.txt and sitemap on the production domain; *.aem.live noindex",
+      "code": ["reference/site-config/robots.txt", "reference/site-config/sitemap.yaml"],
+      "spec": "crawl.spec.js"
+    },
+    "fragments": {
+      "description": "Header and footer loaded from the /nav and /footer fragments",
+      "code": ["blocks/header/header.js", "blocks/footer/footer.js", "blocks/fragment/fragment.js"],
+      "spec": "fragments.spec.js"
+    }
+  }
+}
