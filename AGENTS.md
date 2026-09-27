@@ -51,6 +51,13 @@ Edge Delivery Services. Read a block first. Omissions are in the repo or known.
   block or styled variant has no library entry. The same run rewrites
   `.github/page-types.json`, the page list for the report-only experience
   audit on `main`. Commit it.
+- System integrations need integration checks, just as blocks need unit tests.
+  A change to Brand Concierge / Web SDK, consent, search or the index, crawl
+  rules or the production domain, header/footer, or any new file in `scripts/`
+  or `reference/site-config/` updates `test/integration/` and
+  `test/integration/coverage.json` in the same change, unasked:
+  `.claude/skills/integration-coverage`. `npm test` fails on an unmapped
+  integration file; the "Integration (gate)" workflow blocks PRs into `main`.
 - Brand Concierge (`scripts/brand-concierge.js`) loads only via `consented.js`,
   and its SDKs load only on the first launcher open. Never move it into
   `head.html` or the eager/lazy phases. `CONFIG.paths` must match the Composer

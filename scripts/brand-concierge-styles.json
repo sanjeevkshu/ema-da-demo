@@ -24,7 +24,7 @@
       "links": [
         {
           "text": "Privacy Policy",
-          "url": "https://pulse-portal-ivory.vercel.app/contact"
+          "url": "https://pulse-portal-ivory.vercel.app/privacy"
         }
       ]
     },
@@ -33,7 +33,13 @@
     }
   },
   "disclaimer": {
-    "text": "AI answers can be wrong. Check the product page for final prices and policies."
+    "text": "AI answers can be wrong. Check the product page for final prices and policies. {Terms}",
+    "links": [
+      {
+        "text": "Terms",
+        "url": "https://pulse-portal-ivory.vercel.app/terms-of-service"
+      }
+    ]
   },
   "text": {
     "welcome.heading": "What's your frequency?",

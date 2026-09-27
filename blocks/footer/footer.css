@@ -146,6 +146,22 @@ footer .footer-bottom p {
   text-transform: uppercase;
 }
 
+/* legal row: Privacy Policy · Terms of Service */
+footer .footer-bottom .footer-legal {
+  display: flex;
+  gap: var(--pulse-space-3);
+}
+
+footer .footer-bottom .footer-legal a:any-link {
+  color: var(--pulse-white-80);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+footer .footer-bottom .footer-legal a:hover {
+  color: var(--pulse-white);
+}
+
 @media (width <= 900px) {
   footer .footer > div {
     padding: var(--pulse-space-5) var(--pulse-content-pad);
