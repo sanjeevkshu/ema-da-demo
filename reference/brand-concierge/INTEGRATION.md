@@ -137,6 +137,15 @@ Also note the **IMS Org ID** (`…@AdobeOrg`, shown in the Admin Console). It go
 
 **Check:** you have the region, SDK version and options from the snippet, and they match `CONFIG` in step 7, or the differences are noted for the web team.
 
+> **If every chat message answers "I'm sorry, something went wrong" (seen 2026-09-27):**
+> - `POST https://edge.adobedc.net/brand-concierge/<region>/conversations` returns 400 with `BRANDCON-0002-400` "Request validation failure: Missing field error: 'Datastream config not found'".
+> - The Web SDK itself is fine: `/ee/v1/interact` returns 200.
+> - **Cause:** the concierge has no deployment config for that datastream.
+> - **Fix, in Composer, in the same sandbox as the datastream:**
+>   1. Open the concierge → **Deploy → Add Config**, paste the datastream ID and **save**.
+>   2. Add the test domains under **Surface**. Each message sends the page as a surface, for example `web://feat-bc-ids--ema-da-demo--sanjeevkshu.aem.page/pulse-loop`.
+>   3. Retry. No site change is needed.
+
 ## 7. Website configuration and branch test (Web team)
 
 The loader (`scripts/brand-concierge.js`) already does the following:
@@ -159,7 +168,7 @@ To turn it on:
    ```
    - Set `prod` (the `pulse-bc-prod` datastream) only when the concierge should go live on `pulse-portal-ivory.vercel.app`. While it's empty, the production domain simply doesn't load the concierge.
    - If the snippet uses a newer Web SDK, update `ALLOY_URL`. Keep the version **pinned** (never "latest"), so an SDK update can't change the site without a PR.
-3. Replace `scripts/brand-concierge-styles.json` with the Composer export (step 4.5).
+3. Replace `scripts/brand-concierge-styles.json` with the Composer export (step 4.5). **Keep the full `text` set.** If any of the 30 strings is missing, the Web Client fails with "Unexpected error during rendering / No chat history element found in container" and shows an empty panel. `test/brand-concierge.test.js` checks for all 30.
 4. Run `npm run lint && npm test`. `test/brand-concierge.test.js` checks the environment mapping, surface paths, consent opt-out and lazy loading.
 5. Push. Open `https://feat-bc-ids--ema-da-demo--sanjeevkshu.aem.page/pulse-loop?consent=accept&concierge=debug`.
    - Until a real consent manager replaces `scripts/consent-check.js`, `?consent=accept` stands in for accepting the banner.
