@@ -22,9 +22,9 @@ export const CONFIG = {
   // For now all three share one datastream (one sandbox), so test traffic
   // lands in the same datasets as real visits; split them before launch.
   datastreams: {
-    dev: '80c63552-5c28-48a4-9b5c-812e3e859d16', // *.aem.page and localhost (branch previews)
-    stage: '80c63552-5c28-48a4-9b5c-812e3e859d16', // *.aem.live (pre-launch site)
-    prod: '80c63552-5c28-48a4-9b5c-812e3e859d16', // production domain: pulse-portal-ivory.vercel.app
+    dev: '43e284e9-181c-45da-aa83-0d7222122144', // *.aem.page and localhost (branch previews)
+    stage: '43e284e9-181c-45da-aa83-0d7222122144', // *.aem.live (pre-launch site)
+    prod: '43e284e9-181c-45da-aa83-0d7222122144', // production domain: pulse-portal-ivory.vercel.app
   },
   // conversation.region from the install snippet Composer generates
   region: 'va7',
