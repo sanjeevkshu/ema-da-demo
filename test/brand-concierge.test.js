@@ -8,7 +8,7 @@ installDom();
 window.hlx = { codeBasePath: '' };
 
 const {
-  default: init, ALLOY_URL, CONFIG, OPT_OUT, WEB_CLIENT_URL, environment, installAlloyStub,
+  default: init, ALLOY_URL, CONFIG, OPT_IN, OPT_OUT, WEB_CLIENT_URL, environment, installAlloyStub,
   isSurface, mountLauncher, resolveConfig, startConcierge,
 } = await import('../scripts/brand-concierge.js');
 
@@ -267,6 +267,23 @@ describe('brand concierge: launcher', () => {
     const { launcher } = init();
     assert.equal(document.querySelector('.concierge-launcher'), launcher);
     assert.ok(document.querySelector('link[href$="/styles/brand-concierge.css"]'));
+  });
+
+  test('withdrawing consent removes the assistant; accepting again restores it', () => {
+    init();
+    const consent = (consented) => window.dispatchEvent(new window.CustomEvent('consent.update', { detail: { consented } }));
+    consent(false);
+    assert.equal(document.querySelector('.concierge-launcher'), null);
+    assert.equal(document.querySelector('#concierge-panel'), null);
+    consent(false); // already gone: no error
+    const calls = [];
+    window.alloy = (...args) => { calls.push(args); return Promise.resolve(); };
+    consent(true);
+    assert.ok(document.querySelector('.concierge-launcher'), 'back after accepting');
+    assert.deepEqual(calls, [['setConsent', OPT_IN]], 'Web SDK opted back in');
+    consent(true); // already mounted: no second launcher
+    assert.equal(document.querySelectorAll('.concierge-launcher').length, 1);
+    delete window.alloy;
   });
 
   test('init does nothing with ?concierge=off or off-surface', () => {
