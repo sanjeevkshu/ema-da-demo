@@ -57,6 +57,20 @@ In the right sandbox, go to **Data Collection → Datastreams → New datastream
 
 Also note the **IMS Org ID** (`…@AdobeOrg`, shown in the Admin Console). It goes in `CONFIG.orgId`.
 
+**Configure each datastream for Brand Concierge (verified 2026-09-27).** Adobe's public docs don't spell this out. Without it, every chat message fails with `BRANDCON-0002-400` "Datastream config not found", even though Composer's design preview answers.
+
+1. **Sandbox:** the same as the concierge (PULSE uses `prod`).
+2. **Add Service → Adobe Experience Platform**, with *Enabled* ticked. It's the only service needed.
+3. **Event Dataset:** **Brand Concierge Conversations Event Dataset**. The *Signal* and *Web Traffic* Brand Concierge event datasets also exist; add them if the form allows more than one. Don't use the `cja_brand_concierge_*` reporting datasets.
+4. **Profile Dataset:** empty. The site serves anonymous visitors and uses Adobe 1.0 consent.
+5. **Checkboxes:**
+   - **Brand Concierge: ticked.** This is what "enabled for Brand Concierge" means.
+   - Offer Decisioning, Edge Segmentation, Personalization Destinations and Adobe Journey Optimizer: off.
+6. **Save.** If it reports *"Policy violation … schemas contain sensitive labels … not HIPAA-compliant"*, a schema has sensitive labels (for example `RHD`). Keep only the Experience Platform service with the Conversations dataset and the Brand Concierge checkbox, set the datastream's Mapping Schema to that dataset's schema, and check the schema's Labels tab.
+7. **Composer → Deploy:** remove and re-add the datastream config, republish, and wait a few minutes. Then test the Composer-hosted page before the site.
+
+Don't add Adobe Analytics, Target, Audience Manager, Event Forwarding or Advertising. Brand Concierge doesn't use them.
+
 **Check:** you have three datastream IDs and the org ID. They're public by design: they appear in every page's network calls. Nothing here is a secret.
 
 **Best practice:**
