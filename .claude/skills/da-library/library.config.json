@@ -4,7 +4,10 @@
   "libraryPath": "docs/library",
   "excludedPages": [
     "nav",
-    "footer"
+    "footer",
+    "admin-guide",
+    "author-guide",
+    "developer-guide"
   ],
   "excludedBlocks": {
     "header": "Loaded automatically on every page from /nav; authors never insert it.",
@@ -189,6 +192,8 @@
     "about": "About",
     "article": "Article",
     "shop": "Shop",
-    "search": "Search results"
+    "search": "Search results",
+    "pulse-charge-dock": "Accessory",
+    "privacy": "Legal page"
   }
 }

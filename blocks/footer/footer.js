@@ -31,9 +31,19 @@ function restructure(container) {
   // <strong>) at the very end of the sequence — peel them off first so a
   // column's own body copy isn't mistaken for a bottom line.
   const isPlainPara = (n) => n && n.tagName === 'P' && !n.querySelector('a, strong');
+  // A final links-only paragraph (Privacy · Terms) is the legal row of the
+  // bottom bar. Only the very last node qualifies, so the socials paragraph
+  // further up stays in its column.
+  const last = nodes[nodes.length - 1];
+  const legal = last && last.tagName === 'P' && last.querySelector('a') && !last.querySelector('strong')
+    ? nodes.pop() : null;
   const bottomLines = [];
   while (nodes.length && isPlainPara(nodes[nodes.length - 1])) {
     bottomLines.unshift(nodes.pop());
+  }
+  if (legal) {
+    legal.classList.add('footer-legal');
+    bottomLines.push(legal);
   }
 
   const brandCol = document.createElement('div');

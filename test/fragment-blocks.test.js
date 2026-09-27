@@ -44,6 +44,26 @@ describe('footer', () => {
     assert.equal(bottom.querySelectorAll('p').length, 2, 'two bottom lines');
   });
 
+  test('a final links-only paragraph becomes the legal row of the bottom bar', async () => {
+    const footerHtml = '<div class="default-content-wrapper">'
+      + '<p><a href="/">PULSE</a></p>'
+      + '<p><strong>SOCIAL</strong></p>'
+      + '<p><a href="/ig">IG</a> <a href="/yt">YT</a></p>'
+      + '<p>© 2026 PULSE</p>'
+      + '<p><a href="/privacy">Privacy Policy</a> <a href="/terms-of-service">Terms of Service</a></p>'
+      + '</div>';
+    mockFetch({ '/footer.plain.html': footerHtml });
+    const block = document.createElement('div');
+    document.body.append(block);
+    await decorateFooter(block);
+    const bottom = block.querySelector('.footer-bottom');
+    const legal = bottom.querySelector('.footer-legal');
+    assert.ok(legal, 'legal row in the bottom bar');
+    assert.deepEqual([...legal.querySelectorAll('a')].map((a) => a.getAttribute('href')), ['/privacy', '/terms-of-service']);
+    assert.equal(bottom.lastElementChild, legal, 'after the copyright line');
+    assert.ok(block.querySelector('.footer-col .footer-socials'), 'socials stay in their column');
+  });
+
   test('tags a multi-link paragraph as socials', async () => {
     const footerHtml = '<div class="default-content-wrapper">'
       + '<p><a href="/">PULSE</a></p>'

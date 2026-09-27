@@ -69,6 +69,7 @@ export function installAlloyStub(win = window) {
 }
 
 export const OPT_OUT = { consent: [{ standard: 'Adobe', version: '1.0', value: { general: 'out' } }] };
+export const OPT_IN = { consent: [{ standard: 'Adobe', version: '1.0', value: { general: 'in' } }] };
 
 /** Loads the Web SDK and the Web Client, then mounts the chat into `selector`. */
 export async function startConcierge(cfg, selector, {
@@ -175,9 +176,23 @@ export function mountLauncher(cfg, { doc = document, start = startConcierge } = 
   return { launcher, panel };
 }
 
-export default function init() {
+export default function init(win = window) {
   const cfg = resolveConfig();
   if (!cfg) return null;
-  loadCSS(`${window.hlx.codeBasePath}/styles/brand-concierge.css`);
-  return mountLauncher(cfg);
+  loadCSS(`${win.hlx.codeBasePath}/styles/brand-concierge.css`);
+  let mounted = mountLauncher(cfg);
+  // "Cookie settings": withdrawing removes the assistant; accepting again
+  // brings it back (and opts the Web SDK back in if it already loaded).
+  win.addEventListener('consent.update', (e) => {
+    const consented = Boolean(e.detail && e.detail.consented);
+    if (!consented && mounted) {
+      mounted.launcher.remove();
+      mounted.panel.remove();
+      mounted = null;
+    } else if (consented && !mounted) {
+      mounted = mountLauncher(cfg);
+      if (win.alloy) Promise.resolve(win.alloy('setConsent', OPT_IN)).catch(() => {});
+    }
+  });
+  return mounted;
 }

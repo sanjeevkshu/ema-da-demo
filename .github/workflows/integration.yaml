@@ -1,0 +1,82 @@
+name: Integration
+
+# System-integration checks (test/integration) against the deployed branch
+# preview: consent gate, Brand Concierge + Web SDK/AEP, query index + search,
+# crawl rules on the production domain, header/footer fragments.
+#
+# Gate: PRs into main (the develop -> main promotion). Make the
+# "Integration (gate)" check required in the main branch protection rules.
+# @golden (grounded Brand Concierge answers) is report-only until grounding
+# is fixed: see .claude/skills/integration-coverage/SKILL.md.
+on:
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '17 3 * * *' # nightly on main: catches drift in Adobe-side config
+  workflow_dispatch:
+
+concurrency:
+  group: integration-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  integration:
+    name: Integration (gate)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Resolve the branch preview host
+        id: host
+        env:
+          OWNER: ${{ github.repository_owner }}
+          REPO: ${{ github.event.repository.name }}
+          BRANCH: ${{ github.head_ref || github.ref_name }}
+        run: |
+          SAFE_BRANCH=$(echo "$BRANCH" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g')
+          echo "url=https://${SAFE_BRANCH}--${REPO}--${OWNER}.aem.page" >> "$GITHUB_OUTPUT"
+
+      - name: Wait for the preview to serve this commit's code
+        env:
+          HOST: ${{ steps.host.outputs.url }}
+        run: |
+          for i in $(seq 1 20); do
+            if curl -sf "$HOST/scripts/brand-concierge.js?ck=$RANDOM" -o served.js && cmp -s served.js scripts/brand-concierge.js; then
+              echo "preview is current"; exit 0
+            fi
+            echo "attempt $i: waiting for $HOST"; sleep 15
+          done
+          echo "::warning title=Integration::preview did not match this commit in time; testing anyway"
+
+      - run: npm ci
+
+      - run: npx playwright install --with-deps chromium
+
+      - name: Integration checks (blocking)
+        env:
+          INTEGRATION_BASE_URL: ${{ steps.host.outputs.url }}
+        run: npm run test:integration -- --grep-invert @golden
+
+      - name: Grounded Brand Concierge answers (report-only)
+        if: always()
+        continue-on-error: true
+        env:
+          INTEGRATION_BASE_URL: ${{ steps.host.outputs.url }}
+        run: |
+          npm run test:integration -- --grep @golden --reporter=list,github \
+            || echo "::warning title=Brand Concierge grounding::golden answers failed; see the step log"
+
+      - name: Keep the report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: integration-report
+          path: test/integration/playwright-report/
+          retention-days: 14
+          if-no-files-found: ignore

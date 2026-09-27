@@ -185,7 +185,7 @@ To turn it on:
 3. Replace `scripts/brand-concierge-styles.json` with the Composer export (step 4.5). **Keep the full `text` set.** If any of the 30 strings is missing, the Web Client fails with "Unexpected error during rendering / No chat history element found in container" and shows an empty panel. `test/brand-concierge.test.js` checks for all 30.
 4. Run `npm run lint && npm test`. `test/brand-concierge.test.js` checks the environment mapping, surface paths, consent opt-out and lazy loading.
 5. Push. Open `https://feat-bc-ids--ema-da-demo--sanjeevkshu.aem.page/pulse-loop?consent=accept&concierge=debug`.
-   - Until a real consent manager replaces `scripts/consent-check.js`, `?consent=accept` stands in for accepting the banner.
+   - **Consent:** the site's own banner (`scripts/consent-check.js`, `consent-banner.js`) asks on the first visit. Its Accept and Decline buttons are equally prominent. The choice is stored as `pulse-consent` in `localStorage`, and the footer's **Cookie settings** link reopens it. `?consent=accept` still overrides for one page view, for testing. If a full consent platform (for example OneTrust) replaces the banner later, have it call `choose('accepted' | 'declined')` from `consent-check.js`, or fire the same `consent.update` event.
 6. Check each of these:
    - [ ] The "Ask PULSE" launcher appears. There's **no** request to `adoberesources.net` or `experience.adobe.net` before you open it.
    - [ ] Opening it loads both scripts. The console shows `[alloy] Instance configured` and **no** `securitypolicyviolation` errors.

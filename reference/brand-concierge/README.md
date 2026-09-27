@@ -31,14 +31,18 @@ the affected pages out of the knowledge source.
 | 2 | **Returns.** "Returns accepted within 30 days…" versus "30-day money back guarantee" | Contact FAQ | **Fixed:** FAQ now says "30-day money back guarantee on unworn devices in original packaging" |
 | 3 | **PULSE Arc Slim price.** $219 versus $229 | "Complete Your Setup" grids | **Fixed:** $219 everywhere |
 | 4 | **PULSE Loop Gold price.** $229 versus $259 | "Complete Your Setup" grids | **Fixed:** $229 everywhere |
-| 5 | **Product name.** The FAQ asks about "the Pulse Ring"; the product is **PULSE Loop** | Contact FAQ | Rename |
-| 6 | **Breadcrumbs.** Loop (ring), Vision AR (glasses) and Band Neo sit under "Products > Smartwatches" | Product pages | Fix categories |
+| 5 | **Product name.** The FAQ asks about "the Pulse Ring"; the product is **PULSE Loop** | Contact FAQ | **Fixed 2026-09-27:** "PULSE Loop" in both the question and the answer |
+| 6 | **Breadcrumbs.** Loop (ring), Vision AR (glasses) and Band Neo sit under "Products > Smartwatches" | Product pages | **Fixed 2026-09-27:** Loop → Rings, Vision AR → AR Glasses, Band Neo → Bands; Arc stays under Smartwatches |
 | 7 | **Placeholder pages** (lorem ipsum): `/about`, `/article`, `/landing-page`, `/shop`, `/product-detail-page` | Were in the sitemap | **Fixed:** `robots: noindex`, so they're out of the sitemap (now 10 pages) and site search |
-| 8 | **Accessories with no page:** Arc Slim, Loop Gold, Charge Dock ($49), Loop Case ($29), Neo Straps ($19), Studio ($349) | "Complete Your Setup" grids only | Add pages, or accept mention-only |
-| 9 | **Forms that don't submit:** "Launch Ticket" (Contact) and newsletter "Subscribe" | Contact, Products | Wire them up, or keep instruction I-6 below |
-| 10 | **Typo:** "Three college drops out" → "dropouts" | Know the Brand timeline | Fix |
+| 8 | **Accessories with no page:** Arc Slim, Loop Gold, Charge Dock ($49), Loop Case ($29), Neo Straps ($19), Studio ($349) | "Complete Your Setup" grids only | **Fixed 2026-09-27:** a page each (`/pulse-arc-slim`, `/pulse-loop-gold`, `/pulse-charge-dock`, `/pulse-loop-case`, `/pulse-neo-straps`, `/pulse-studio`), built only from facts already on the site; linked from the Products grid and every "Complete Your Setup" grid |
+| 9 | **Forms that don't submit:** "Launch Ticket" (Contact) and newsletter "Subscribe" | Contact, Products | **Open:** code work (a form endpoint). Until then instruction I-6 sends people to email, and the Privacy page says the forms don't collect data yet |
+| 10 | **Typo:** "Three college drops out" → "dropouts" | Know the Brand timeline | **Fixed 2026-09-27:** "dropouts" |
+| 11 | **Products page links.** Every "View Details" linked to `/product-details` (the Arc page), including Band Neo, Loop, Vision AR, Arc Slim and Loop Gold | Products | **Fixed 2026-09-27:** each card links to its own page |
+| 12 | **Related-product cards had no links.** "Complete Your Setup" grids were four-cell cards with nowhere to go | Product pages | **Fixed 2026-09-27:** every card links to its product page |
+| 13 | **No privacy or terms pages.** The concierge privacy notice pointed at `/contact`; Composer's export pointed at a missing `/privacy` and an unfilled `{Terms}` | Site-wide | **Drafted 2026-09-27:** `/privacy` and `/terms-of-service` are live with **[To be confirmed]** markers for legal; the footer links both. Point Composer's privacy link and `{Terms}` at them |
+| 14 | **A handover guide was previewed.** `admin-guide` (admin emails, security settings) was public on `main--…aem.page` | Preview host | **Fixed 2026-09-27:** unpreviewed, and the DA source kept. The library build now excludes the three guides |
 
-Still open: #5, #6, #8, #9 and #10.
+Still open: #9 (forms) and the legal markers in #13. Everything else is fixed on the live site.
 
 ---
 
