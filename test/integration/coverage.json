@@ -37,9 +37,10 @@
       "spec": "crawl.spec.js"
     },
     "fragments": {
-      "description": "Header and footer loaded from the /nav and /footer fragments",
+      "description": "Header and footer loaded from the /nav and /footer fragments; phone menu layout and layering",
       "code": [
         "blocks/header/header.js",
+        "blocks/header/header.css",
         "blocks/footer/footer.js",
         "blocks/fragment/fragment.js"
       ],
