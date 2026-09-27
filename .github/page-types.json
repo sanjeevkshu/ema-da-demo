@@ -56,6 +56,14 @@
     ]
   },
   {
+    "name": "Legal page",
+    "path": "/privacy",
+    "pages": [
+      "privacy",
+      "terms-of-service"
+    ]
+  },
+  {
     "name": "Shop",
     "path": "/shop",
     "pages": [
@@ -75,6 +83,18 @@
     "path": "/product-discovery",
     "pages": [
       "product-discovery"
+    ]
+  },
+  {
+    "name": "Accessory",
+    "path": "/pulse-charge-dock",
+    "pages": [
+      "pulse-arc-slim",
+      "pulse-charge-dock",
+      "pulse-loop-case",
+      "pulse-loop-gold",
+      "pulse-neo-straps",
+      "pulse-studio"
     ]
   },
   {
