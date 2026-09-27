@@ -134,9 +134,16 @@ export function mountLauncher(cfg, { doc = document, start = startConcierge } = 
   close.className = 'concierge-close';
   close.setAttribute('aria-label', 'Close chat');
   close.textContent = '×';
+  // header bar above the chat, so the Web Client's layers can't cover close
+  const header = doc.createElement('div');
+  header.className = 'concierge-header';
+  const title = doc.createElement('span');
+  title.className = 'concierge-title';
+  title.textContent = cfg.label;
+  header.append(title, close);
   const mount = doc.createElement('div');
   mount.id = 'brand-concierge-mount';
-  panel.append(close, mount);
+  panel.append(header, mount);
 
   let started;
   const setOpen = (open) => {

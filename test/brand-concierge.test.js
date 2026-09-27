@@ -210,6 +210,11 @@ describe('brand concierge: launcher', () => {
     assert.equal(panel.getAttribute('aria-label'), 'Ask PULSE');
     assert.equal(panel.open, false);
     assert.ok(panel.querySelector('#brand-concierge-mount'));
+    // the Web Client's chat history covers anything inside the mount, so the
+    // close button must live in the header bar, outside it
+    const close = panel.querySelector('.concierge-close');
+    assert.equal(close.closest('#brand-concierge-mount'), null);
+    assert.equal(close.closest('.concierge-header').querySelector('.concierge-title').textContent, 'Ask PULSE');
   });
 
   test('loads the SDKs on the first open only; Escape and close return focus', async () => {
