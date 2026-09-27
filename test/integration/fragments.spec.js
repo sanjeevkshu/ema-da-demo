@@ -9,6 +9,38 @@ test('header loads the nav fragment with search and Shop Now', async ({ page }) 
   await expect(nav.getByRole('link', { name: 'Shop Now' })).toBeVisible();
 });
 
+test.describe('phone menu', () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+
+  test('opens over the page with even, tappable rows and closes on Escape', async ({ page }) => {
+    await page.goto('/pulse-loop?consent=decline');
+    const nav = page.locator('header nav');
+    const toggle = nav.getByRole('button', { name: 'Open navigation' });
+    const hit = await toggle.boundingBox();
+    expect(Math.min(hit.width, hit.height), 'hamburger target').toBeGreaterThanOrEqual(44);
+    await toggle.click();
+    await expect(nav).toHaveAttribute('aria-expanded', 'true');
+
+    const rows = await nav.locator('.nav-sections li a').evaluateAll((links) => links.map((a) => ({
+      text: a.textContent.trim(),
+      height: a.getBoundingClientRect().height,
+      sub: !!a.closest('li li'),
+    })));
+    expect(rows.length).toBeGreaterThan(5);
+    rows.forEach((r) => expect(r.height, `${r.text} row`).toBeGreaterThanOrEqual(44));
+    expect(new Set(rows.filter((r) => !r.sub).map((r) => r.height)).size, 'top-level rows match').toBe(1);
+    expect(new Set(rows.filter((r) => r.sub).map((r) => r.height)).size, 'product rows match').toBe(1);
+
+    // nothing on the page (e.g. carousel controls) shows through the open menu
+    const covered = await page.evaluate(() => [[195, 300], [300, 600], [60, 780]]
+      .every(([x, y]) => !!document.elementFromPoint(x, y)?.closest('header')));
+    expect(covered, 'menu covers the page').toBe(true);
+
+    await page.keyboard.press('Escape');
+    await expect(nav).toHaveAttribute('aria-expanded', 'false');
+  });
+});
+
 test('footer loads with its columns and the legal links', async ({ page }) => {
   await page.goto('/pulse-loop');
   const footer = page.locator('footer');

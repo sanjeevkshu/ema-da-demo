@@ -115,6 +115,67 @@ describe('brand concierge: styling config', () => {
     assert.deepEqual(missing, []);
     assert.ok(styles.metadata && styles.theme && styles.arrays['welcome.examples'].length > 0);
   });
+
+  test('theme uses only variables the Web Client supports', async () => {
+    const fs = await import('node:fs');
+    const { theme } = JSON.parse(fs.readFileSync('scripts/brand-concierge-styles.json', 'utf8'));
+    const { variables } = JSON.parse(fs.readFileSync('reference/brand-concierge/supported-theme-variables.json', 'utf8'));
+    assert.deepEqual(Object.keys(theme).filter((key) => !variables.includes(key)), []);
+  });
+
+  // WCAG 2.2 AA: 4.5:1 for text, 3:1 for input borders and focus rings
+  test('theme colour pairs meet WCAG AA contrast', async () => {
+    const fs = await import('node:fs');
+    const { theme } = JSON.parse(fs.readFileSync('scripts/brand-concierge-styles.json', 'utf8'));
+    const luminance = (hex) => {
+      const [r, g, b] = hex.match(/[0-9a-f]{2}/gi).map((c) => {
+        const v = parseInt(c, 16) / 255;
+        return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+      });
+      return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    };
+    const ratio = (a, b) => {
+      const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+      return (hi + 0.05) / (lo + 0.05);
+    };
+    const t = (key) => theme[key];
+    const pairs = [
+      ['--color-text', '--main-container-background', 4.5],
+      ['--color-text-muted', '--main-container-background', 4.5],
+      ['--welcome-subheading-text-color', '--main-container-background', 4.5],
+      ['--message-concierge-text', '--message-concierge-background', 4.5],
+      ['--message-concierge-link-color', '--message-concierge-background', 4.5],
+      ['--message-user-text', '--message-user-background', 4.5],
+      ['--input-text-color', '--input-background', 4.5],
+      ['--input-outline-color', '--input-background', 3],
+      ['--input-focus-outline-color', '--input-background', 3],
+      ['--submit-button-fill-color', '--color-button-submit', 3],
+      ['--prompt-suggestion-button-text-color', '--prompt-suggestion-button-background', 4.5],
+      ['--prompt-suggestion-button-text-color', '--prompt-suggestion-button-background-hover', 4.5],
+      ['--prompt-pill-text-color', '--prompt-pill-background', 4.5],
+      ['--button-primary-text', '--button-primary-background', 4.5],
+      ['--button-primary-text', '--button-primary-hover', 4.5],
+      ['--card-text-color', '--card-background', 4.5],
+      ['--disclaimer-color', '--main-container-background', 4.5],
+      ['--privacy-notice-text-color', '--privacy-notice-background', 4.5],
+      ['--privacy-notice-title-color', '--privacy-notice-background', 4.5],
+    ];
+    const failing = pairs
+      .map(([fg, bg, min]) => [fg, bg, min, ratio(t(fg), t(bg))])
+      .filter(([, , min, r]) => r < min)
+      .map(([fg, bg, min, r]) => `${fg} on ${bg}: ${r.toFixed(2)} < ${min}`);
+    assert.deepEqual(failing, []);
+  });
+
+  test('inputs are at least 16px (no iOS zoom) and touch targets at least 40px', async () => {
+    const fs = await import('node:fs');
+    const { theme } = JSON.parse(fs.readFileSync('scripts/brand-concierge-styles.json', 'utf8'));
+    const px = (v) => (v.endsWith('rem') ? parseFloat(v) * 16 : parseFloat(v));
+    assert.ok(px(theme['--input-font-size']) >= 16);
+    ['--input-height', '--input-height-mobile'].forEach((k) => assert.ok(px(theme[k]) >= 44, k));
+    ['--input-button-height', '--input-button-width', '--button-height-s', '--feedback-icon-btn-size-desktop']
+      .forEach((k) => assert.ok(px(theme[k]) >= 40, k));
+  });
 });
 
 describe('brand concierge: Web SDK', () => {

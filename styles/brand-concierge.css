@@ -1,29 +1,34 @@
-/* Brand Concierge launcher and chat panel (scripts/brand-concierge.js) */
+/* Brand Concierge launcher and chat panel (scripts/brand-concierge.js).
+ * Type, spacing and colours inside the chat come from the theme in
+ * scripts/brand-concierge-styles.json; this file only frames it. */
 .concierge-launcher {
   position: fixed;
-  right: 24px;
-  bottom: 24px;
+  right: max(24px, env(safe-area-inset-right));
+  bottom: max(24px, env(safe-area-inset-bottom));
   z-index: 20;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   min-height: 48px;
-  padding: 12px 20px;
+  padding: 12px 22px;
   border: 2px solid var(--pulse-blue);
   border-radius: var(--pulse-radius-pill);
   background-color: var(--pulse-ink);
   color: var(--pulse-white);
   font-family: var(--pulse-font);
-  font-size: var(--pulse-fs-small);
+  font-size: 0.9375rem;
   font-weight: 700;
+  line-height: 1.2;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   box-shadow: 0 8px 24px rgb(17 24 39 / 24%);
   cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.15s ease;
 }
 
 .concierge-launcher::before {
   content: '';
+  flex: 0 0 auto;
   width: 10px;
   height: 10px;
   border-radius: 50%;
@@ -35,6 +40,10 @@
   background-color: var(--pulse-blue);
 }
 
+.concierge-launcher:hover {
+  transform: translateY(-1px);
+}
+
 .concierge-launcher:focus-visible {
   outline: 3px solid var(--pulse-orange);
   outline-offset: 3px;
@@ -42,18 +51,20 @@
 
 .concierge-panel {
   position: fixed;
-  inset: auto 24px 88px auto;
+  inset: auto max(24px, env(safe-area-inset-right)) calc(max(24px, env(safe-area-inset-bottom)) + 64px) auto;
   z-index: 21;
   box-sizing: border-box;
-  width: min(420px, calc(100vw - 48px));
-  height: min(640px, calc(100dvh - 120px));
+  width: min(440px, calc(100vw - 48px));
+  height: min(720px, calc(100dvh - 112px));
   margin: 0;
   padding: 0;
   overflow: hidden;
-  border: 1px solid var(--pulse-ink);
+  border: 1px solid rgb(17 24 39 / 16%);
   border-radius: var(--pulse-radius-md);
-  background-color: var(--pulse-surface);
-  box-shadow: 0 16px 48px rgb(17 24 39 / 24%);
+  background-color: var(--pulse-white);
+  color: var(--pulse-ink);
+  font-family: var(--pulse-font);
+  box-shadow: 0 24px 64px rgb(17 24 39 / 24%), 0 2px 8px rgb(17 24 39 / 8%);
 }
 
 .concierge-panel[open] {
@@ -66,18 +77,58 @@
   flex: 0 0 auto;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 8px 8px 16px;
-  border-bottom: 1px solid rgb(17 24 39 / 12%);
+  gap: 12px;
+  min-height: 56px;
+  box-sizing: border-box;
+  padding: 6px 6px 6px 20px;
   background-color: var(--pulse-ink);
   color: var(--pulse-white);
 }
 
 .concierge-title {
-  font-family: var(--pulse-font);
-  font-size: var(--pulse-fs-small);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9375rem;
   font-weight: 700;
+  line-height: 1.2;
   letter-spacing: 0.04em;
   text-transform: uppercase;
+}
+
+.concierge-title::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--pulse-orange);
+}
+
+/* 44px target (WCAG 2.5.5); the × stays visible on the dark bar */
+.concierge-close {
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background-color: transparent;
+  color: var(--pulse-white);
+  font-family: inherit;
+  font-size: 1.75rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.concierge-close:hover {
+  background-color: rgb(255 255 255 / 14%);
+}
+
+.concierge-close:focus-visible {
+  outline: 3px solid var(--pulse-orange);
+  outline-offset: -3px;
 }
 
 .concierge-panel #brand-concierge-mount {
@@ -87,35 +138,50 @@
   min-height: 0;
 }
 
-.concierge-close {
-  flex: 0 0 auto;
-  width: 36px;
-  height: 36px;
-  border: 0;
-  border-radius: 50%;
-  background-color: var(--pulse-white);
-  color: var(--pulse-ink);
-  font-size: 22px;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.concierge-close:focus-visible {
-  outline: 3px solid var(--pulse-orange);
-  outline-offset: 3px;
-}
-
 @media (width < 600px) {
   .concierge-launcher {
-    right: 16px;
-    bottom: 16px;
+    right: max(16px, env(safe-area-inset-right));
+    bottom: max(16px, env(safe-area-inset-bottom));
   }
 
+  /* full screen on phones; keep the header and input clear of notches */
   .concierge-panel {
     inset: 0;
     width: 100vw;
     height: 100dvh;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
     border: 0;
     border-radius: 0;
+    box-shadow: none;
+  }
+
+  .concierge-header {
+    padding-left: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .concierge-launcher {
+    transition: none;
+  }
+
+  .concierge-launcher:hover {
+    transform: none;
+  }
+}
+
+/* Windows High Contrast: shadows and backgrounds drop out, so draw edges */
+@media (forced-colors: active) {
+  .concierge-launcher,
+  .concierge-close {
+    border: 2px solid ButtonText;
+  }
+
+  .concierge-panel {
+    border: 2px solid CanvasText;
+  }
+
+  .concierge-header {
+    border-bottom: 1px solid CanvasText;
   }
 }
