@@ -1,10 +1,11 @@
 /* PULSE location cards — image, name + locale badge, address, phone.
-   48px below the section heading (Figma 2:492 → 2:495); the heading keeps 8px */
+   48px below the section heading (Figma 2:492 → 2:495); the heading's own
+   margin collapses into this one */
 .locations {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--pulse-space-3);
-  margin-top: var(--pulse-space-5);
+  margin-top: var(--pulse-space-6);
 }
 
 .locations .locations-card {
