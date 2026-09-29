@@ -188,31 +188,43 @@
   height: 22px;
 }
 
+/* each dot is a 24x24 tap target (WCAG 2.2 AA, 2.5.8) that draws the
+   8px design dot in its centre, so the look is unchanged */
 .carousel .carousel-dots {
   display: flex;
   align-items: center;
-  gap: var(--pulse-space-1);
+  gap: 0;
 }
 
 .carousel .carousel-dot {
-  width: 8px;
-  height: 8px;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
   padding: 0;
   border: none;
   border-radius: 50%;
-  background-color: var(--pulse-white-50);
+  background: none;
   cursor: pointer;
+}
+
+.carousel .carousel-dot::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--pulse-white-50);
   transition: background-color 0.15s ease, transform 0.15s ease;
 }
 
-.carousel .carousel-dot.is-active {
+.carousel .carousel-dot.is-active::before {
   background-color: var(--pulse-blue);
   transform: scale(1.25);
 }
 
 .carousel .carousel-dot:focus-visible {
   outline: 2px solid var(--pulse-blue);
-  outline-offset: 2px;
+  outline-offset: -2px;
 }
 
 /* visually-hidden live region for screen readers */

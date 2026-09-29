@@ -1,7 +1,7 @@
 /* PULSE newsletter — light-blue band, heading/copy left, email form right */
 .newsletter > div {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: center;
   gap: var(--pulse-space-6);
 }
@@ -26,6 +26,7 @@
 
 .newsletter .newsletter-form-el input {
   flex: 1;
+  min-width: 0;
   padding: 14px 20px;
   border-radius: var(--pulse-radius-sm);
   border: 1px solid var(--pulse-ink);
@@ -50,9 +51,16 @@
   background-color: var(--link-hover-color);
 }
 
+/* the grid is on the row, so the one-column override must be too */
 @media (width <= 900px) {
-  .newsletter {
-    grid-template-columns: 1fr;
+  .newsletter > div {
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--pulse-space-3);
+  }
+}
+
+@media (width <= 480px) {
+  .newsletter .newsletter-form-el {
+    flex-direction: column;
   }
 }
