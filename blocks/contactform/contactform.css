@@ -24,6 +24,8 @@
   text-transform: uppercase;
 }
 
+/* the page's h1 (or an h2 when the block isn't first on the page) */
+.contactform .contactform-info h1,
 .contactform .contactform-info h2 {
   margin: 0;
   font-size: var(--pulse-fs-h2);
