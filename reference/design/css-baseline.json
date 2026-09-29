@@ -1,0 +1,50 @@
+{
+  "blocks/cards/cards.css": {
+    "colors": 1,
+    "fontSizes": 0
+  },
+  "blocks/carousel/carousel.css": {
+    "colors": 5,
+    "fontSizes": 0
+  },
+  "blocks/columns/columns.css": {
+    "colors": 2,
+    "fontSizes": 0
+  },
+  "blocks/footer/footer.css": {
+    "colors": 1,
+    "fontSizes": 4
+  },
+  "blocks/header/header.css": {
+    "colors": 4,
+    "fontSizes": 2
+  },
+  "blocks/hero/hero.css": {
+    "colors": 1,
+    "fontSizes": 0
+  },
+  "blocks/pdp/pdp.css": {
+    "colors": 0,
+    "fontSizes": 2
+  },
+  "blocks/specs/specs.css": {
+    "colors": 1,
+    "fontSizes": 0
+  },
+  "blocks/valuecards/valuecards.css": {
+    "colors": 0,
+    "fontSizes": 1
+  },
+  "styles/brand-concierge.css": {
+    "colors": 5,
+    "fontSizes": 0
+  },
+  "styles/consent-banner.css": {
+    "colors": 1,
+    "fontSizes": 0
+  },
+  "styles/styles.css": {
+    "colors": 7,
+    "fontSizes": 0
+  }
+}

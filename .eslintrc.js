@@ -21,5 +21,22 @@ module.exports = {
     files: ['test/integration/**/*.js'],
     env: { node: true },
     rules: { 'no-restricted-syntax': 'off' },
+  }, {
+    // Design gate: Node-side Playwright specs and scripts that walk pages in order.
+    files: ['test/design/**/*.js', 'test/design/**/*.mjs', 'test/a11y/**/*.js', 'test/a11y/**/*.mjs', 'test/visual/*.js', 'tokens/*.mjs'],
+    env: { node: true },
+    rules: {
+      'no-restricted-syntax': 'off',
+      'no-await-in-loop': 'off',
+      'no-continue': 'off',
+      'no-console': 'off',
+      'import/prefer-default-export': 'off',
+      'import/extensions': ['error', { js: 'always', mjs: 'always' }],
+      'max-len': ['error', { code: 140, ignoreStrings: true, ignoreTemplateLiterals: true }],
+    },
+  }, {
+    // installed only by the visual job (npm ci --prefix test/visual), never by the build
+    files: ['test/visual/*.js'],
+    rules: { 'import/no-unresolved': ['error', { ignore: ['^@applitools/'] }] },
   }],
 };

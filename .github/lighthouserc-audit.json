@@ -3,11 +3,14 @@
     "collect": {
       "numberOfRuns": 3,
       "settings": {
-        "skipAudits": ["is-crawlable"]
+        "skipAudits": [
+          "is-crawlable"
+        ]
       }
     },
     "upload": {
-      "target": "temporary-public-storage"
+      "target": "filesystem",
+      "outputDir": ".lighthouseci/reports"
     }
   }
 }

@@ -1,0 +1,80 @@
+{
+  "$comment": "Frozen fixture pages the design gate tests on PRs: one per page type, copied from the real page, previewed and never published (/drafts is excluded from the index and sitemap). Their content must not change, so any visual or layout difference comes from code. The gate checks each page's .plain.html against 'sha' first; after a deliberate refresh, run node test/design/run.mjs --update-fixtures.",
+  "pages": {
+    "index": {
+      "type": "Home",
+      "path": "/drafts/design-fixtures/",
+      "sha": "5d08b58f0815"
+    },
+    "about": {
+      "type": "About",
+      "path": "/drafts/design-fixtures/about",
+      "sha": "01f558a51c56"
+    },
+    "article": {
+      "type": "Article",
+      "path": "/drafts/design-fixtures/article",
+      "sha": "1ec1e1032fa1"
+    },
+    "contact": {
+      "type": "Contact",
+      "path": "/drafts/design-fixtures/contact",
+      "sha": "eadde67e3783"
+    },
+    "discover": {
+      "type": "Discover",
+      "path": "/drafts/design-fixtures/discover",
+      "sha": "94107e96d06f"
+    },
+    "know-the-brand": {
+      "type": "Brand story",
+      "path": "/drafts/design-fixtures/know-the-brand",
+      "sha": "0ee726c9af96"
+    },
+    "landing-page": {
+      "type": "Landing page",
+      "path": "/drafts/design-fixtures/landing-page",
+      "sha": "782d92f69eb5"
+    },
+    "lifestyle-vision": {
+      "type": "Lifestyle",
+      "path": "/drafts/design-fixtures/lifestyle-vision",
+      "sha": "ff93c99629e0"
+    },
+    "privacy": {
+      "type": "Legal page",
+      "path": "/drafts/design-fixtures/privacy",
+      "sha": "aa7ed6a9e6dd"
+    },
+    "shop": {
+      "type": "Shop",
+      "path": "/drafts/design-fixtures/shop",
+      "sha": "3bedd8f88237"
+    },
+    "product-details": {
+      "type": "Product details",
+      "path": "/drafts/design-fixtures/product-details",
+      "sha": "a440a49fd2d4"
+    },
+    "product-discovery": {
+      "type": "Product listing",
+      "path": "/drafts/design-fixtures/product-discovery",
+      "sha": "42b035022e19"
+    },
+    "pulse-charge-dock": {
+      "type": "Accessory",
+      "path": "/drafts/design-fixtures/pulse-charge-dock",
+      "sha": "d18de1050f32"
+    },
+    "pulse-band-neo": {
+      "type": "Product (Pulse range)",
+      "path": "/drafts/design-fixtures/pulse-band-neo",
+      "sha": "b774e2e5d273"
+    },
+    "search": {
+      "type": "Search results",
+      "path": "/drafts/design-fixtures/search",
+      "sha": "080f32c1c89f"
+    }
+  }
+}

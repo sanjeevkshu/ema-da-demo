@@ -1,0 +1,16 @@
+{
+  "type": {
+    "fs-display": { "$type": "dimension", "$value": "40px" },
+    "lh-display": { "$type": "dimension", "$value": "48px" },
+    "fs-stat": { "$type": "dimension", "$value": "36px" },
+    "fs-h2": { "$type": "dimension", "$value": "30px" },
+    "fs-lead": { "$type": "dimension", "$value": "18px" }
+  },
+  "layout": {
+    "content-pad": { "$type": "dimension", "$value": "24px" }
+  },
+  "space": {
+    "section-y": { "$type": "dimension", "$value": "56px" },
+    "section-y-lg": { "$type": "dimension", "$value": "64px" }
+  }
+}

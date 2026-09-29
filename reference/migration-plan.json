@@ -5,8 +5,8 @@
   "canvasNodeId": "0:1",
   "responsiveStrategy": "fold-into-css",
   "pages": [
-    { "order": 1, "slug": "know-the-brand", "nodeId": "23:3", "figmaName": "know-the-brand-desktop", "tabletNodeId": "2:1101", "mobileNodeId": "2:1690", "width": 1440, "status": "pending" },
-    { "order": 2, "slug": "lifestyle-vision", "nodeId": "2:235", "figmaName": "lifestyle-vision-desktop", "tabletNodeId": "2:1195", "mobileNodeId": "2:1772", "width": 1440, "status": "pending" },
+    { "order": 1, "slug": "know-the-brand", "nodeId": "49:2", "figmaName": "know-the-brand-desktop", "tabletNodeId": "49:4", "mobileNodeId": "2:1690", "width": 1440, "status": "pending" },
+    { "order": 2, "slug": "lifestyle-vision", "nodeId": "49:3", "figmaName": "lifestyle-vision-desktop", "tabletNodeId": "2:1195", "mobileNodeId": "2:1772", "width": 1440, "status": "pending" },
     { "order": 3, "slug": "contact", "nodeId": "2:417", "figmaName": "contact-desktop", "tabletNodeId": "2:1284", "mobileNodeId": "2:1840", "width": 1440, "status": "pending" },
     { "order": 4, "slug": "product-discovery", "nodeId": "2:652", "figmaName": "product-discovery-desktop", "tabletNodeId": "2:1404", "mobileNodeId": null, "width": 1440, "status": "pending" },
     { "order": 5, "slug": "product-details", "nodeId": "2:796", "figmaName": "product-details-desktop", "tabletNodeId": "2:1529", "mobileNodeId": null, "width": 1440, "status": "pending" },

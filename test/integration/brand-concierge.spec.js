@@ -44,6 +44,8 @@ test.describe('@golden grounded answers', () => {
     ['How long does the PULSE Loop battery last?', /7[-\s]day/i],
     ['What does PULSE Band Neo cost?', /\$129\b/],
     ['Is shipping free?', /\$100/],
+    // accessories joined the product catalog on 2026-09-29
+    ['What does the PULSE Charge Dock cost?', /\$49\b/],
   ];
   for (const [question, fact] of GOLDEN) {
     test(`${question} → ${fact}`, async ({ page }) => {

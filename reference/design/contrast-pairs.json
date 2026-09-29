@@ -1,0 +1,40 @@
+{
+  "$comment": "Every foreground/background token pairing the site uses, checked against WCAG 2.2 AA by test/a11y/contrast.test.js (no browser). kind: text = 4.5:1, large = 3:1 (24px, or 18.66px bold), ui = 3:1 (borders, focus rings, icons). A translucent background names the surface it sits 'over'. A pair that fails needs a waiver with an owner and a reason, or a fix in Figma and the tokens.",
+  "pairs": [
+    { "fg": "ink", "bg": "white", "kind": "text", "where": "body copy" },
+    { "fg": "ink", "bg": "surface", "kind": "text", "where": "cards, form card" },
+    { "fg": "ink-80", "bg": "white", "kind": "text", "where": "carousel copy" },
+    { "fg": "ink-70", "bg": "white", "kind": "text", "where": "intro and secondary copy" },
+    { "fg": "ink-70", "bg": "surface", "kind": "text", "where": "copy on cards" },
+    { "fg": "ink-60", "bg": "white", "kind": "text", "where": "contact channel labels (14px)" },
+    { "fg": "ink-50", "bg": "white", "kind": "text", "where": "'Follow for drops' label (14px bold)" },
+    { "fg": "blue", "bg": "white", "kind": "text", "where": "links, prices, eyebrows" },
+    { "fg": "blue", "bg": "surface", "kind": "text", "where": "prices on cards" },
+    { "fg": "white", "bg": "blue", "kind": "text", "where": "primary buttons" },
+    { "fg": "white", "bg": "ink", "kind": "text", "where": "footer, dark sections" },
+    { "fg": "white-80", "bg": "ink", "kind": "text", "where": "footer copy" },
+    { "fg": "white-70", "bg": "ink", "kind": "text", "where": "dark-section secondary copy" },
+    { "fg": "orange", "bg": "ink", "kind": "text", "where": "footer column headings (14px bold)" },
+    { "fg": "orange", "bg": "white", "kind": "text", "where": "schedule time labels, eyebrows" },
+    { "fg": "orange", "bg": "orange-tint", "kind": "text", "where": "location locale badge (12px bold)", "over": "white" },
+    { "fg": "blue", "bg": "white", "kind": "ui", "where": "focus rings" },
+    { "fg": "ink", "bg": "white", "kind": "ui", "where": "input and card borders" },
+    { "fg": "orange", "bg": "white", "kind": "ui", "where": "icons and accents" },
+    { "fg": "white", "bg": "orange", "kind": "text", "where": "accent buttons, 'Drop 01' and hero badges (14-16px bold)" },
+    { "fg": "orange", "bg": "surface", "kind": "large", "where": "timeline years (36px bold)" },
+    { "fg": "orange", "bg": "blue", "kind": "text", "where": "stats labels (16px)" },
+    { "fg": "blue", "bg": "ink", "kind": "large", "where": "hero accent word (64px bold)" },
+    { "fg": "orange", "bg": "orange-tint", "over": "white", "kind": "large", "where": "value card icons (26px)" }
+  ],
+  "waivers": {
+    "ink-50 on white (text)": { "owner": "design (Figma)", "reason": "Figma 2:460 sets the label at ink 50%; needs ink 60% or darker.", "review": "2026-10-31" },
+    "orange on white (text)": { "owner": "design (Figma)", "reason": "Specified in Figma; raised in the PULSE design-system prompt (text-safe orange, e.g. an orange-700 for text on light backgrounds).", "review": "2026-10-31" },
+    "orange on orange-tint (text)": { "owner": "design (Figma)", "reason": "Specified in Figma; raised in the PULSE design-system prompt (text-safe orange, e.g. an orange-700 for text on light backgrounds).", "review": "2026-10-31" },
+    "orange on white (ui)": { "owner": "design (Figma)", "reason": "Specified in Figma; raised in the PULSE design-system prompt (text-safe orange, e.g. an orange-700 for text on light backgrounds).", "review": "2026-10-31" },
+    "white on orange (text)": { "owner": "design (Figma)", "reason": "Figma accent fills carry white text; needs a darker accent fill or ink text.", "review": "2026-10-31" },
+    "orange on surface (large)": { "owner": "design (Figma)", "reason": "Specified in Figma; raised in the PULSE design-system prompt (text-safe orange, e.g. an orange-700 for text on light backgrounds).", "review": "2026-10-31" },
+    "orange on blue (text)": { "owner": "design (Figma)", "reason": "Figma stats band sets orange labels on blue; needs white or a lighter accent.", "review": "2026-10-31" },
+    "blue on ink (large)": { "owner": "design (Figma)", "reason": "Figma hero sets a blue accent word on ink; needs a lighter blue on dark backgrounds.", "review": "2026-10-31" },
+    "orange on orange-tint (large)": { "owner": "design (Figma)", "reason": "Specified in Figma; raised in the PULSE design-system prompt (text-safe orange, e.g. an orange-700 for text on light backgrounds).", "review": "2026-10-31" }
+  }
+}
