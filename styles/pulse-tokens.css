@@ -15,6 +15,7 @@
   --pulse-white: #fff;
 
   /* opacity ramps */
+  --pulse-ink-90: rgb(17 24 39 / 90%);
   --pulse-ink-80: rgb(17 24 39 / 80%);
   --pulse-ink-70: rgb(17 24 39 / 70%);
   --pulse-ink-60: rgb(17 24 39 / 60%);

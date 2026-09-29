@@ -21,5 +21,17 @@ module.exports = {
     files: ['test/integration/**/*.js'],
     env: { node: true },
     rules: { 'no-restricted-syntax': 'off' },
+  }, {
+    // Design gate: Node-side Playwright specs and scripts that walk pages in order.
+    files: ['test/design/**/*.js', 'test/design/**/*.mjs'],
+    env: { node: true },
+    rules: {
+      'no-restricted-syntax': 'off',
+      'no-await-in-loop': 'off',
+      'no-continue': 'off',
+      'no-console': 'off',
+      'import/extensions': ['error', { js: 'always', mjs: 'always' }],
+      'max-len': ['error', { code: 140, ignoreStrings: true, ignoreTemplateLiterals: true }],
+    },
   }],
 };

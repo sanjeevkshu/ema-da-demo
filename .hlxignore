@@ -9,3 +9,4 @@ migration-work/*
 sync-block-collection.sh
 reference/site-config/*
 reference/brand-concierge/*
+reference/design/*

@@ -10,7 +10,9 @@
     "lint:fix": "npm run lint:js -- --fix && npm run lint:css -- --fix",
     "test": "node --test \"test/*.test.js\"",
     "test:coverage": "node -e \"require('fs').mkdirSync('coverage',{recursive:true})\" && node --test --experimental-test-coverage --test-coverage-include=\"blocks/**/*.js\" --test-coverage-exclude=\"test/**\" --test-reporter=spec --test-reporter-destination=stdout --test-reporter=lcov --test-reporter-destination=coverage/lcov.info \"test/*.test.js\" && node test/check-coverage.js",
-    "test:integration": "playwright test -c test/integration/playwright.config.js"
+    "test:integration": "playwright test -c test/integration/playwright.config.js",
+    "test:design": "node test/design/run.mjs",
+    "design:drift": "node test/design/drift.mjs"
   },
   "repository": {
     "type": "git",

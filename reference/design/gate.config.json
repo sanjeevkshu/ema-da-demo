@@ -1,0 +1,16 @@
+{
+  "$comment": "Design gate levels per layer and destination. off = not run; report = runs, shows on the PR, never fails it; block = fails the check. 'nightly' runs on main's live preview, where block means the run turns red and GitHub notifies. Rules (test/design-gate.test.js): main is never looser than develop; a layer or page moves up only after 3 green runs in a row, or, for visual-figma, once its Figma baseline is approved. Change levels only in a reviewed PR. See .claude/skills/design-compliance/SKILL.md.",
+  "widths": [390, 768, 1440],
+  "destinations": ["develop", "main"],
+  "layers": {
+    "tokens": { "what": "Figma tokens = CSS tokens; colour and font-size literals never grow; media rules re-lay-out the real grid", "develop": "block", "main": "block", "nightly": "block" },
+    "responsive": { "what": "No sideways scroll, no clipped text, 24px tap targets, no stretched images, one h1, every page type at 390/768/1440", "develop": "block", "main": "block", "nightly": "block" },
+    "product": { "what": "Cards and product pages match the product catalog: image, alt, price, link; galleries use approved images", "develop": "block", "main": "block", "nightly": "block" },
+    "specs": { "what": "Measured block layout and style match the values taken from each block's Figma node", "develop": "report", "main": "block", "nightly": "block" },
+    "coverage": { "what": "Every block and page type has a Figma source, or a recorded reason", "develop": "report", "main": "block", "nightly": "report" },
+    "visual-main": { "what": "Before/after/diff screenshots against the base branch, attached to the report", "develop": "report", "main": "report", "nightly": "off" },
+    "visual-figma": { "what": "Screenshot against the approved Figma frame export", "develop": "report", "main": "report", "nightly": "report", "promoted": { "develop": [], "main": [] } }
+  },
+  "promotion": { "greenRuns": 3 },
+  "visual": { "maxChange": 0.005, "maxFigmaDiff": 0.25 }
+}

@@ -135,3 +135,25 @@ computed styles. SIGNED OFF.
 
 Lesson: #3 and #4 are the same defect, copied. When a structural bug is fixed in
 one generator, grep the other generators for the same snippet before closing it.
+
+## Round 6: design gate (2026-09-29)
+
+Found while building the automated gate (`.claude/skills/design-compliance`).
+Each is now caught by a layer, so it can't come back unseen.
+
+| # | Area | Issue | Root cause | Fix | Caught by |
+|---|------|-------|------------|-----|-----------|
+| 1 | Contact, phone | Page 621px wide on 390px; ticket form off-screen | One-column rule on `.contactform`, grid on `.contactform > div` | Rule on the row, `minmax(0, 1fr)` | responsive, tokens (orphan media rule) |
+| 2 | Contact, tablet | Form squeezed into 353px, select text clipped | Same | Same; locations 3 across on tablet | responsive, specs |
+| 3 | Contact, desktop | Icon tiles, divider, "Follow for drops" chips missing | Not built in the first migration | From Figma 2:434 | specs |
+| 4 | Products, phone | Page scrolled 229px sideways | Same rule-on-the-wrong-element bug, copied into newsletter | Same | responsive, tokens |
+| 5 | Carousel dots | 8–10px tap targets | Dots drawn as the button | 24px button drawing the 8px dot | responsive, specs |
+| 6 | Home, Discover, Contact, 3 PDPs | No `<h1>` | First heading authored as h2 | First heading → h1 in DA | responsive |
+| 7 | 4 accessories, Vision AR and Arc galleries | Unrelated stock photos (radishes, pears…) | Wireframe-kit placeholders | PULSE illustrations and genuine images, approved per product | product |
+| 8 | Arc cards | Card image differed from the catalog | No single source | Cards use the catalog image | product |
+| 9 | Figma map | know-the-brand, lifestyle and brand-tablet node IDs gone | Designer re-wrapped frames into sections | IDs updated, fingerprints stored | drift, coverage |
+| 10 | Tokens | `ink-90` in Figma, not in CSS | Token file drifted | Added | tokens |
+
+Lesson: #1 and #4 are the same defect, copied, again (see round 5). The fix
+that stops it recurring is a check, not a note: `orphanGridRules` in
+`test/design/static.mjs`.
