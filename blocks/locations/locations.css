@@ -1,8 +1,10 @@
-/* PULSE location cards — image, name + locale badge, address, phone */
+/* PULSE location cards — image, name + locale badge, address, phone.
+   48px below the section heading (Figma 2:492 → 2:495); the heading keeps 8px */
 .locations {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--pulse-space-3);
+  margin-top: var(--pulse-space-5);
 }
 
 .locations .locations-card {
@@ -67,8 +69,27 @@
   font-weight: 600;
 }
 
+/* tablet keeps 3 across (Figma 2:1284) with a shorter image; phone stacks */
 @media (width <= 900px) {
   .locations {
-    grid-template-columns: 1fr;
+    gap: var(--pulse-space-2);
+  }
+
+  .locations .locations-card {
+    padding: var(--pulse-space-2);
+  }
+
+  .locations .locations-image img {
+    height: 120px;
+  }
+}
+
+@media (width < 700px) {
+  .locations {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .locations .locations-image img {
+    height: 180px;
   }
 }

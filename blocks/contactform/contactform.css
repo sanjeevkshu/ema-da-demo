@@ -1,16 +1,17 @@
 /* PULSE contact — info column + bordered form card */
 .contactform > div {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--pulse-space-6);
   align-items: start;
 }
 
-/* left: contact info */
+/* left: contact info (Figma 2:434 — 16px within the intro, 32px between groups) */
 .contactform .contactform-info {
   display: flex;
   flex-direction: column;
-  gap: var(--pulse-space-4);
+  gap: var(--pulse-space-2);
+  min-width: 0;
 }
 
 .contactform .contactform-info em {
@@ -27,6 +28,7 @@
   margin: 0;
   font-size: var(--pulse-fs-h2);
   font-weight: 600;
+  line-height: 1.1;
 }
 
 .contactform .contactform-info p {
@@ -42,25 +44,106 @@
   padding: 0;
   display: flex;
   flex-direction: column;
+  gap: 20px;
+}
+
+/* channel row: 44px icon tile + label/value (Figma 2:440) */
+.contactform .contactform-channel {
+  display: flex;
+  align-items: center;
   gap: var(--pulse-space-2);
-}
-
-/* label text (before the <br><strong>) is muted; the value is full-strength */
-.contactform .contactform-info ul li {
-  color: var(--pulse-ink-70);
+  color: var(--pulse-ink-60);
   font-size: var(--pulse-fs-small);
+  line-height: 17px;
 }
 
-.contactform .contactform-info ul strong {
-  display: block;
+.contactform .contactform-channel-text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.contactform .contactform-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--pulse-radius-md);
+  color: var(--pulse-blue);
+}
+
+.contactform .contactform-icon::before {
+  content: '';
+  width: 22px;
+  height: 22px;
+  background-color: currentcolor;
+  mask: url('../../icons/contact-chat.svg') center / contain no-repeat;
+}
+
+.contactform .contactform-channel-mail .contactform-icon::before {
+  mask-image: url('../../icons/contact-mail.svg');
+}
+
+.contactform .contactform-channel-phone .contactform-icon {
+  background-color: var(--pulse-orange-tint);
+  color: var(--pulse-orange);
+}
+
+.contactform .contactform-channel-phone .contactform-icon::before {
+  mask-image: url('../../icons/contact-phone.svg');
+}
+
+/* the value (after the <br>) is full-strength */
+.contactform .contactform-channel strong,
+.contactform .contactform-channel a {
+  display: inline-block;
   margin-top: 2px;
   color: var(--pulse-ink);
   font-size: var(--pulse-fs-body-lg);
+  font-weight: 700;
+  line-height: 22px;
 }
 
 .contactform .contactform-info a {
   color: var(--pulse-blue);
+  font-weight: 700;
+}
+
+/* divider + "follow for drops" chips (Figma 2:458–2:466) */
+.contactform .contactform-info .contactform-social-label {
+  margin-top: var(--pulse-space-2);
+  padding-top: var(--pulse-space-4);
+  border-top: 1px solid var(--pulse-ink-10);
+  color: var(--pulse-ink-50);
+  font-size: var(--pulse-fs-small);
+  font-weight: 700;
+  line-height: 17px;
+  text-transform: uppercase;
+}
+
+.contactform .contactform-info .contactform-social {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.contactform .contactform-info .contactform-social a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 33px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  background-color: var(--pulse-surface);
+  color: var(--pulse-ink);
+  font-size: var(--pulse-fs-small);
   font-weight: 600;
+  line-height: 17px;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.contactform .contactform-info .contactform-social a:hover {
+  background-color: var(--pulse-ink-10);
 }
 
 /* right: form card — the <form> is the card container */
@@ -128,8 +211,18 @@
   background-color: var(--link-hover-color);
 }
 
+/* tablet and phone: one column, form full width (Figma 2:1284, 2:1840).
+   The grid is on the row, so the override must be too. */
 @media (width <= 900px) {
-  .contactform {
-    grid-template-columns: 1fr;
+  .contactform > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--pulse-space-5);
+  }
+}
+
+@media (width <= 600px) {
+  .contactform .contactform-form > div,
+  .contactform .contactform-form form {
+    padding: var(--pulse-space-3);
   }
 }
