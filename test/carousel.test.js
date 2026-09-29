@@ -89,6 +89,10 @@ describe('carousel: decorate — structure', () => {
     const active = block.querySelectorAll('.carousel-slide.is-active');
     assert.equal(active.length, 1);
     assert.equal(active[0].getAttribute('aria-hidden'), 'false');
+    // hidden slides are inert: their links and buttons can't take focus
+    const hidden = [...block.querySelectorAll('.carousel-slide:not(.is-active)')];
+    assert.ok(hidden.length && hidden.every((s) => s.inert));
+    assert.equal(active[0].inert, false);
   });
 });
 

@@ -17,6 +17,8 @@
     "valuecards": { "sourceNode": "2:160", "files": ["blocks/valuecards/valuecards.js", "blocks/valuecards/valuecards.css"] },
     "columns.culture": { "sourceNode": "2:176", "files": ["blocks/columns/columns.js", "blocks/columns/columns.css"] },
     "stats": { "sourceNode": "2:188", "files": ["blocks/stats/stats.js", "blocks/stats/stats.css"] },
+    "contactform": { "sourceNode": "2:433", "files": ["blocks/contactform/contactform.js", "blocks/contactform/contactform.css"], "responsiveNodes": ["2:1284", "2:1840"], "note": "info column 2:434 (icon tiles, divider, follow chips) + form card 2:468. Layout only: the three frames carry different copy" },
+    "locations": { "sourceNode": "2:495", "files": ["blocks/locations/locations.js", "blocks/locations/locations.css"], "responsiveNodes": ["2:1284", "2:1840"], "note": "3 across on desktop and tablet, stacked on phone" },
     "header": { "sourceNode": "2:111", "files": ["content/nav.plain.html", "blocks/header/header.css"] },
     "footer": { "sourceNode": "2:198", "files": ["content/footer.plain.html", "blocks/footer/footer.css"] }
   },

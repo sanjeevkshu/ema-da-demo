@@ -51,7 +51,7 @@
     },
     "contactform": {
       "name": "Contact form",
-      "description": "Builds a form from a list. One cell: a heading, then one line per field (\"Label | type\" or \"Label | select | option 1, option 2\"), then the submit label. The form does not submit anywhere yet."
+      "description": "Two cells. Left: eyebrow, heading, intro, then a list of contact channels (\"LABEL\", line break, bold value or a link); each gets an email, phone or chat icon. Optionally, a short label (\"Follow for drops\") and a paragraph of links only, which become chips. Right: a heading, then one line per field (\"Label | type\" or \"Label | select | option 1, option 2\"), then the submit label. The form does not submit anywhere yet."
     },
     "filterbar": {
       "name": "Filter bar",

@@ -20,10 +20,12 @@ function buildForm(cell) {
       const type = (parts[1] || 'text').toLowerCase();
       const field = document.createElement('div');
       field.className = 'contactform-field';
+      const id = label.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      // the label names its control for screen readers (WCAG 1.3.1, 4.1.2)
       const lbl = document.createElement('label');
       lbl.textContent = label;
+      lbl.htmlFor = id;
       field.append(lbl);
-      const id = label.toLowerCase().replace(/[^a-z0-9]+/g, '-');
       if (type === 'textarea') {
         const ta = document.createElement('textarea');
         ta.id = id; ta.rows = 4; ta.placeholder = parts[2] || '';
@@ -58,11 +60,58 @@ function buildForm(cell) {
   inner.replaceChildren(form);
 }
 
+/** Which icon a channel gets: a link is a community channel, else email or phone by its value. */
+export function channelType(li) {
+  const link = li.querySelector('a[href]');
+  const href = link ? link.getAttribute('href') : '';
+  const value = (li.querySelector('strong, a') || li).textContent;
+  if (href.startsWith('mailto:') || (!link && value.includes('@'))) return 'mail';
+  if (href.startsWith('tel:') || (!link && /\+?\d[\d\s().-]{5,}/.test(value))) return 'phone';
+  return 'chat';
+}
+
+/**
+ * Info cell: each channel in the list gets an icon tile, and a paragraph made
+ * only of links (after the list) becomes the "follow" chips, with the
+ * paragraph before it as their label.
+ */
+function decorateInfo(cell) {
+  const list = cell.querySelector('ul');
+  if (list) {
+    list.classList.add('contactform-channels');
+    [...list.children].forEach((li) => {
+      li.classList.add('contactform-channel', `contactform-channel-${channelType(li)}`);
+      const icon = document.createElement('span');
+      icon.className = 'contactform-icon';
+      icon.setAttribute('aria-hidden', 'true');
+      const text = document.createElement('span');
+      text.className = 'contactform-channel-text';
+      text.append(...li.childNodes);
+      li.append(icon, text);
+    });
+  }
+  // only links, separated by whitespace (text nodes have no tagName)
+  const linkOnly = (p) => !!p.querySelector('a') && [...p.childNodes].every(
+    (n) => n.tagName === 'A' || (!n.tagName && !n.textContent.trim()),
+  );
+  let social = list && list.nextElementSibling;
+  while (social && !(social.tagName === 'P' && linkOnly(social))) social = social.nextElementSibling;
+  if (social) {
+    social.classList.add('contactform-social');
+    social.querySelectorAll('a').forEach((a) => a.classList.remove('button'));
+    const label = social.previousElementSibling;
+    if (label && label.tagName === 'P' && !linkOnly(label)) label.classList.add('contactform-social-label');
+  }
+}
+
 export default function decorate(block) {
   // Single row, two cells: cell 0 = contact info (left), cell 1 = form (right).
   const row = block.firstElementChild;
   const cells = row ? [...row.children] : [];
-  if (cells[0]) cells[0].classList.add('contactform-info');
+  if (cells[0]) {
+    cells[0].classList.add('contactform-info');
+    decorateInfo(cells[0]);
+  }
   if (cells[1]) {
     cells[1].classList.add('contactform-form');
     buildForm(cells[1]);
