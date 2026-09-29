@@ -88,19 +88,27 @@ const cssFiles = (root) => [
   ...readdirSync(join(root, 'styles')).filter((f) => f.endsWith('.css')).map((f) => `styles/${f}`),
 ];
 
+/** Media query widths (px) that aren't design-token breakpoints. */
+export function offGridBreakpoints(css, allowed) {
+  return [...stripComments(css).matchAll(/@media[^{]*?\b(?:width|min-width|max-width)\s*[<>=:]*\s*(\d+)px/g)]
+    .map((m) => Number(m[1])).filter((px) => !allowed.includes(px));
+}
+
 export function checkTokens(root = '.') {
   const problems = [];
   const notes = [];
-  // 1. Figma tokens and the CSS custom properties agree
-  const figma = json(join(root, 'reference/design-tokens.json')).colors;
+  // 1. the generated CSS still carries every token at its token value (no hand edits)
+  const tokens = json(join(root, 'reference/design-tokens.json'));
   const tokensCss = read(join(root, 'styles/pulse-tokens.css'));
-  Object.entries(figma).forEach(([name, value]) => {
-    const m = tokensCss.match(new RegExp(`--pulse-${name}\\s*:\\s*([^;]+);`));
-    if (!m) { problems.push(`colour "${name}" from Figma has no --pulse-${name} in styles/pulse-tokens.css`); return; }
-    const a = parseColor(value);
-    const b = parseColor(m[1]);
-    if (!a || !b || a.some((x, i) => Math.abs(x - b[i]) > 0.01)) problems.push(`--pulse-${name} is ${m[1].trim()}, Figma says ${value}`);
+  const [rootCss, compactCss = ''] = tokensCss.split('@media');
+  [[tokens.base, rootCss, 'base'], [tokens.compact, compactCss, 'compact']].forEach(([set, css, label]) => {
+    Object.entries(set).forEach(([name, value]) => {
+      const m = css.match(new RegExp(`--pulse-${name}\\s*:\\s*([^;]+);`));
+      if (!m) problems.push(`${label} token "${name}" has no --pulse-${name} in styles/pulse-tokens.css; run npm run tokens`);
+      else if (m[1].trim() !== value) problems.push(`--pulse-${name} (${label}) is ${m[1].trim()}, the token says ${value}; run npm run tokens`);
+    });
   });
+  const allowed = Object.values(tokens.breakpoints).map((v) => parseInt(v, 10));
   // 2. literals outside the tokens file never grow
   const baselinePath = join(root, 'reference/design/css-baseline.json');
   const baseline = existsSync(baselinePath) ? json(baselinePath) : {};
@@ -112,6 +120,7 @@ export function checkTokens(root = '.') {
       else if (now[k] < was[k]) notes.push(`${f}: ${k} down from ${was[k]} to ${now[k]}; lower the baseline (node test/design/run.mjs --update-baseline)`);
     });
     orphanGridRules(read(join(root, f))).forEach((o) => problems.push(`${f}: ${o}`));
+    offGridBreakpoints(read(join(root, f)), allowed).forEach((px) => problems.push(`${f}: @media at ${px}px isn't a token breakpoint (${allowed.join(', ')}px)`));
   });
   return { problems, notes };
 }

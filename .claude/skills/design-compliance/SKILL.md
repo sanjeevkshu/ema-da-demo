@@ -1,88 +1,98 @@
 ---
 name: design-compliance
-description: Keep PULSE's pages governed by the Figma design and the product catalog — the "Design (gate)" check on every PR. Use without being asked whenever a change touches a block's layout or CSS, adds a block, variant or page type, changes a product's image, price or page, or when the Figma file changes. Also use for "check design", "does this match Figma", "check Figma drift", "approve a Figma baseline", "promote a design check", "why did the Design gate fail", or when test/design-gate.test.js fails.
+description: Keep PULSE's pages governed by the Figma design system — design tokens, accessibility and layout — through the "Design (gate)" check on every PR, without slowing the build. Use without being asked whenever a change touches a block's layout or CSS, a design token, adds a block, variant or page type, or when the Figma file changes. Also use for "check design", "does this match Figma", "check Figma drift", "sync tokens", "approve a baseline", "promote a design check", "refresh the fixtures", "why did the Design gate fail", or when test/design-gate.test.js or test/a11y fails.
 ---
 
 # Design compliance (sanjeevkshu / ema-da-demo)
 
-Design is governed like code: DESIGN → BUILD → INTEGRATE → TEST → DEPLOY, with a
-check at each PR. **Sources of truth:** Figma owns layout and style; DA owns
-the words; the product catalog owns product images and prices.
+Design is governed like code, and none of it slows the build or deploy:
 
-| Source | File | Used by |
-|---|---|---|
-| Figma nodes per block and page, and reasons for anything without one | `reference/figma-sync.json` | coverage, drift |
-| Design tokens (from Figma) | `reference/design-tokens.json` → `styles/pulse-tokens.css` | tokens |
-| Measured block specs per breakpoint, from Figma | `reference/design/specs.json` | specs |
-| Products: card image, price, page | `reference/brand-concierge/product-catalog.csv` (also the concierge's catalog) | product |
-| Other approved images per product | `reference/design/product-media.json` | product |
-| Levels per layer and destination | `reference/design/gate.config.json` | runner |
-| Figma frame fingerprints at last sync | `reference/design/figma-fingerprints.json` | drift |
-| Approved Figma frame exports | `reference/design/baselines/<page>-<width>.png` | visual-figma |
+- Code ships through AEM Code Sync on merge, not through CI.
+- The critical path is the **Build** workflow (lint, headless a11y lint, token sync, unit tests; about 1 minute).
+- Everything heavier runs in **`pr-quality.yaml`**, in parallel, folded into one required check: **"Design (gate)"**.
 
-## The layers
+**Sources of truth:**
+- **Figma** owns layout and style.
+- **Copy and imagery belong to authoring** (DA) and are never design-gated.
+- Checks run on **frozen fixture pages**, so any difference comes from code.
 
-| Layer | Proves | Where |
-|---|---|---|
-| tokens | Figma tokens equal the CSS tokens; colour and font-size literals never grow (ratchet in `css-baseline.json`); a media rule never re-lays-out an element that isn't the grid | `test/design/static.mjs` |
-| responsive | Every page type at 390/768/1440: no sideways scroll, no clipped text, tap targets ≥24px (WCAG 2.2, with its spacing exception), no stretched images, one `<h1>` | `responsive.spec.js` |
-| product | Every card shows its catalog image, alt naming the product, catalog price and link; product pages' heading, price and gallery images are approved | `product.spec.js` |
-| specs | Measured columns, sizes, gaps and styles match Figma per breakpoint | `specs.spec.js` |
-| coverage | Every block and page type has a Figma node or a recorded reason | `static.mjs` |
-| visual-main | Before/after/diff screenshots against the PR's base branch, in the report artifact | `visual.spec.js` |
-| visual-figma | Screenshot against the approved Figma export; skipped until a baseline exists | `visual.spec.js` |
+## Pipeline
 
-`npm test` runs `test/design-gate.test.js` on every build: the config is valid,
-**main is never looser than develop**, and the code-level layers pass.
+| Stage | Where | Time | What |
+|---|---|---|---|
+| Build (critical path) | `main.yaml` | ~1 min | `lint` · `lint:a11y` (axe-core on every block's decorated example in jsdom, plus the token contrast matrix; no browser, ~4 s) · `tokens:check` · unit tests + coverage |
+| Page checks | `pr-quality.yaml` → `design` ×3 widths in parallel | ~1–2 min each | tokens, fixtures, responsive, a11y (axe in headless Chromium), specs, coverage, visual-figma |
+| Visual | `pr-quality.yaml` → `visual` | async | Applitools, **Layout** match (ignores copy and imagery), Ultrafast Grid at 390/768/1440, baselines per branch |
+| Gate | `pr-quality.yaml` → `gate` | seconds | `test/design/aggregate.mjs`: skipped = pass; report-only layers warn |
+| Nightly | `design.yaml` | — | the live real pages (`DESIGN_PAGES=live`) at the nightly levels |
+| Tokens | `tokens-sync.yaml` | ~1 min | Tokens Studio push to `tokens/figma` → Style Dictionary → bot commit → PR into develop |
+| Drift | `design-drift.yaml` | on demand | Figma frame fingerprints vs the last sync (needs `FIGMA_TOKEN`) |
+
+Required checks on develop and main: **build** and **Design (gate)**.
+Secrets:
+- `APPLITOOLS_API_KEY` (the visual job skips without it, and on forked PRs)
+- `FIGMA_TOKEN` (drift only)
+
+## Sources and files
+
+| What | File |
+|---|---|
+| Tokens (DTCG, from Tokens Studio) | `tokens/base.json`, `tokens/compact.json` (≤900px overrides), `tokens/$metadata.json` |
+| Generated tokens (never hand-edit) | `styles/pulse-tokens.css`, `reference/design-tokens.json` via `tokens/build.mjs` |
+| Levels per layer and destination | `reference/design/gate.config.json` |
+| Frozen fixture pages | `reference/design/fixtures.json`; DA `/drafts/design-fixtures/<page>` (previewed, never published) |
+| Contrast pairs and waivers | `reference/design/contrast-pairs.json` |
+| Block specs from Figma | `reference/design/specs.json` |
+| Figma map, and reasons for no design | `reference/figma-sync.json` |
+| Literal ratchet, fingerprints, baselines | `reference/design/css-baseline.json`, `figma-fingerprints.json`, `baselines/` |
+| Figma design-system brief | `reference/design/FIGMA-PROMPT.md` |
 
 ## Levels and promotion
 
-`off` → `report` (shows on the PR, never fails it) → `block`. Each layer has a
-level for `develop`, `main` and `nightly`. At nightly, `block` turns the run red.
-
-- Change levels only in a reviewed PR, and never make main looser than develop.
+`off` → `report` (visible, never fails) → `block`.
+- The unit tests enforce three rules: **main is never looser than develop**, waivers carry an owner, a reason and a review date, and a lapsed waiver fails.
 - Promote a layer after 3 green runs in a row.
-- Promote a Figma page per destination: approve its baseline first (below), then add the slug to `visual-figma.promoted.<destination>` and to every higher destination.
+- Promote `visual` once its Applitools baselines are approved.
+- Promote a `visual-figma` page once its Figma export is committed to `baselines/` and the slug is added to every destination from the lowest one up.
 
 ## When you change something (no request needed)
 
 | Change | Do |
 |---|---|
-| Block CSS/layout | Run the gate locally (below). If Figma defines the look, add or update the block's entry in `specs.json`, with values from `get_design_context` on its node |
-| New block or variant | Map it in `figma-sync.json` `blocks` (node id) or `noDesign.blocks` (why), add a spec if it has a node, plus the library entry and unit tests |
-| New page type | Map it in `figma-sync.json` `pages` or `noDesign.pages` |
-| New or changed product, image or price | Update the catalog CSV (card image = `image_url`) and `product-media.json` (gallery images; `illustration` for stand-ins). Tell the user to re-upload the CSV in Composer |
-| Removed colour/font literals | `node test/design/run.mjs --update-baseline` to lower the ratchet |
+| Block CSS or layout | Run the gate on the branch preview. If Figma defines the look, add or update the block's `specs.json` entry, with values from `get_design_context` |
+| A token | Edit `tokens/*.json` (or let Tokens Studio push), `npm run tokens`, commit both generated files |
+| New block or variant | Map it in `figma-sync.json` (or `noDesign` with a reason), add a spec, then `node test/a11y/fixtures.mjs` after the library build |
+| New page type | Map it in `figma-sync.json`; create its fixture: copy the page's DA source to `/drafts/design-fixtures/<slug>`, preview it, add it to `fixtures.json`, then `run.mjs --update-fixtures` |
+| New colour pairing | Add it to `contrast-pairs.json`. If it fails AA, fix it in Figma, or waive it (owner, reason, review) and raise it with design |
+| Fewer literals | `node test/design/run.mjs --update-baseline` |
 | Figma edited | Run the drift check; update specs, build and fingerprints in one PR |
 
-## Run it
+## Run it locally
 
 ```sh
-# all layers at a destination's levels, against a branch preview
+npm run lint:a11y && npm run tokens:check        # the critical-path additions
 DESIGN_BASE_URL=https://<branch>--ema-da-demo--sanjeevkshu.aem.page \
-DESIGN_COMPARE_URL=https://develop--ema-da-demo--sanjeevkshu.aem.page \
-npm run test:design -- --destination develop
-# one layer
-npx playwright test -c test/design/playwright.config.js --grep "@responsive "
+  node test/design/run.mjs --destination develop --width 390
 ```
 
-Locally, the default browser build isn't installed. Use
-`migration-work/probe/pw-design.config.js` with
-`PWB=/ms-playwright/chromium_headless_shell-1208/chrome-headless-shell-linux64/chrome-headless-shell`,
-and set `DESIGN_PW_CONFIG` and `DESIGN_RESULTS` to point the runner at it.
+- The local browser build differs from the pinned one. Use `migration-work/probe/pw-design.config.js` with `PWB=/ms-playwright/chromium_headless_shell-1208/chrome-headless-shell-linux64/chrome-headless-shell`, and set `DESIGN_PW_CONFIG` and `DESIGN_RESULTS` to point at it.
+- **Applitools:** `npm ci --prefix test/visual`, then `APPLITOOLS_API_KEY=… test/visual/node_modules/.bin/playwright test -c test/visual/playwright.config.js`.
 
 ## Figma drift on demand
 
-- **From the workspace, no token:** for each node that `mappedNodes()` in `test/design/drift.mjs` lists, call Figma MCP `get_metadata` with `maxDepth: 1`. Save each response to `migration-work/figma-meta/<id with - for :>.xml`, then run `node test/design/drift.mjs --from-metadata migration-work/figma-meta`. Add `--write` only after the sync is reviewed.
-- **From GitHub:** Actions → "Design drift" → Run. It stays dormant until a `FIGMA_TOKEN` secret exists. Tick "export frames" to get PNGs of the page frames.
-- **To approve a baseline:** review an exported PNG against the build, then commit it as `reference/design/baselines/<page>-1440.png`. The visual-figma layer picks it up. Tablet and phone need their own frames exported.
+- **Workspace, no token:** for every node that `mappedNodes()` in `test/design/drift.mjs` lists, call Figma MCP `get_metadata` with `maxDepth: 1`. Save each response to `migration-work/figma-meta/<id with - for :>.xml`, then run `node test/design/drift.mjs --from-metadata migration-work/figma-meta`. Add `--write` only after review.
+- **GitHub:** Actions → "Design drift" → Run. Tick "export frames" for PNGs to approve as `baselines/<page>-1440.png`.
 
 ## Gotchas learned
 
-- **Media rule on the wrong element.** `@media { .block { grid-template-columns } }` does nothing when the grid is on `.block > div`. This caused Contact's and the Products page's phone overflow. The tokens layer now flags it; use `minmax(0, 1fr)` columns.
-- **The Figma frames at each breakpoint carry different copy** (emails, addresses, FAQs), and a frame can itself be broken (Contact desktop wraps per character). Treat frames as layout references. Send design defects to the designer; don't build them.
-- **Designers re-wrap frames into sections**, which changes node IDs (23:3 → 49:2, 2:235 → 49:3). The drift check reports these as MISSING. Update `figma-sync.json` and `migration-plan.json` together.
-- **Figma MCP output:** `get_design_context` gives exact CSS values plus asset URLs (valid for 14 days). `get_screenshot` only shows an image to the agent, so file baselines need the REST export.
-- **Tap targets:** undersized links spaced ≥24px apart pass WCAG 2.5.8. Carousel dots at 8px apart don't; make the button 24px and draw the dot inside it.
-- **DA image swaps:** DA source `<picture>` elements keep stale `/media-da` `<source>` paths. Rewrite the whole `<picture>` to a single `<img>`. Media IDs (`media_<hash>`) are the same on preview and live.
-- **Content fixes ship through DA, not git.** Preview them with the PR; publish live after the code merges if the content depends on it.
+- **A check that ran nothing must fail.**
+  - A folder's `index` page is served at `/folder/`, not `/folder/index`, and it returned 404 while the layout checks "passed".
+  - A layer-name pattern without digits silently dropped every `a11y` result.
+  - `loadPage` now fails on any non-200 page, and the runner fails any enabled layer that runs zero tests.
+- **Headless-lint scope.** jsdom has no layout, so contrast and target size can't be checked without a browser. The lint checks names, labels, roles and ARIA from real block code, and checks contrast at the token level. The rendered axe layer checks the rest. The lint found an unlabelled `<select>`; the rendered layer found focusable hidden carousel slides (fixed with `inert`) and colour-only links.
+- **PULSE orange `#f97316` fails AA** on white, surface, blue and its own tint, and white-on-orange fails too. These are waived until 2026-10-31 and raised in the Figma prompt. A rendered contrast failure passes only when its exact colours are a waived token pair.
+- **Isolate heavy tools.** Applitools pulls in about 176 MB, including browser drivers. It lives in `test/visual/` with its own lockfile, so `npm ci` on the critical path never installs it.
+- **Tokens Studio emits `#FFFFFF` and `rgba()`.** `tokens/build.mjs` normalises colours to stylelint's notation. CSS variables don't work in media queries, so breakpoints are tokens enforced by the tokens layer.
+- **Media rule on the wrong element.** `@media { .block { grid-template-columns } }` does nothing when the grid is on `.block > div`. This caused both phone overflows; the tokens layer flags it.
+- **Figma frames at each breakpoint carry different copy, and frames get re-wrapped into sections** (their IDs change). Treat frames as layout references; drift reports them as MISSING.
+- **Required checks with path filters stay pending forever.** Use one aggregator job with `if: always()` and treat skipped as a pass.

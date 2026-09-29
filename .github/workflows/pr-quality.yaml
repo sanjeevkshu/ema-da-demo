@@ -1,0 +1,154 @@
+name: PR quality
+
+# Design and accessibility governance for pull requests, off the critical path.
+#   Critical path: the "Build" workflow (lint, headless a11y lint, token sync,
+#   unit tests + coverage), ~1 min, runs on every push. Nothing here slows it,
+#   and nothing here gates deployment: code ships through AEM Code Sync on merge.
+#   Here: page checks in three parallel jobs (one per Figma width) and the
+#   Applitools visual job, all against the PR's branch preview on frozen
+#   fixture pages, folded into ONE required check: "Design (gate)".
+# Required checks on develop and main: "build" and "Design (gate)".
+# Levels per layer and destination: reference/design/gate.config.json.
+# See .claude/skills/design-compliance/SKILL.md.
+on:
+  pull_request:
+    branches: [develop, main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-quality-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  changes: # ~5 s: skip the page checks when no front-end or design file changed
+    runs-on: ubuntu-latest
+    outputs:
+      frontend: ${{ steps.f.outputs.frontend }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - id: f
+        env:
+          BASE: ${{ github.base_ref }}
+        run: |
+          if git diff --name-only "origin/$BASE...HEAD" | grep -qE '^(blocks|styles|scripts|icons|tokens|head\.html|reference/design|reference/figma-sync\.json|test/design|test/visual|\.github/workflows/pr-quality\.yaml)'; then
+            echo "frontend=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "frontend=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  preview: # the PR's branch preview, once it serves this PR's code
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+    outputs:
+      url: ${{ steps.h.outputs.url }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - id: h
+        env:
+          HEAD: ${{ github.head_ref }}
+          BASE: ${{ github.base_ref }}
+          OWNER: ${{ github.repository_owner }}
+          REPO: ${{ github.event.repository.name }}
+        run: |
+          host="https://$(echo "$HEAD" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g')--${REPO}--${OWNER}.aem.page"
+          echo "url=$host" >> "$GITHUB_OUTPUT"
+          files=$(git diff --name-only "origin/$BASE...HEAD" -- 'blocks/*.js' 'blocks/*.css' 'styles/*.css' 'scripts/*.js' | head -20)
+          [ -z "$files" ] && exit 0
+          for i in $(seq 1 20); do
+            stale=0
+            for f in $files; do
+              [ -f "$f" ] || continue
+              curl -sf --compressed "$host/$f?ck=$RANDOM" -o served.tmp && cmp -s served.tmp "$f" || stale=1
+            done
+            [ "$stale" = 0 ] && { echo "preview is current"; exit 0; }
+            echo "attempt $i: waiting for $host"; sleep 15
+          done
+          echo "::warning title=Design gate::preview did not match this PR in time; testing anyway"
+
+  design: # tokens, fixtures, responsive, a11y (axe, headless), specs, coverage, visual-figma
+    needs: preview
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        width: [390, 768, 1440]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: pw-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+      - run: npx playwright install --with-deps chromium
+      - name: Design gate at ${{ matrix.width }}px
+        env:
+          DESIGN_BASE_URL: ${{ needs.preview.outputs.url }}
+        run: node test/design/run.mjs --destination "${{ github.base_ref }}" --width ${{ matrix.width }}
+      - if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: design-report-${{ matrix.width }}
+          path: test/design/design-report/
+          retention-days: 14
+          if-no-files-found: ignore
+
+  visual: # Applitools, Layout match, Ultrafast Grid renders the 3 widths in the cloud
+    needs: preview
+    # no secrets on forked PRs: skip rather than fail
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: test/visual/package-lock.json
+      - name: Applitools key present?
+        id: key
+        env:
+          KEY: ${{ secrets.APPLITOOLS_API_KEY }}
+        run: |
+          if [ -n "$KEY" ]; then echo "on=true" >> "$GITHUB_OUTPUT"; else
+            echo "on=false" >> "$GITHUB_OUTPUT"
+            echo "::notice title=Visual (Applitools)::No APPLITOOLS_API_KEY secret, so the visual layer is dormant."
+          fi
+      - if: steps.key.outputs.on == 'true'
+        run: npm ci --prefix test/visual # isolated: the Build job never installs it
+      - if: steps.key.outputs.on == 'true'
+        run: npx --prefix test/visual playwright install --with-deps chromium
+      - if: steps.key.outputs.on == 'true'
+        env:
+          APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
+          APPLITOOLS_BATCH_ID: ${{ github.event.pull_request.head.sha }}
+          DESIGN_BASE_URL: ${{ needs.preview.outputs.url }}
+        run: test/visual/node_modules/.bin/playwright test -c test/visual/playwright.config.js
+
+  gate: # the only required check from this workflow
+    name: Design (gate)
+    needs: [changes, preview, design, visual]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: |
+            test/design/aggregate.mjs
+            reference/design/gate.config.json
+      - env:
+          NEEDS: ${{ toJSON(needs) }}
+          DESTINATION: ${{ github.base_ref }}
+        run: node test/design/aggregate.mjs

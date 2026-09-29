@@ -1,100 +1,46 @@
-name: Design
+name: Design (nightly)
 
-# Design compliance gate (test/design): design tokens, responsive hygiene at
-# the Figma widths, block specs from Figma, product integrity against the
-# catalog, Figma coverage, and before/after screenshots.
-#
-# Levels per layer and destination live in reference/design/gate.config.json:
-# a PR into develop gets the develop levels, a PR into main the (stricter)
-# main levels, and the nightly run checks the live site.
-# Make "Design (gate)" a required check on develop and main.
-# See .claude/skills/design-compliance/SKILL.md.
+# The live site, as visitors see it: the design gate's nightly levels
+# (reference/design/gate.config.json) on the real page-type pages, not the
+# frozen fixtures. It never blocks anything; a blocking layer that fails
+# turns the run red so GitHub notifies. PRs are checked by pr-quality.yaml.
 on:
-  pull_request:
-    branches: [develop, main]
   schedule:
-    - cron: '41 3 * * *' # nightly on the live site
+    - cron: '41 3 * * *'
   workflow_dispatch:
-    inputs:
-      destination:
-        description: Which levels to apply
-        type: choice
-        options: [nightly, develop, main]
-        default: nightly
 
-concurrency:
-  group: design-${{ github.ref }}
-  cancel-in-progress: true
+permissions:
+  contents: read
 
 jobs:
   design:
-    name: Design (gate)
+    name: Design (nightly) ${{ matrix.width }}px
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        width: [390, 768, 1440]
     steps:
       - uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-
       - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm
-
-      - name: Resolve hosts and levels
-        id: host
-        env:
-          OWNER: ${{ github.repository_owner }}
-          REPO: ${{ github.event.repository.name }}
-          HEAD: ${{ github.head_ref }}
-          BASE: ${{ github.base_ref }}
-          INPUT: ${{ inputs.destination }}
-        run: |
-          safe() { echo "$1" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g'; }
-          if [ -n "$HEAD" ]; then
-            echo "url=https://$(safe "$HEAD")--${REPO}--${OWNER}.aem.page" >> "$GITHUB_OUTPUT"
-            echo "compare=https://$(safe "$BASE")--${REPO}--${OWNER}.aem.page" >> "$GITHUB_OUTPUT"
-            echo "destination=$BASE" >> "$GITHUB_OUTPUT"
-          else
-            echo "url=https://main--${REPO}--${OWNER}.aem.live" >> "$GITHUB_OUTPUT"
-            echo "compare=" >> "$GITHUB_OUTPUT"
-            echo "destination=${INPUT:-nightly}" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Wait for the preview to serve this PR's code
-        if: github.event_name == 'pull_request'
-        env:
-          HOST: ${{ steps.host.outputs.url }}
-          BASE: ${{ github.base_ref }}
-        run: |
-          files=$(git diff --name-only "origin/$BASE...HEAD" -- 'blocks/*.js' 'blocks/*.css' 'styles/*.css' 'scripts/*.js' | head -20)
-          [ -z "$files" ] && { echo "no front-end files changed"; exit 0; }
-          for i in $(seq 1 20); do
-            stale=0
-            for f in $files; do
-              [ -f "$f" ] || continue
-              curl -sf --compressed "$HOST/$f?ck=$RANDOM" -o served.tmp && cmp -s served.tmp "$f" || stale=1
-            done
-            [ "$stale" = 0 ] && { echo "preview is current"; exit 0; }
-            echo "attempt $i: waiting for $HOST"; sleep 15
-          done
-          echo "::warning title=Design gate::preview did not match this PR in time; testing anyway"
-
       - run: npm ci
-
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: pw-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
       - run: npx playwright install --with-deps chromium
-
-      - name: Design gate
-        env:
-          DESIGN_BASE_URL: ${{ steps.host.outputs.url }}
-          DESIGN_COMPARE_URL: ${{ steps.host.outputs.compare }}
-        run: node test/design/run.mjs --destination "${{ steps.host.outputs.destination }}"
-
-      - name: Keep the report (screenshots, diffs, traces)
-        if: always()
+      - env:
+          DESIGN_BASE_URL: https://main--${{ github.event.repository.name }}--${{ github.repository_owner }}.aem.live
+          DESIGN_PAGES: live
+        run: node test/design/run.mjs --destination nightly --width ${{ matrix.width }}
+      - if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: design-report
+          name: design-nightly-${{ matrix.width }}
           path: test/design/design-report/
           retention-days: 14
           if-no-files-found: ignore

@@ -7,15 +7,17 @@ import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
 import {
-  parseColor, literalCounts, orphanGridRules, checkTokens, checkCoverage, rules,
+  parseColor, literalCounts, orphanGridRules, checkTokens, checkCoverage, rules, offGridBreakpoints,
 } from './design/static.mjs'; // eslint-disable-line import/extensions
+import { decide } from './design/aggregate.mjs'; // eslint-disable-line import/extensions
+import { build, normalize } from '../tokens/build.mjs'; // eslint-disable-line import/extensions
 import {
   fingerprint, itemsFromXml, itemsFromRest, mappedNodes,
 } from './design/drift.mjs'; // eslint-disable-line import/extensions
 
 const config = JSON.parse(readFileSync('reference/design/gate.config.json', 'utf8'));
 const LEVELS = ['off', 'report', 'block'];
-const LAYERS = ['tokens', 'responsive', 'product', 'specs', 'coverage', 'visual-main', 'visual-figma'];
+const LAYERS = ['tokens', 'fixtures', 'responsive', 'a11y', 'specs', 'coverage', 'visual', 'visual-figma'];
 
 describe('gate config', () => {
   test('every layer has a known level for every destination and nightly', () => {
@@ -53,6 +55,52 @@ describe('gate config', () => {
 
   test('widths are the Figma phone, tablet and desktop frames', () => {
     assert.deepEqual(config.widths, [390, 768, 1440]);
+  });
+
+  test('every page type has a frozen fixture page, previewed under /drafts', () => {
+    const { pages } = JSON.parse(readFileSync('reference/design/fixtures.json', 'utf8'));
+    JSON.parse(readFileSync('.github/page-types.json', 'utf8')).forEach((t) => {
+      const slug = t.path === '/' ? 'index' : t.path.slice(1);
+      assert.ok(pages[slug], `fixture for ${t.name}`);
+      assert.match(pages[slug].path, /^\/drafts\/design-fixtures\//);
+      assert.match(pages[slug].sha, /^[0-9a-f]{12}$/);
+    });
+    assert.equal(pages.index.path, '/drafts/design-fixtures/', 'a folder index is served at the folder URL');
+  });
+});
+
+describe('the single required check', () => {
+  const needs = (r) => Object.fromEntries(Object.entries(r).map(([k, v]) => [k, { result: v }]));
+  test('skipped jobs pass; failed or cancelled jobs fail', () => {
+    assert.equal(decide(needs({
+      changes: 'success', preview: 'skipped', design: 'skipped', visual: 'skipped',
+    }), 'develop', config).ok, true);
+    assert.equal(decide(needs({ design: 'failure', visual: 'success' }), 'develop', config).ok, false);
+    assert.equal(decide(needs({ preview: 'cancelled' }), 'main', config).ok, false);
+  });
+  test('Applitools differences only fail where the visual layer blocks', () => {
+    const visualFails = needs({ design: 'success', visual: 'failure' });
+    assert.equal(decide(visualFails, 'develop', config).ok, config.layers.visual.develop !== 'block');
+    const strict = { ...config, layers: { ...config.layers, visual: { develop: 'block', main: 'block' } } };
+    assert.equal(decide(visualFails, 'develop', strict).ok, false);
+  });
+});
+
+describe('design tokens (Figma → Tokens Studio → Style Dictionary)', () => {
+  test('the committed CSS and JSON are exactly what the tokens generate', async () => {
+    const { css, json } = await build();
+    assert.equal(readFileSync('styles/pulse-tokens.css', 'utf8'), css, 'run npm run tokens');
+    assert.equal(readFileSync('reference/design-tokens.json', 'utf8'), json, 'run npm run tokens');
+  });
+  test('Tokens Studio colour notations come out as stylelint expects', () => {
+    assert.equal(normalize('#FFFFFF'), '#fff');
+    assert.equal(normalize('#1D4ED8'), '#1d4ed8');
+    assert.equal(normalize('rgba(17, 24, 39, 0.7)'), 'rgb(17 24 39 / 70%)');
+    assert.equal(normalize('rgb(17,24,39)'), 'rgb(17 24 39)');
+    assert.equal(normalize({ value: 16, unit: 'px' }), '16px');
+  });
+  test('media queries only use token breakpoints', () => {
+    assert.deepEqual(offGridBreakpoints('@media (width <= 900px) {} @media (width < 768px) {}', [600, 900]), [768]);
   });
 });
 

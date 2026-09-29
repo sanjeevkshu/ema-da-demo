@@ -12,6 +12,11 @@ jobs:
         node-version: 24
     - run: npm ci
     - run: npm run lint
+    # Headless accessibility lint (no browser, ~4 s): axe-core on every block's
+    # decorated example in jsdom, plus the design-token contrast matrix.
+    - run: npm run lint:a11y
+    # Design tokens: the committed CSS/JSON match tokens/*.json (Style Dictionary).
+    - run: npm run tokens:check
     # Functional test coverage gate: every block must stay at 80%+ line,
     # branch and function coverage or the build fails. See test/README.md.
     - name: Test + coverage gate (80%+)

@@ -157,3 +157,16 @@ Each is now caught by a layer, so it can't come back unseen.
 Lesson: #1 and #4 are the same defect, copied, again (see round 5). The fix
 that stops it recurring is a check, not a note: `orphanGridRules` in
 `test/design/static.mjs`.
+
+## Round 7: accessibility and tokens in the pipeline (2026-09-29)
+
+| # | Area | Issue | Fix | Caught by |
+|---|------|-------|-----|-----------|
+| 1 | Contact form | Labels not tied to their fields; the Subject select had no accessible name | `label.htmlFor` | headless axe lint (jsdom) |
+| 2 | Carousel | Hidden slides kept focusable buttons (keyboard focus out of sight) | hidden slides are `inert` | rendered axe |
+| 3 | Legal, Pulse range, accessory pages | Links in running text distinguished by colour only (1.4.1) | underline in default content | rendered axe |
+| 4 | Brand palette | Orange `#f97316` fails AA on white, surface, blue and its tint; white on orange; blue on ink; ink 50% labels | Waived to 2026-10-31, owner design; raised in `reference/design/FIGMA-PROMPT.md` | token contrast matrix, rendered axe |
+| 5 | Tokens | Weights, line heights, tracking, shadows, z-index, motion, borders, sizes and breakpoints weren't tokens | 28 tokens added via Style Dictionary; breakpoints enforced | tokens layer |
+| 6 | Gate itself | Home fixture 404 read as a pass; `a11y` results dropped by a letters-only layer pattern | non-200 pages fail; empty layers fail | end-to-end dry runs |
+
+Lesson: a check that runs nothing must fail. Every layer now proves it ran.

@@ -2,3 +2,6 @@ helix-importer-ui
 *.min.js
 migration-work
 node_modules
+test/design/design-report
+test/visual/node_modules
+test/**/test-results

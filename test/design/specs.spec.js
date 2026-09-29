@@ -3,14 +3,16 @@
  * taken from its Figma node (reference/design/specs.json), at every width.
  */
 import { test, expect } from '@playwright/test';
-import { WIDTHS, loadPage, readJSON } from './helpers.js';
+import {
+  WIDTHS, loadPage, readJSON, pathFor,
+} from './helpers.js';
 
 const { $comment, ...specs } = readJSON('reference/design/specs.json');
 
 for (const [block, spec] of Object.entries(specs)) {
   for (const width of WIDTHS) {
     test(`@specs ${block} on ${spec.page} at ${width}px (Figma ${Object.values(spec.figma).join(', ')})`, async ({ page }) => {
-      await loadPage(page, spec.page, width);
+      await loadPage(page, pathFor(spec.page), width);
       for (const check of spec.checks) {
         if (check.widths && !check.widths.includes(width)) continue;
         const found = await page.evaluate(({ selector, props, gapFrom }) => {

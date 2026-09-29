@@ -1,0 +1,54 @@
+name: Tokens sync
+
+# Figma → Tokens Studio → GitHub → Style Dictionary → PR.
+# The designer pushes token changes from the Tokens Studio plugin to the
+# tokens/figma branch (tokens/*.json, DTCG). This job regenerates
+# styles/pulse-tokens.css and reference/design-tokens.json with Style
+# Dictionary, commits them to the same branch, and opens (or updates) a PR
+# into develop, where the Build and Design (gate) checks run as usual.
+on:
+  push:
+    branches: [tokens/figma]
+    paths: ['tokens/**']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: tokens-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run tokens
+      - run: npx stylelint styles/pulse-tokens.css
+      - name: Commit the generated files
+        run: |
+          if git diff --quiet -- styles/pulse-tokens.css reference/design-tokens.json; then
+            echo "generated files already match the tokens"; exit 0
+          fi
+          git config user.name "pulse-tokens-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add styles/pulse-tokens.css reference/design-tokens.json
+          git commit -m "chore(tokens): regenerate from tokens/*.json (Style Dictionary)"
+          git push
+      - name: Open or update the PR into develop
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ -z "$(gh pr list --head tokens/figma --base develop --json number --jq '.[].number')" ]; then
+            gh pr create --head tokens/figma --base develop \
+              --title "Design tokens from Figma" \
+              --body "Token changes pushed from Figma (Tokens Studio), regenerated with Style Dictionary. Review the token diff and the Design (gate) results. Preview: https://tokens-figma--${{ github.event.repository.name }}--${{ github.repository_owner }}.aem.page/"
+          fi

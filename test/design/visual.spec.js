@@ -1,21 +1,16 @@
 /*
- * @visual-main  — every page type at every width, screenshotted on the PR's
- *                 branch and on its base branch (DESIGN_COMPARE_URL). The
- *                 before / after / diff images are attached to the report, so
- *                 reviewers see exactly what a change does to the design.
- * @visual-figma — the same screenshots against the approved Figma frame export
- *                 in reference/design/baselines/<page>-<width>.png. Pages without
- *                 an approved baseline are skipped with a note. Copy differs from
- *                 the frames by design (DA owns the words), so the score is a
- *                 review aid until a page is promoted in gate.config.json.
+ * @visual-figma — every page type at every width against the approved Figma
+ * frame export in reference/design/baselines/<page>-<width>.png. Pages without
+ * an approved baseline are skipped with a note. Report-only until a page is
+ * promoted in gate.config.json. (Before/after regression against the base
+ * branch is the Applitools layer: test/visual.)
  */
 import { test, expect } from '@playwright/test';
 import { existsSync, readFileSync } from 'node:fs';
 import {
-  PAGE_TYPES, WIDTHS, config, loadPage,
+  PAGES, WIDTHS, config, loadPage,
 } from './helpers.js';
 
-const COMPARE = process.env.DESIGN_COMPARE_URL;
 const { visual } = config;
 
 /** Share of pixels that differ (0..1) plus a diff image, computed in the browser. */
@@ -45,8 +40,7 @@ async function diff(page, a, b) {
       out.data[i + 2] = hit ? 0 : da.data[i + 2] / 3;
       out.data[i + 3] = 255;
     }
-    // height differences count as changed rows
-    const extra = Math.abs(ia.height - ib.height) * w;
+    const extra = Math.abs(ia.height - ib.height) * w; // height differences count as changed rows
     const c = document.createElement('canvas');
     c.width = w; c.height = h;
     c.getContext('2d').putImageData(out, 0, 0);
@@ -54,39 +48,20 @@ async function diff(page, a, b) {
   }, [`data:image/png;base64,${a.toString('base64')}`, `data:image/png;base64,${b.toString('base64')}`]);
 }
 
-async function shoot(page, path, width) {
-  await loadPage(page, path, width);
-  return page.screenshot({ fullPage: true, animations: 'disabled', caret: 'hide' });
-}
-
-for (const type of PAGE_TYPES) {
-  const slug = type.path === '/' ? 'index' : type.path.slice(1);
+for (const type of PAGES) {
   for (const width of WIDTHS) {
-    test(`@visual-main ${slug} at ${width}px`, async ({ page, browser }, info) => {
-      test.skip(!COMPARE, 'no DESIGN_COMPARE_URL (the base branch preview)');
-      const after = await shoot(page, type.path, width);
-      const other = await browser.newPage({ baseURL: COMPARE });
-      const before = await shoot(other, type.path, width);
-      await other.close();
-      const { ratio, png } = await diff(page, after, before);
-      await info.attach(`before (${new URL(COMPARE).hostname.split('--')[0]})`, { body: before, contentType: 'image/png' });
-      await info.attach('after (this branch)', { body: after, contentType: 'image/png' });
-      await info.attach('diff (red = changed)', { body: Buffer.from(png, 'base64'), contentType: 'image/png' });
-      info.annotations.push({ type: 'visual change', description: `${(ratio * 100).toFixed(2)}% of the page` });
-      expect(ratio, `${slug} at ${width}px changed ${(ratio * 100).toFixed(2)}% against the base branch`).toBeLessThanOrEqual(visual.maxChange);
-    });
-
-    test(`@visual-figma ${slug} at ${width}px`, async ({ page }, info) => {
-      const file = `reference/design/baselines/${slug}-${width}.png`;
+    test(`@visual-figma ${type.slug} at ${width}px`, async ({ page }, info) => {
+      const file = `reference/design/baselines/${type.slug}-${width}.png`;
       test.skip(!existsSync(file), `no approved Figma baseline (${file})`);
-      const after = await shoot(page, type.path, width);
+      await loadPage(page, type.path, width);
+      const build = await page.screenshot({ fullPage: true, animations: 'disabled', caret: 'hide' });
       const figma = readFileSync(file);
-      const { ratio, png } = await diff(page, after, figma);
+      const { ratio, png } = await diff(page, build, figma);
       await info.attach('figma (approved baseline)', { body: figma, contentType: 'image/png' });
-      await info.attach('build (this branch)', { body: after, contentType: 'image/png' });
+      await info.attach('build (this branch)', { body: build, contentType: 'image/png' });
       await info.attach('diff (red = differs)', { body: Buffer.from(png, 'base64'), contentType: 'image/png' });
       info.annotations.push({ type: 'figma match', description: `${(100 - ratio * 100).toFixed(1)}% of pixels match` });
-      expect(ratio, `${slug} at ${width}px differs ${(ratio * 100).toFixed(1)}% from Figma`).toBeLessThanOrEqual(visual.maxFigmaDiff);
+      expect(ratio, `${type.slug} at ${width}px differs ${(ratio * 100).toFixed(1)}% from Figma`).toBeLessThanOrEqual(visual.maxFigmaDiff);
     });
   }
 }

@@ -5,16 +5,16 @@
  *   - no clipped text in headings, buttons, labels or form controls
  *   - tap targets at least 24x24 px (WCAG 2.2 AA, 2.5.8; links inside text are exempt)
  *   - images keep their aspect ratio (no stretching)
- *   - exactly one <h1> per page (checked once, at desktop width)
+ * Copy and imagery are authoring's, not the gate's: nothing here reads the words.
  */
 import { test, expect } from '@playwright/test';
 import {
-  PAGE_TYPES, WIDTHS, loadPage, describeEl,
+  PAGES, WIDTHS, loadPage, describeEl,
 } from './helpers.js';
 
-for (const type of PAGE_TYPES) {
+for (const type of PAGES) {
   for (const width of WIDTHS) {
-    test(`@responsive ${type.name} (${type.path}) at ${width}px`, async ({ page }) => {
+    test(`@responsive ${type.name} (${type.slug}) at ${width}px`, async ({ page }) => {
       await loadPage(page, type.path, width);
       const report = await page.evaluate((describe) => {
         // eslint-disable-next-line no-new-func
@@ -89,11 +89,8 @@ for (const type of PAGE_TYPES) {
           })
           .map(name);
 
-        // 5. one <h1> per page (screen-reader navigation and SEO)
-        const h1s = document.querySelectorAll('main h1').length;
-
         return {
-          overflow, wide, clipped, small, stretched, h1s,
+          overflow, wide, clipped, small, stretched,
         };
       }, describeEl);
 
@@ -101,7 +98,6 @@ for (const type of PAGE_TYPES) {
       expect.soft(report.clipped, 'clipped text').toEqual([]);
       expect.soft(report.small, 'tap targets under 24x24px').toEqual([]);
       expect.soft(report.stretched, 'stretched images').toEqual([]);
-      if (width === WIDTHS[WIDTHS.length - 1]) expect.soft(report.h1s, 'h1 headings on the page').toBe(1);
     });
   }
 }
