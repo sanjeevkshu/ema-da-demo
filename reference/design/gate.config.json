@@ -1,0 +1,12 @@
+{
+  "$comment": "Design gate: the browser-side layers that run on PRs (pr-quality.yaml), one level each, the same for PRs into develop and into main (shift left: nothing new fails at promotion). off = not run; report = runs and shows, never fails; block = fails the check. The nightly run on the live pages is report-only and opens an issue when a blocking layer fails. Code-level design checks (tokens, literals, breakpoints, Figma coverage, contrast) run in the Build workflow on every push. Copy and imagery are never checked: they belong to authoring. Raise a level after 3 green runs in a row (visual: once its Applitools baselines are approved), in a reviewed PR. See .claude/skills/design-compliance/SKILL.md.",
+  "widths": [390, 768, 1440],
+  "layers": {
+    "fixtures": { "what": "The frozen fixture pages are unchanged, so every difference comes from code", "level": "block" },
+    "responsive": { "what": "No sideways scroll, clipped text or stretched images; 24px tap targets; every page type at 390/768/1440", "level": "block" },
+    "a11y": { "what": "axe-core WCAG 2.2 A/AA on rendered pages (contrast, target size, focus, names); waived token pairs only", "level": "block" },
+    "specs": { "what": "Measured block layout and style match the values taken from each block's Figma node", "level": "block" },
+    "visual": { "what": "Applitools Layout match (copy and imagery ignored) at 390/768/1440, baselines per branch, reviewed in the Applitools dashboard", "level": "report" }
+  },
+  "promotion": { "greenRuns": 3 }
+}

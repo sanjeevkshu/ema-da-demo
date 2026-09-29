@@ -1,0 +1,136 @@
+{
+  "$comment": "Figma frame fingerprints at the last reviewed sync. Written by test/design/drift.mjs --write.",
+  "verified": "2026-09-29",
+  "nodes": {
+    "49:2": {
+      "hash": "b0a10de54e44",
+      "size": "1440x3227",
+      "children": 7
+    },
+    "49:3": {
+      "hash": "3503a0a544fd",
+      "size": "1440x4418",
+      "children": 7
+    },
+    "2:417": {
+      "hash": "171fa0e31c94",
+      "size": "1440x3528",
+      "children": 5
+    },
+    "2:652": {
+      "hash": "ab2612977a47",
+      "size": "1440x2254",
+      "children": 6
+    },
+    "2:796": {
+      "hash": "3dcaf265b3da",
+      "size": "1440x2590",
+      "children": 7
+    },
+    "1:1413": {
+      "hash": "2de7cf6dc4a8",
+      "size": "1440x4811",
+      "children": 15
+    },
+    "1:1140": {
+      "hash": "1f656f0e5b8e",
+      "size": "1440x1788",
+      "children": 6
+    },
+    "1:1214": {
+      "hash": "8a76b3a8a1a8",
+      "size": "1440x3603",
+      "children": 9
+    },
+    "1:1288": {
+      "hash": "3fcfb720dfac",
+      "size": "1442x3905",
+      "children": 13
+    },
+    "1:1045": {
+      "hash": "6b4d6ae06e50",
+      "size": "1440x2115",
+      "children": 6
+    },
+    "55:2": {
+      "hash": "173748f61d1b",
+      "size": "1440x4811",
+      "children": 14
+    },
+    "55:145": {
+      "hash": "ffbe8e8f7c5a",
+      "size": "1440x2269",
+      "children": 3
+    },
+    "49:4": {
+      "hash": "10114f4c895f",
+      "size": "768x2397",
+      "children": 6
+    },
+    "2:1690": {
+      "hash": "5953dfd49c01",
+      "size": "390x1866",
+      "children": 8
+    },
+    "2:1195": {
+      "hash": "5f6cb3c1f6f3",
+      "size": "768x2670",
+      "children": 6
+    },
+    "2:1772": {
+      "hash": "19702f39b540",
+      "size": "390x2278",
+      "children": 8
+    },
+    "2:1284": {
+      "hash": "c7ae52f60883",
+      "size": "768x2192",
+      "children": 7
+    },
+    "2:1840": {
+      "hash": "f3ab1759267e",
+      "size": "390x1849",
+      "children": 8
+    },
+    "2:1404": {
+      "hash": "6da0720a89ac",
+      "size": "768x2062",
+      "children": 7
+    },
+    "2:1529": {
+      "hash": "180524f7836b",
+      "size": "768x2101",
+      "children": 5
+    },
+    "64:25": {
+      "hash": "e92166b5f840",
+      "size": "768x1535",
+      "children": 5
+    },
+    "64:90": {
+      "hash": "27062d43ad63",
+      "size": "390x990",
+      "children": 4
+    },
+    "64:132": {
+      "hash": "321efaae4dbf",
+      "size": "768x1064",
+      "children": 3
+    },
+    "64:195": {
+      "hash": "70881eb3ad32",
+      "size": "390x844",
+      "children": 3
+    },
+    "2:48": {
+      "hash": "3614ed1c20a1",
+      "size": "2400x1800",
+      "children": 7
+    },
+    "2:2264": {
+      "hash": "24d098357173",
+      "size": "1200x2200",
+      "children": 1
+    }
+  }
+}

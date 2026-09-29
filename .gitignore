@@ -13,3 +13,9 @@ helix-importer-ui
 !AGENTS.md
 test/integration/playwright-report/
 test/integration/test-results/
+test/design/design-report/
+test/design/design-results.json
+test/design/test-results/
+test/visual/node_modules/
+test/design/nightly-alert.md
+.lighthouseci/

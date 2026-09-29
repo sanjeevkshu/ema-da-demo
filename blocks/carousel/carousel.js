@@ -176,6 +176,8 @@ export default function decorate(block) {
       const active = i === current;
       s.classList.toggle('is-active', active);
       s.setAttribute('aria-hidden', active ? 'false' : 'true');
+      // hidden slides leave the tab order too, so keyboard focus never lands out of sight
+      s.inert = !active;
     });
     dotButtons.forEach((d, i) => {
       d.classList.toggle('is-active', i === current);

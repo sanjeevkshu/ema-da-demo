@@ -1,0 +1,41 @@
+{
+  "$comment": "Block design specs taken from Figma (get_design_context) per breakpoint. Checked by test/design/specs.spec.js on the page named in 'page'. Values are computed styles, compared exactly; 'columns' counts distinct left edges of the selector's matches. Add a block when it gets a Figma mapping in reference/figma-sync.json.",
+  "contactform": {
+    "page": "/contact",
+    "figma": { "desktop": "2:433", "tablet": "2:1284", "phone": "2:1840" },
+    "checks": [
+      { "selector": ".contactform > div > div", "columns": { "390": 1, "768": 1, "1440": 2 } },
+      { "selector": ".contactform-info :is(h1, h2)", "style": { "font-size": "40px", "line-height": "44px", "font-weight": "600" }, "widths": [1440] },
+      { "selector": ".contactform-icon", "count": 3, "size": [44, 44], "style": { "border-radius": "12px" } },
+      { "selector": ".contactform-channel-phone .contactform-icon", "style": { "background-color": "rgba(249, 115, 22, 0.1)", "color": "rgb(249, 115, 22)" } },
+      { "selector": ".contactform-channel strong", "style": { "font-size": "18px", "font-weight": "700", "color": "rgb(17, 24, 39)" } },
+      { "selector": ".contactform-social-label", "style": { "font-size": "14px", "font-weight": "700", "color": "rgba(17, 24, 39, 0.5)", "text-transform": "uppercase", "border-top-color": "rgba(17, 24, 39, 0.1)" } },
+      { "selector": ".contactform-social a", "min": 1, "size": [null, 33], "style": { "border-radius": "6px", "background-color": "rgb(247, 248, 250)", "padding": "8px 16px", "font-size": "14px", "font-weight": "600" } },
+      { "selector": ".contactform-form form", "style": { "border-radius": "24px", "border-top-width": "2px", "background-color": "rgb(247, 248, 250)" } }
+    ]
+  },
+  "locations": {
+    "page": "/contact",
+    "figma": { "desktop": "2:495", "tablet": "2:1284", "phone": "2:1840" },
+    "checks": [
+      { "selector": ".locations-card", "count": 3, "columns": { "390": 1, "768": 3, "1440": 3 } },
+      { "selector": ".locations", "gapAbove": { "from": ".locations-container .default-content-wrapper h2", "px": 48 } },
+      { "selector": ".locations-card", "style": { "border-radius": "20px", "border-top-width": "1px" } }
+    ]
+  },
+  "newsletter": {
+    "page": "/product-discovery",
+    "figma": { "desktop": "2:652" },
+    "checks": [
+      { "selector": ".newsletter > div > div", "columns": { "390": 1, "768": 1, "1440": 2 } }
+    ]
+  },
+  "carousel": {
+    "page": "/",
+    "figma": { "desktop": "55:145" },
+    "checks": [
+      { "selector": ".carousel-dot", "min": 2, "size": [24, 24] },
+      { "selector": ".carousel-arrow", "min": 2, "size": [48, 48] }
+    ]
+  }
+}

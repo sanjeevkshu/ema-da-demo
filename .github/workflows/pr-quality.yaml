@@ -1,0 +1,179 @@
+name: PR quality
+
+# Everything slower than the Build critical path, for pull requests, in
+# parallel, folded into ONE required check: "Design (gate)".
+#   design    ×3 widths: fixtures, responsive, a11y (axe, headless), specs
+#   lighthouse ×2 form factors: performance, best practices, SEO
+#   visual    Applitools Layout match (report until baselines are approved)
+#   security  dependency review (new vulnerable or disallowed dependencies)
+# All page checks run on the PR's branch preview, on frozen fixture pages.
+# Same bar for PRs into develop and into main (reference/design/gate.config.json).
+# Nothing here gates deployment: code ships through AEM Code Sync on merge.
+# Required checks on develop and main: "build" and "Design (gate)".
+on:
+  pull_request:
+    branches: [develop, main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-quality-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  changes: # ~5 s: skip page checks when no front-end or design file changed
+    runs-on: ubuntu-latest
+    outputs:
+      frontend: ${{ steps.f.outputs.frontend }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - id: f
+        env:
+          BASE: ${{ github.base_ref }}
+        run: |
+          if git diff --name-only "origin/$BASE...HEAD" | grep -qE '^(blocks|styles|scripts|icons|fonts|tokens|head\.html|reference/design|reference/figma-sync\.json|test/design|test/visual|\.lighthouserc\.json|\.github/(lighthouserc|workflows/pr-quality|actions))'; then
+            echo "frontend=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "frontend=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  preview: # the PR's branch preview, once it serves this PR's code
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+    outputs:
+      url: ${{ steps.host.outputs.url }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - id: host
+        uses: ./.github/actions/aem-host
+        with:
+          branch: ${{ github.head_ref }}
+          diff: origin/${{ github.base_ref }}...HEAD
+
+  design:
+    needs: preview
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        width: [390, 768, 1440]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: pw-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+      - run: npx playwright install --with-deps chromium
+      - name: Design gate at ${{ matrix.width }}px
+        env:
+          DESIGN_BASE_URL: ${{ needs.preview.outputs.url }}
+        run: node test/design/run.mjs --destination "${{ github.base_ref }}" --width ${{ matrix.width }}
+      - if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: design-report-${{ matrix.width }}
+          path: test/design/design-report/
+          retention-days: 14
+          if-no-files-found: ignore
+
+  lighthouse: # every page type's fixture; reports kept private (artifact)
+    needs: preview
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        form-factor: [desktop, mobile]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+      - run: npm install -g @lhci/cli@0.14.0
+      - name: Lighthouse (${{ matrix.form-factor }})
+        env:
+          HOST: ${{ needs.preview.outputs.url }}
+          CONFIG: ${{ matrix.form-factor == 'desktop' && '.lighthouserc.json' || '.github/lighthouserc-mobile.json' }}
+        run: |
+          urls=()
+          for p in $(node -e "Object.values(require('./reference/design/fixtures.json').pages).forEach((f) => console.log(f.path))"); do
+            urls+=("--collect.url=${HOST}${p}?consent=decline")
+          done
+          lhci autorun --config="$CONFIG" "${urls[@]}"
+      - if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: lighthouse-${{ matrix.form-factor }}
+          path: .lighthouseci/
+          include-hidden-files: true
+          retention-days: 14
+          if-no-files-found: ignore
+
+  visual: # Applitools: Layout match, Ultrafast Grid renders the 3 widths in the cloud
+    needs: preview
+    # no secrets on forked PRs: skip rather than fail
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: test/visual/package-lock.json
+      - name: Applitools key present?
+        id: key
+        env:
+          KEY: ${{ secrets.APPLITOOLS_API_KEY }}
+        run: |
+          if [ -n "$KEY" ]; then echo "on=true" >> "$GITHUB_OUTPUT"; else
+            echo "on=false" >> "$GITHUB_OUTPUT"
+            echo "::notice title=Visual (Applitools)::No APPLITOOLS_API_KEY secret, so the visual layer is dormant."
+          fi
+      - if: steps.key.outputs.on == 'true'
+        run: npm ci --prefix test/visual # isolated: the Build job never installs it
+      - if: steps.key.outputs.on == 'true'
+        run: npx --prefix test/visual playwright install --with-deps chromium
+      - if: steps.key.outputs.on == 'true'
+        env:
+          APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
+          APPLITOOLS_BATCH_ID: ${{ github.event.pull_request.head.sha }}
+          DESIGN_BASE_URL: ${{ needs.preview.outputs.url }}
+        run: test/visual/node_modules/.bin/playwright test -c test/visual/playwright.config.js
+
+  security: # new dependencies with known vulnerabilities fail the gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+        with:
+          fail-on-severity: high
+
+  gate: # the only required check from this workflow
+    name: Design (gate)
+    needs: [changes, preview, design, lighthouse, visual, security]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          sparse-checkout: |
+            test/design/aggregate.mjs
+            reference/design/gate.config.json
+      - env:
+          NEEDS: ${{ toJSON(needs) }}
+          DESTINATION: ${{ github.base_ref }}
+        run: node test/design/aggregate.mjs

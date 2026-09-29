@@ -58,6 +58,18 @@ Edge Delivery Services. Read a block first. Omissions are in the repo or known.
   `test/integration/coverage.json` in the same change, unasked:
   `.claude/skills/integration-coverage`. `npm test` fails on an unmapped
   integration file; the "Integration (gate)" workflow blocks PRs into `main`.
+- Design is governed like code. Figma owns layout and style; copy and imagery
+  belong to authoring and are never design-gated. Tokens flow Figma → Tokens
+  Studio → `tokens/*.json` → `npm run tokens` (Style Dictionary); never
+  hand-edit `styles/pulse-tokens.css`. A change to a block's layout or CSS, a
+  new block, variant or page type, a token, or a Figma edit updates
+  `reference/figma-sync.json` and `reference/design/` in the same change,
+  unasked: `.claude/skills/design-compliance`. Build (every push) is the
+  critical path; PRs run "Design (gate)" (`pr-quality.yaml`, in parallel) on
+  frozen fixture pages with one level per layer, the same for `develop` and
+  `main`. Pin new actions by commit SHA with least-privilege `permissions:`.
+- New/changed `scripts/` files also meet the 80% per-file coverage gate
+  (`aem.js` and `scripts.js` are exempt, with reasons, in `test/check-coverage.js`).
 - Brand Concierge (`scripts/brand-concierge.js`) loads only via `consented.js`,
   and its SDKs load only on the first launcher open. Never move it into
   `head.html` or the eager/lazy phases. `CONFIG.paths` must match the Composer

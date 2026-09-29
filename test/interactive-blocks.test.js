@@ -195,6 +195,10 @@ describe('contactform', () => {
     assert.ok(form.querySelector('textarea'));
     assert.equal(form.querySelectorAll('select option').length, 2);
     assert.equal(form.querySelector('button.contactform-submit').textContent, 'Send');
+    // every label names its control
+    form.querySelectorAll('label').forEach((lbl) => {
+      assert.ok(form.querySelector(`#${lbl.htmlFor}`), `label "${lbl.textContent}" points at a control`);
+    });
   });
 
   test('prevents submit navigation', () => {
@@ -229,5 +233,63 @@ describe('contactform', () => {
     decorateContactform(block);
     // still produces a form with a submit button
     assert.ok(block.querySelector('.contactform-form form button'));
+  });
+
+  const info = '<div><h2>Talk</h2><ul>'
+    + '<li>EMAIL US<br><strong>hello@pulsewear.com</strong></li>'
+    + '<li>PHONE<br><strong>+1 (555) 234-PULS</strong></li>'
+    + '<li>DISCORD<br><a href="https://discord.gg/pulsewear">discord.gg/pulsewear</a></li>'
+    + '</ul><p>Follow for drops</p>'
+    + '<p><a href="https://instagram.com" class="button">Instagram</a> <a href="https://tiktok.com">TikTok</a></p></div>';
+
+  test('gives each contact channel an icon tile by type', () => {
+    const block = buildBlock('contactform', [[info, '<div><p>Send</p></div>']]);
+    decorateContactform(block);
+    const items = [...block.querySelectorAll('.contactform-channel')];
+    assert.deepEqual(
+      items.map((li) => [...li.classList].find((c) => c.startsWith('contactform-channel-'))),
+      ['contactform-channel-mail', 'contactform-channel-phone', 'contactform-channel-chat'],
+    );
+    items.forEach((li) => {
+      assert.equal(li.firstElementChild.className, 'contactform-icon');
+      assert.equal(li.firstElementChild.getAttribute('aria-hidden'), 'true');
+      assert.ok(li.querySelector('.contactform-channel-text strong, .contactform-channel-text a'));
+    });
+  });
+
+  test('turns the links-only paragraph after the list into follow chips', () => {
+    const block = buildBlock('contactform', [[info, '<div><p>Send</p></div>']]);
+    decorateContactform(block);
+    const social = block.querySelector('.contactform-social');
+    assert.equal(social.querySelectorAll('a').length, 2);
+    assert.equal(social.querySelector('a.button'), null, 'button styling removed');
+    assert.equal(block.querySelector('.contactform-social-label').textContent, 'Follow for drops');
+  });
+
+  test('mailto and tel links pick mail and phone icons', () => {
+    const block = buildBlock('contactform', [[
+      '<div><ul><li>Mail<br><a href="mailto:a@b.co">a@b.co</a></li><li>Call<br><a href="tel:+15551234">call</a></li></ul></div>',
+      '<div><p>Send</p></div>',
+    ]]);
+    decorateContactform(block);
+    assert.ok(block.querySelector('.contactform-channel-mail'));
+    assert.ok(block.querySelector('.contactform-channel-phone'));
+  });
+
+  test('no chips without a links-only paragraph, and no label when links come first', () => {
+    const block = buildBlock('contactform', [[
+      '<div><ul><li>Hi<br><strong>x</strong></li></ul><p>Text and <a href="/a">a link</a></p></div>',
+      '<div><p>Send</p></div>',
+    ]]);
+    decorateContactform(block);
+    assert.equal(block.querySelector('.contactform-social'), null);
+
+    const block2 = buildBlock('contactform', [[
+      '<div><ul><li>Hi</li></ul><p><a href="/a">A</a></p><p><a href="/b">B</a></p></div>',
+      '<div><p>Send</p></div>',
+    ]]);
+    decorateContactform(block2);
+    assert.ok(block2.querySelector('.contactform-social'));
+    assert.equal(block2.querySelector('.contactform-social-label'), null);
   });
 });

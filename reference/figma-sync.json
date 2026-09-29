@@ -6,7 +6,7 @@
   "lastSynced": "2026-09-21",
   "tokens": {
     "target": "styles/pulse-tokens.css",
-    "sourceNodes": ["23:3", "2:48", "2:2264"]
+    "sourceNodes": ["49:2", "2:48", "2:2264"]
   },
   "blocks": {
     "hero.split": { "sourceNode": "2:126", "files": ["blocks/hero/hero.js", "blocks/hero/hero.css"] },
@@ -17,12 +17,25 @@
     "valuecards": { "sourceNode": "2:160", "files": ["blocks/valuecards/valuecards.js", "blocks/valuecards/valuecards.css"] },
     "columns.culture": { "sourceNode": "2:176", "files": ["blocks/columns/columns.js", "blocks/columns/columns.css"] },
     "stats": { "sourceNode": "2:188", "files": ["blocks/stats/stats.js", "blocks/stats/stats.css"] },
+    "contactform": { "sourceNode": "2:433", "files": ["blocks/contactform/contactform.js", "blocks/contactform/contactform.css"], "responsiveNodes": ["2:1284", "2:1840"], "note": "info column 2:434 (icon tiles, divider, follow chips) + form card 2:468. Layout only: the three frames carry different copy" },
+    "locations": { "sourceNode": "2:495", "files": ["blocks/locations/locations.js", "blocks/locations/locations.css"], "responsiveNodes": ["2:1284", "2:1840"], "note": "3 across on desktop and tablet, stacked on phone" },
     "header": { "sourceNode": "2:111", "files": ["content/nav.plain.html", "blocks/header/header.css"] },
-    "footer": { "sourceNode": "2:198", "files": ["content/footer.plain.html", "blocks/footer/footer.css"] }
+    "footer": { "sourceNode": "2:198", "files": ["content/footer.plain.html", "blocks/footer/footer.css"] },
+    "accordion": { "sourceNode": "2:523", "files": ["blocks/accordion/accordion.js", "blocks/accordion/accordion.css"], "note": "contact FAQ section" },
+    "cards": { "sourceNode": "55:104", "files": ["blocks/cards/cards.js", "blocks/cards/cards.css"], "note": "landing Hero Carousel page, card row" },
+    "filterbar": { "sourceNode": "2:672", "files": ["blocks/filterbar/filterbar.js", "blocks/filterbar/filterbar.css"] },
+    "newsletter": { "sourceNode": "2:747", "files": ["blocks/newsletter/newsletter.js", "blocks/newsletter/newsletter.css"] },
+    "pdp": { "sourceNode": "2:815", "files": ["blocks/pdp/pdp.js", "blocks/pdp/pdp.css"], "note": "Configurator: gallery, copy, price, CTA" },
+    "productgrid": { "sourceNode": "2:688", "files": ["blocks/productgrid/productgrid.js", "blocks/productgrid/productgrid.css"], "note": ".related variant: 2:933 and landing 55:86" },
+    "scenarios": { "sourceNode": "2:259", "files": ["blocks/scenarios/scenarios.js", "blocks/scenarios/scenarios.css"] },
+    "schedule": { "sourceNode": "2:320", "files": ["blocks/schedule/schedule.js", "blocks/schedule/schedule.css"], "note": "Day-In-The-Life, nested in columns.schedule-layout" },
+    "specs": { "sourceNode": "2:860", "files": ["blocks/specs/specs.js", "blocks/specs/specs.css"] },
+    "testimonials": { "sourceNode": "2:288", "files": ["blocks/testimonials/testimonials.js", "blocks/testimonials/testimonials.css"], "note": ".reviews variant: 2:889; landing 55:7" },
+    "ugcgrid": { "sourceNode": "2:355", "files": ["blocks/ugcgrid/ugcgrid.js", "blocks/ugcgrid/ugcgrid.css"] }
   },
   "pages": {
-    "know-the-brand": { "sourceNode": "23:3", "target": "content/know-the-brand.plain.html", "status": "done", "images": "content/images/know-the-brand" },
-    "lifestyle-vision": { "sourceNode": "2:235", "target": "content/lifestyle-vision.plain.html", "status": "done", "images": "content/images/lifestyle-vision" },
+    "know-the-brand": { "sourceNode": "49:2", "target": "content/know-the-brand.plain.html", "status": "done", "images": "content/images/know-the-brand", "note": "Figma section (was frame 23:3 until the designer wrapped it, found 2026-09-29)" },
+    "lifestyle-vision": { "sourceNode": "49:3", "target": "content/lifestyle-vision.plain.html", "status": "done", "images": "content/images/lifestyle-vision", "note": "Figma section (was frame 2:235 until the designer wrapped it, found 2026-09-29)" },
     "contact": { "sourceNode": "2:417", "target": "content/contact.plain.html", "status": "done", "images": "content/images/contact" },
     "product-discovery": { "sourceNode": "2:652", "target": "content/product-discovery.plain.html", "status": "done", "images": "content/images/product-discovery" },
     "product-details": { "sourceNode": "2:796", "target": "content/product-details.plain.html", "status": "done", "images": "content/images/product-details" },
@@ -34,6 +47,27 @@
     "discover": { "sourceNode": "55:2", "target": "content/discover.plain.html", "status": "done", "images": "content/media-da/discover", "note": "landing page with Hero Carousel" },
     "pulse-vision-ar": { "sourceNode": "55:145", "target": "content/pulse-vision-ar.plain.html", "status": "done", "images": "content/media-da/pulse-vision-ar", "note": "PDP with Hero Carousel (thumbnails)" },
     "pulse-loop": { "sourceNode": "55:145", "target": "content/pulse-loop.plain.html", "status": "done", "images": "content/media-da/pulse-loop", "note": "PDP with Hero Carousel (thumbnails)" },
-    "pulse-band-neo": { "sourceNode": "55:145", "target": "content/pulse-band-neo.plain.html", "status": "done", "images": "content/media-da/pulse-band-neo", "note": "PDP with Hero Carousel (thumbnails)" }
+    "pulse-band-neo": { "sourceNode": "55:145", "target": "content/pulse-band-neo.plain.html", "status": "done", "images": "content/media-da/pulse-band-neo", "note": "PDP with Hero Carousel (thumbnails)" },
+    "index": { "sourceNode": "55:2", "target": "DA /index", "status": "done", "note": "home shares the Hero Carousel landing design with discover" },
+    "pulse-arc-slim": { "sourceNode": "2:796", "target": "DA /pulse-arc-slim", "status": "done", "note": "no frame of its own: follows the product-details layout (pdp + related productgrid)" },
+    "pulse-charge-dock": { "sourceNode": "2:796", "target": "DA /pulse-charge-dock", "status": "done", "note": "no frame of its own: follows the product-details layout (pdp + related productgrid)" },
+    "pulse-loop-case": { "sourceNode": "2:796", "target": "DA /pulse-loop-case", "status": "done", "note": "no frame of its own: follows the product-details layout (pdp + related productgrid)" },
+    "pulse-loop-gold": { "sourceNode": "2:796", "target": "DA /pulse-loop-gold", "status": "done", "note": "no frame of its own: follows the product-details layout (pdp + related productgrid)" },
+    "pulse-neo-straps": { "sourceNode": "2:796", "target": "DA /pulse-neo-straps", "status": "done", "note": "no frame of its own: follows the product-details layout (pdp + related productgrid)" },
+    "pulse-studio": { "sourceNode": "2:796", "target": "DA /pulse-studio", "status": "done", "note": "no frame of its own: follows the product-details layout (pdp + related productgrid)" }
+  },
+  "nodesVerified": "2026-09-29",
+  "noDesign": {
+    "$comment": "Blocks and page types with no Figma source, and why. The design gate treats these as covered by the hygiene, spec and product layers only.",
+    "blocks": {
+      "fragment": "Infrastructure: renders another page (nav, footer) inside this one; has no look of its own.",
+      "search": "Built after the Figma file, in the PULSE design language (tokens only).",
+      "widget": "Boilerplate block; the site ships no widgets."
+    },
+    "pages": {
+      "privacy": "Legal copy page drafted after the Figma file; default content only.",
+      "terms-of-service": "Legal copy page drafted after the Figma file; default content only.",
+      "search": "Search results page built after the Figma file."
+    }
   }
 }

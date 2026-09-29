@@ -1,11 +1,22 @@
 {
-  "extends": ["config:recommended"],
+  "extends": ["config:recommended", "helpers:pinGitHubActionDigests"],
+  "baseBranches": ["develop"],
   "packageRules": [
     {
       "matchDepTypes": ["devDependencies"],
       "labels": ["ignore-psi-check"],
       "automerge": true,
       "ignoreTests": false
+    },
+    {
+      "matchManagers": ["github-actions"],
+      "groupName": "GitHub Actions",
+      "automerge": false
+    },
+    {
+      "matchFileNames": ["test/visual/package.json"],
+      "groupName": "Applitools visual layer",
+      "automerge": false
     },
     {
       "matchPackageNames": ["eslint"],

@@ -1,0 +1,10 @@
+{
+  "name": "pulse-visual",
+  "private": true,
+  "description": "Applitools visual layer of the design gate. Installed only by the visual job (npm ci --prefix test/visual), so the lint and build path stays lean.",
+  "type": "module",
+  "devDependencies": {
+    "@applitools/eyes-playwright": "1.49.3",
+    "@playwright/test": "1.63.0"
+  }
+}

@@ -4,16 +4,21 @@ name: Integration
 # preview: consent gate, Brand Concierge + Web SDK/AEP, query index + search,
 # crawl rules on the production domain, header/footer fragments.
 #
-# Gate: PRs into main (the develop -> main promotion). Make the
-# "Integration (gate)" check required in the main branch protection rules.
+#   PR into main (the develop -> main promotion): the full suite, blocking.
+#   PR into develop: only when an integration file changed, and without the
+#     Brand Concierge spec (it starts real chats that land in analytics).
+#   Nightly: the full suite on main, to catch drift in Adobe-side config.
 # @golden (grounded Brand Concierge answers) is report-only until grounding
 # is fixed: see .claude/skills/integration-coverage/SKILL.md.
 on:
   pull_request:
-    branches: [main]
+    branches: [main, develop]
   schedule:
-    - cron: '17 3 * * *' # nightly on main: catches drift in Adobe-side config
+    - cron: '17 3 * * *'
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 concurrency:
   group: integration-${{ github.ref }}
@@ -25,46 +30,56 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
 
-      - uses: actions/setup-node@v7
+      - name: Scope
+        id: scope
+        env:
+          BASE: ${{ github.base_ref }}
+        run: |
+          if [ "$BASE" != "develop" ]; then echo "run=full" >> "$GITHUB_OUTPUT"; exit 0; fi
+          files=$(node -e "const c=require('./test/integration/coverage.json'); const s=new Set(['test/integration/helpers.js']); Object.values(c.integrations).forEach((i)=>{(i.code||[]).forEach((f)=>s.add(f)); if (i.spec) s.add('test/integration/'+i.spec);}); console.log([...s].join('\n'))")
+          if git diff --name-only "origin/$BASE...HEAD" | grep -qxF -f <(echo "$files"; echo ".github/workflows/integration.yaml"); then
+            echo "run=subset" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=none" >> "$GITHUB_OUTPUT"; echo "no integration file changed: nothing to check"
+          fi
+
+      - if: steps.scope.outputs.run != 'none'
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 24
           cache: npm
 
-      - name: Resolve the branch preview host
+      - if: steps.scope.outputs.run != 'none'
         id: host
-        env:
-          OWNER: ${{ github.repository_owner }}
-          REPO: ${{ github.event.repository.name }}
-          BRANCH: ${{ github.head_ref || github.ref_name }}
-        run: |
-          SAFE_BRANCH=$(echo "$BRANCH" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g')
-          echo "url=https://${SAFE_BRANCH}--${REPO}--${OWNER}.aem.page" >> "$GITHUB_OUTPUT"
+        uses: ./.github/actions/aem-host
+        with:
+          branch: ${{ github.head_ref || github.ref_name }}
+          diff: ${{ github.base_ref && format('origin/{0}...HEAD', github.base_ref) || '' }}
 
-      - name: Wait for the preview to serve this commit's code
-        env:
-          HOST: ${{ steps.host.outputs.url }}
-        run: |
-          for i in $(seq 1 20); do
-            if curl -sf "$HOST/scripts/brand-concierge.js?ck=$RANDOM" -o served.js && cmp -s served.js scripts/brand-concierge.js; then
-              echo "preview is current"; exit 0
-            fi
-            echo "attempt $i: waiting for $HOST"; sleep 15
-          done
-          echo "::warning title=Integration::preview did not match this commit in time; testing anyway"
+      - if: steps.scope.outputs.run != 'none'
+        run: npm ci
 
-      - run: npm ci
-
-      - run: npx playwright install --with-deps chromium
+      - if: steps.scope.outputs.run != 'none'
+        run: npx playwright install --with-deps chromium
 
       - name: Integration checks (blocking)
+        if: steps.scope.outputs.run == 'full'
         env:
           INTEGRATION_BASE_URL: ${{ steps.host.outputs.url }}
         run: npm run test:integration -- --grep-invert @golden
 
+      - name: Integration checks, no chats (blocking)
+        if: steps.scope.outputs.run == 'subset'
+        env:
+          INTEGRATION_BASE_URL: ${{ steps.host.outputs.url }}
+        run: npm run test:integration -- consent.spec.js search.spec.js fragments.spec.js
+
       - name: Grounded Brand Concierge answers (report-only)
-        if: always()
+        if: always() && steps.scope.outputs.run == 'full'
         continue-on-error: true
         env:
           INTEGRATION_BASE_URL: ${{ steps.host.outputs.url }}
@@ -73,8 +88,8 @@ jobs:
             || echo "::warning title=Brand Concierge grounding::golden answers failed; see the step log"
 
       - name: Keep the report
-        if: always()
-        uses: actions/upload-artifact@v7
+        if: always() && steps.scope.outputs.run != 'none'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: integration-report
           path: test/integration/playwright-report/
