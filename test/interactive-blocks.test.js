@@ -195,6 +195,10 @@ describe('contactform', () => {
     assert.ok(form.querySelector('textarea'));
     assert.equal(form.querySelectorAll('select option').length, 2);
     assert.equal(form.querySelector('button.contactform-submit').textContent, 'Send');
+    // every label names its control
+    form.querySelectorAll('label').forEach((lbl) => {
+      assert.ok(form.querySelector(`#${lbl.htmlFor}`), `label "${lbl.textContent}" points at a control`);
+    });
   });
 
   test('prevents submit navigation', () => {

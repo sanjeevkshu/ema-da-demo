@@ -20,10 +20,12 @@ function buildForm(cell) {
       const type = (parts[1] || 'text').toLowerCase();
       const field = document.createElement('div');
       field.className = 'contactform-field';
+      const id = label.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      // the label names its control for screen readers (WCAG 1.3.1, 4.1.2)
       const lbl = document.createElement('label');
       lbl.textContent = label;
+      lbl.htmlFor = id;
       field.append(lbl);
-      const id = label.toLowerCase().replace(/[^a-z0-9]+/g, '-');
       if (type === 'textarea') {
         const ta = document.createElement('textarea');
         ta.id = id; ta.rows = 4; ta.placeholder = parts[2] || '';
