@@ -34,5 +34,9 @@ module.exports = {
       'import/extensions': ['error', { js: 'always', mjs: 'always' }],
       'max-len': ['error', { code: 140, ignoreStrings: true, ignoreTemplateLiterals: true }],
     },
+  }, {
+    // installed only by the visual job (npm ci --prefix test/visual), never by the build
+    files: ['test/visual/*.js'],
+    rules: { 'import/no-unresolved': ['error', { ignore: ['^@applitools/'] }] },
   }],
 };
