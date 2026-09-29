@@ -4,8 +4,12 @@ name: Tokens sync
 # The designer pushes token changes from the Tokens Studio plugin to the
 # tokens/figma branch (tokens/*.json, DTCG). This job regenerates
 # styles/pulse-tokens.css and reference/design-tokens.json with Style
-# Dictionary, commits them to the same branch, and opens (or updates) a PR
-# into develop, where the Build and Design (gate) checks run as usual.
+# Dictionary, commits them to the same branch, and opens a PR into develop.
+#
+# It acts as a GitHub App (vars.TOKENS_APP_ID, secrets.TOKENS_APP_PRIVATE_KEY),
+# not GITHUB_TOKEN: GitHub doesn't run workflows for pushes or PRs made with
+# GITHUB_TOKEN, so the token PR would get no Build or Design (gate) checks.
+# Without the app it stops after regenerating, with a notice.
 on:
   push:
     branches: [tokens/figma]
@@ -13,8 +17,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 
 concurrency:
   group: tokens-sync
@@ -25,28 +28,38 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - name: App token (so the PR gets its checks)
+        id: app
+        if: vars.TOKENS_APP_ID != ''
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          app-id: ${{ vars.TOKENS_APP_ID }}
+          private-key: ${{ secrets.TOKENS_APP_PRIVATE_KEY }}
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          token: ${{ steps.app.outputs.token || github.token }}
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 24
           cache: npm
       - run: npm ci
       - run: npm run tokens
       - run: npx stylelint styles/pulse-tokens.css
-      - name: Commit the generated files
-        run: |
-          if git diff --quiet -- styles/pulse-tokens.css reference/design-tokens.json; then
-            echo "generated files already match the tokens"; exit 0
-          fi
-          git config user.name "pulse-tokens-bot"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add styles/pulse-tokens.css reference/design-tokens.json
-          git commit -m "chore(tokens): regenerate from tokens/*.json (Style Dictionary)"
-          git push
-      - name: Open or update the PR into develop
+      - name: Commit the generated files and open the PR
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ steps.app.outputs.token }}
         run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::notice title=Tokens sync::No GitHub App configured (vars.TOKENS_APP_ID); run npm run tokens on tokens/figma and open the PR by hand."
+            git diff --stat; exit 0
+          fi
+          if ! git diff --quiet -- styles/pulse-tokens.css reference/design-tokens.json; then
+            git config user.name "pulse-tokens[bot]"
+            git config user.email "pulse-tokens[bot]@users.noreply.github.com"
+            git add styles/pulse-tokens.css reference/design-tokens.json
+            git commit -m "chore(tokens): regenerate from tokens/*.json (Style Dictionary)"
+            git push
+          fi
           if [ -z "$(gh pr list --head tokens/figma --base develop --json number --jq '.[].number')" ]; then
             gh pr create --head tokens/figma --base develop \
               --title "Design tokens from Figma" \

@@ -26,7 +26,11 @@ The map lives in `test/integration/coverage.json`.
    - a file in `scripts/` (other than `aem.js` and `scripts.js`), or a file in `reference/site-config/`, has no entry in `coverage.json`
    - a mapped file or spec is missing
    - a spec belongs to no integration
-2. **Live checks, on PRs into `main`.** `.github/workflows/integration.yaml` runs the specs against the PR's branch preview (the `develop` → `main` promotion) and nightly on `main`. The job is **"Integration (gate)"**; make it a required check in the `main` branch protection rules.
+2. **Live checks.** `.github/workflows/integration.yaml`, job **"Integration (gate)"** (required on `main`):
+   - PRs into `main` (the `develop` → `main` promotion): the full suite on the PR's branch preview.
+   - PRs into `develop`, only when a mapped integration file changes: consent, search and fragments, without the Brand Concierge spec (it starts real chats).
+   - Nightly on `main`.
+   - After every merge to `main`, `post-deploy.yaml` checks that aem.live serves the commit's code, then runs the no-chat specs plus crawl on aem.live and the production domain.
 3. **`@golden` answers, report-only.** These are Brand Concierge answers checked against site facts: Loop 7 days, Band Neo $129, free shipping over $100. They run in the same job but can't fail it.
    - Once grounding is fixed and they pass on three consecutive runs, delete the `continue-on-error` step and drop `--grep-invert @golden`.
 

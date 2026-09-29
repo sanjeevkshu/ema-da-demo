@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 /*
  * Design gate runner. Applies the levels in reference/design/gate.config.json
- * for one destination, runs the layers, and fails only on blocking layers.
+ * (one per layer, the same for develop and main), runs the browser layers, and
+ * fails only on blocking layers. --destination nightly never fails: it writes
+ * test/design/nightly-alert.md for the workflow to raise as an issue.
  *
  *   node test/design/run.mjs --destination develop|main|nightly [--width 390]
  *   node test/design/run.mjs --update-baseline     rewrite the literal ratchet after a clean-up
@@ -17,7 +19,7 @@ import {
 } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { checkTokens, checkCoverage, updateBaseline } from './static.mjs';
+import { updateBaseline } from './static.mjs';
 
 const args = process.argv.slice(2);
 const BASE = process.env.DESIGN_BASE_URL || 'https://main--ema-da-demo--sanjeevkshu.aem.page';
@@ -57,8 +59,9 @@ if (args.includes('--update-baseline')) {
 }
 const flag = (name, fallback) => { const i = args.indexOf(name); return i >= 0 ? args[i + 1] : fallback; };
 const destination = flag('--destination', process.env.GITHUB_BASE_REF || 'nightly');
+const nightly = destination === 'nightly';
 const config = JSON.parse(readFileSync('reference/design/gate.config.json', 'utf8'));
-const level = (layer) => config.layers[layer][destination] || 'report';
+const level = (layer) => config.layers[layer].level;
 const width = flag('--width', null);
 const firstShard = !width || Number(width) === config.widths[0];
 const mode = process.env.DESIGN_PAGES || 'fixtures';
@@ -71,15 +74,6 @@ const add = (layer, r) => {
   };
 };
 
-// code-level layers, once
-for (const [layer, check] of [['tokens', checkTokens], ['coverage', checkCoverage]]) {
-  if (level(layer) === 'off' || !firstShard) continue;
-  const { problems, notes } = check('.');
-  add(layer, {
-    passed: problems.length ? 0 : 1, failed: problems.length ? 1 : 0, problems, notes,
-  });
-}
-
 // the frozen fixtures must be unchanged, or differences could come from authoring
 if (mode === 'fixtures' && firstShard && level('fixtures') !== 'off') {
   const changed = await changedFixtures();
@@ -91,7 +85,7 @@ if (mode === 'fixtures' && firstShard && level('fixtures') !== 'off') {
 }
 
 // browser layers
-const browserLayers = ['responsive', 'specs', 'a11y', 'visual-figma'].filter((l) => level(l) !== 'off');
+const browserLayers = ['responsive', 'specs', 'a11y'].filter((l) => level(l) !== 'off');
 if (browserLayers.length) {
   const grep = `(${browserLayers.map((l) => `@${l} `).join('|')})${width ? `.* at ${width}px` : ''}`;
   const pw = spawnSync('npx', ['playwright', 'test', '-c', process.env.DESIGN_PW_CONFIG || 'test/design/playwright.config.js', '--grep', grep,
@@ -100,7 +94,6 @@ if (browserLayers.length) {
   if (!existsSync(out)) { console.error(`no results at ${out} (playwright exit ${pw.status})`); process.exit(2); }
   const report = JSON.parse(readFileSync(out, 'utf8'));
   browserLayers.forEach((l) => add(l, {}));
-  const promoted = new Set(((config.layers['visual-figma'].promoted || {})[destination]) || []);
   const walk = (suite) => {
     (suite.specs || []).forEach((spec) => spec.tests.forEach((t) => {
       const layer = (spec.title.match(/^@([a-z0-9-]+) /) || [])[1];
@@ -113,16 +106,14 @@ if (browserLayers.length) {
       else {
         r.failed += 1;
         const msg = (last.errors || []).map((e) => (e.message || '').replace(ANSI, '').split('\n')[0]).join('; ');
-        const slug = (spec.title.match(/^@visual-figma (\S+)/) || [])[1];
-        r.problems.push(`${spec.title.replace(/^@\S+ /, '')}: ${msg}${slug && promoted.has(slug) ? ' [promoted: blocks]' : ''}`);
-        if (slug && promoted.has(slug)) r.promotedFailure = true;
+        r.problems.push(`${spec.title.replace(/^@\S+ /, '')}: ${msg}`);
       }
     }));
     (suite.suites || []).forEach(walk);
   };
   report.suites.forEach(walk);
-  // a layer that ran nothing must not read as a pass (visual-figma skips until baselines exist)
-  browserLayers.filter((l) => l !== 'visual-figma').forEach((l) => {
+  // a layer that ran nothing must not read as a pass
+  browserLayers.forEach((l) => {
     const r = results[l];
     if (!r.passed && !r.failed) {
       r.failed = 1;
@@ -134,7 +125,7 @@ if (browserLayers.length) {
 // summary
 const icon = (r) => {
   if (!r.failed) return '✅';
-  return r.level === 'block' || r.promotedFailure ? '❌' : '⚠️';
+  return r.level === 'block' ? '❌' : '⚠️';
 };
 const lines = [`## Design gate — ${destination}`, '', '| Layer | Level | Result | What it checks |', '|---|---|---|---|'];
 Object.entries(results).forEach(([layer, r]) => {
@@ -151,9 +142,11 @@ const md = lines.join('\n');
 console.log(`\n${md}\n`);
 if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${md}\n`);
 
-const blocking = Object.entries(results).filter(([, r]) => r.failed && (r.level === 'block' || r.promotedFailure));
+const blocking = Object.entries(results).filter(([, r]) => r.failed && r.level === 'block');
 Object.entries(results).filter(([, r]) => r.failed).forEach(([layer, r]) => {
   const kind = blocking.some(([l]) => l === layer) ? 'error' : 'warning';
   if (process.env.GITHUB_ACTIONS) console.log(`::${kind} title=Design gate (${layer}, ${r.level})::${r.problems.slice(0, 3).join(' | ').slice(0, 900)}`);
 });
-process.exit(blocking.length ? 1 : 0);
+// nightly is report-only: it never fails, and leaves an alert for the issue step instead
+if (nightly && blocking.length) writeFileSync('test/design/nightly-alert.md', `${md}\n`);
+process.exit(blocking.length && !nightly ? 1 : 0);

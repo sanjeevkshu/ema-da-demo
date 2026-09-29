@@ -1,12 +1,12 @@
 /*
- * Design gate, code-level layers (no browser):
- *   tokens    — reference/design-tokens.json (from Figma) and styles/pulse-tokens.css agree;
- *               colour and font-size literals outside the tokens never grow (ratchet);
+ * Code-level design checks (no browser), run in Build:
+ *   tokens    — colour and font-size literals outside the tokens never grow (ratchet);
+ *               media queries use token breakpoints;
  *               a media query never re-lays-out an element that isn't the grid (the
  *               Contact and newsletter phone-overflow bug)
  *   coverage  — every block and page type has a Figma source or a recorded reason not to
  *
- * Pure functions are exported for test/design-gate.test.js; run.mjs calls runStatic().
+ * Run on every push in the Build workflow, by test/design-gate.test.js.
  */
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
@@ -97,17 +97,8 @@ export function offGridBreakpoints(css, allowed) {
 export function checkTokens(root = '.') {
   const problems = [];
   const notes = [];
-  // 1. the generated CSS still carries every token at its token value (no hand edits)
+  // tokens and generated files agree: `npm run tokens:check` in Build
   const tokens = json(join(root, 'reference/design-tokens.json'));
-  const tokensCss = read(join(root, 'styles/pulse-tokens.css'));
-  const [rootCss, compactCss = ''] = tokensCss.split('@media');
-  [[tokens.base, rootCss, 'base'], [tokens.compact, compactCss, 'compact']].forEach(([set, css, label]) => {
-    Object.entries(set).forEach(([name, value]) => {
-      const m = css.match(new RegExp(`--pulse-${name}\\s*:\\s*([^;]+);`));
-      if (!m) problems.push(`${label} token "${name}" has no --pulse-${name} in styles/pulse-tokens.css; run npm run tokens`);
-      else if (m[1].trim() !== value) problems.push(`--pulse-${name} (${label}) is ${m[1].trim()}, the token says ${value}; run npm run tokens`);
-    });
-  });
   const allowed = Object.values(tokens.breakpoints).map((v) => parseInt(v, 10));
   // 2. literals outside the tokens file never grow
   const baselinePath = join(root, 'reference/design/css-baseline.json');

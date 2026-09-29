@@ -11,11 +11,9 @@
  *   node test/design/drift.mjs --from-metadata <dir>       Figma MCP get_metadata (maxDepth 1) XML saved as <dir>/<id>.xml,
  *                                                          one per node (id with ":" as "-"); used from the workspace
  * Options: --write (store the new fingerprints after a reviewed sync)
- *          --export <dir> (REST only: PNG of every page frame at 1x, for baseline review)
+ *          --fail-on-drift (exit 1 when a frame changed)
  */
-import {
-  readFileSync, writeFileSync, existsSync, mkdirSync,
-} from 'node:fs';
+import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { join } from 'node:path';
 
@@ -118,17 +116,6 @@ async function main() {
     const keep = Object.fromEntries(Object.entries(result.out).filter(([, v]) => v));
     writeFileSync(STORE, `${JSON.stringify({ $comment: 'Figma frame fingerprints at the last reviewed sync. Written by test/design/drift.mjs --write.', verified: new Date().toISOString().slice(0, 10), nodes: keep }, null, 2)}\n`);
     console.log(`stored ${Object.keys(keep).length} fingerprints`);
-  }
-  if (opt('--export') && process.env.FIGMA_TOKEN) {
-    const dir = opt('--export');
-    mkdirSync(dir, { recursive: true });
-    const pages = Object.entries(sync.pages).map(([slug, p]) => [slug, p.sourceNode]);
-    const res = await fetch(`https://api.figma.com/v1/images/${sync.fileKey}?format=png&scale=1&ids=${encodeURIComponent(pages.map(([, n]) => n).join(','))}`, { headers: { 'X-Figma-Token': process.env.FIGMA_TOKEN } }).then((r) => r.json());
-    for (const [slug, node] of pages) {
-      const url = res.images[node];
-      if (url) writeFileSync(join(dir, `${slug}-1440.png`), Buffer.from(await (await fetch(url)).arrayBuffer()));
-    }
-    console.log(`exported ${pages.length} frames to ${dir}; approve one by copying it to reference/design/baselines/ in a PR`);
   }
   return drift.length && args.includes('--fail-on-drift') ? 1 : 0;
 }

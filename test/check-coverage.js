@@ -3,7 +3,7 @@
  *
  * `node --test --test-coverage-*` thresholds only check the aggregate, so a
  * well-covered block can hide one that is barely tested. This reads the lcov
- * report and fails when any file under blocks/ is below the threshold on
+ * report and fails when any file under blocks/ or scripts/ is below the threshold on
  * lines, branches or functions — or has no coverage record at all, which means
  * no test loads it.
  *
@@ -41,12 +41,20 @@ readFileSync(lcovPath, 'utf8').split('end_of_record').forEach((record) => {
   });
 });
 
-// every block script must be loaded by at least one test
+// scripts/ files the gate doesn't hold to the threshold, and why
+const EXEMPT = {
+  'scripts/aem.js': 'vendored from the AEM boilerplate; never edited here',
+  'scripts/scripts.js': 'page bootstrap (68% today); follow-up: raise it, then remove this exemption',
+};
+
+// every block script, and every project script, must be loaded by at least one test
 const blockFiles = readdirSync('blocks', { withFileTypes: true })
   .filter((d) => d.isDirectory())
   .flatMap((d) => readdirSync(join('blocks', d.name))
     .filter((f) => f.endsWith('.js'))
-    .map((f) => `blocks/${d.name}/${f}`));
+    .map((f) => `blocks/${d.name}/${f}`))
+  .concat(readdirSync('scripts').filter((f) => f.endsWith('.js')).map((f) => `scripts/${f}`)
+    .filter((f) => !EXEMPT[f]));
 
 const reportFor = (file) => covered.get(file)
   || [...covered].find(([sf]) => sf.endsWith(`/${file}`))?.[1];
@@ -67,7 +75,8 @@ blockFiles.forEach((file) => {
 });
 
 if (failures) {
-  fail(`coverage gate: ${failures} of ${blockFiles.length} block files below ${THRESHOLD}% per file.`);
+  fail(`coverage gate: ${failures} of ${blockFiles.length} files below ${THRESHOLD}% per file.`);
 } else {
-  out(`coverage gate: all ${blockFiles.length} block files ≥ ${THRESHOLD}% lines, branches and functions.`);
+  out(`coverage gate: all ${blockFiles.length} block and script files ≥ ${THRESHOLD}% lines, branches and functions`
+    + ` (exempt: ${Object.keys(EXEMPT).join(', ')}).`);
 }

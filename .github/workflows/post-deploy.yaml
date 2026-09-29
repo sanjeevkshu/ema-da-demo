@@ -1,0 +1,53 @@
+name: Post-deploy
+
+# After every merge to main: did the release actually reach visitors?
+#   1. aem.live serves this commit's code (AEM Code Sync can lag, and the CDN
+#      once kept a stale header.js until a manual code resync).
+#   2. Smoke checks on aem.live and the production domain: consent, search,
+#      header/footer fragments, crawl rules. No Brand Concierge chats.
+# A failure here means "roll forward or revert now", not "fix before merge".
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: post-deploy
+  cancel-in-progress: false
+
+jobs:
+  smoke:
+    name: Post-deploy smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - id: live
+        uses: ./.github/actions/aem-host
+        with:
+          branch: main
+          tier: live
+          diff: ${{ github.event.before && github.event.before != '0000000000000000000000000000000000000000' && format('{0}...{1}', github.event.before, github.sha) || '' }}
+          fail-if-stale: 'true'
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Smoke checks on aem.live and the production domain
+        env:
+          INTEGRATION_BASE_URL: ${{ steps.live.outputs.url }}
+        run: npm run test:integration -- consent.spec.js search.spec.js fragments.spec.js crawl.spec.js
+      - if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: post-deploy-report
+          path: test/integration/playwright-report/
+          retention-days: 14
+          if-no-files-found: ignore

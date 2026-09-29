@@ -4,14 +4,14 @@ This project was migrated from Figma file **Agentic AI Delivery** (`dbJRnntnVQz6
 
 ## What's here
 
-- `reference/design-tokens.json` — the extracted design system (colors, type scale, radii, spacing).
-- `styles/pulse-tokens.css` — those tokens as CSS custom properties. **Every block consumes these**, so changing a token here re-themes the whole site.
+- `tokens/*.json` — the design tokens in DTCG format, synced from Figma by Tokens Studio (branch `tokens/figma`). This is the source.
+- `styles/pulse-tokens.css` and `reference/design-tokens.json` — **generated** from the tokens by `npm run tokens` (Style Dictionary, `tokens/build.mjs`). Never hand-edit them; Build fails when they're out of sync. **Every block consumes the CSS variables**, so a token change re-themes the whole site.
 - `reference/figma-sync.json` — the source-of-truth map: each **block** and **page** → its Figma node id.
 - `reference/migration-plan.json` — page inventory with Figma node ids and responsive-variant node ids.
 
 ## How a future design update flows
 
-1. **Token change in Figma** (e.g. brand blue shifts): re-read the design tokens and update `styles/pulse-tokens.css`. No block edits needed — all blocks reference the variables.
+1. **Token change in Figma** (e.g. brand blue shifts): push it from Tokens Studio to `tokens/figma`; `tokens-sync.yaml` regenerates the CSS and opens the PR. No block edits needed — all blocks reference the variables.
 2. **Layout/content change on a page**: look up the page's `sourceNode` in `figma-sync.json`, re-run `get_design_context` on that node, and regenerate `content/<slug>.plain.html`. Put new images in `content/media-da/<slug>/`.
 3. **New block/section**: add a block under `blocks/` with tests (≥80% coverage, see `testing-and-coverage.md`), then register its Figma `sourceNode` in `figma-sync.json`.
 4. Bump `lastSynced` in `figma-sync.json`.

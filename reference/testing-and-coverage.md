@@ -1,8 +1,9 @@
 # Testing & coverage policy (skill/instruction)
 
-**Rule: all new block development must ship functional tests with ≥ 80% code
-coverage (lines, branches, functions). This is a CI gate — a PR that drops any
-block below 80% is rejected.**
+**Rule: all new block and script development must ship functional tests with ≥ 80% code
+coverage (lines, branches, functions), per file. This is a CI gate — a PR that drops any
+block, or any file in `scripts/` other than the exempt `aem.js` (vendored) and
+`scripts.js` (bootstrap, follow-up), below 80% is rejected.**
 
 This is the standing instruction for anyone (human or agent) adding or changing
 a block in this project.

@@ -1,15 +1,27 @@
 name: Build
+
+# The critical path (~30 s): every push, every branch. Nothing slower belongs
+# here; page checks run in parallel in pr-quality.yaml.
 on: [push]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
-    - uses: actions/checkout@v7
-    - name: Use Node.js 20
-      uses: actions/setup-node@v6
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+    - name: Use Node.js 24
+      uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
       with:
         node-version: 24
+        cache: npm
     - run: npm ci
     - run: npm run lint
     # Headless accessibility lint (no browser, ~4 s): axe-core on every block's
@@ -17,7 +29,7 @@ jobs:
     - run: npm run lint:a11y
     # Design tokens: the committed CSS/JSON match tokens/*.json (Style Dictionary).
     - run: npm run tokens:check
-    # Functional test coverage gate: every block must stay at 80%+ line,
-    # branch and function coverage or the build fails. See test/README.md.
+    # Unit tests (incl. the code-level design checks in test/design-gate.test.js)
+    # and the 80% per-file coverage gate for blocks/ and scripts/. See test/README.md.
     - name: Test + coverage gate (80%+)
       run: npm run test:coverage

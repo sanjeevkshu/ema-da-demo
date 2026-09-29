@@ -1,9 +1,9 @@
 name: Design (nightly)
 
-# The live site, as visitors see it: the design gate's nightly levels
-# (reference/design/gate.config.json) on the real page-type pages, not the
-# frozen fixtures. It never blocks anything; a blocking layer that fails
-# turns the run red so GitHub notifies. PRs are checked by pr-quality.yaml.
+# The live site, as visitors see it: the design gate's browser layers on the
+# real page-type pages (not the frozen fixtures). Report-only: it never fails.
+# When a blocking layer fails, the alert job opens (or comments on) one issue labelled
+# "design-nightly", so the failure has an owner. PRs are checked by pr-quality.yaml.
 on:
   schedule:
     - cron: '41 3 * * *'
@@ -22,13 +22,13 @@ jobs:
       matrix:
         width: [390, 768, 1440]
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 24
           cache: npm
       - run: npm ci
-      - uses: actions/cache@v4
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/ms-playwright
           key: pw-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
@@ -37,10 +37,42 @@ jobs:
           DESIGN_BASE_URL: https://main--${{ github.event.repository.name }}--${{ github.repository_owner }}.aem.live
           DESIGN_PAGES: live
         run: node test/design/run.mjs --destination nightly --width ${{ matrix.width }}
+      - name: Keep the alert
+        if: hashFiles('test/design/nightly-alert.md') != ''
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: nightly-alert-${{ matrix.width }}
+          path: test/design/nightly-alert.md
+          retention-days: 7
       - if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: design-nightly-${{ matrix.width }}
           path: test/design/design-report/
           retention-days: 14
           if-no-files-found: ignore
+
+  alert: # one issue for all widths, raised once
+    needs: design
+    if: always()
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        continue-on-error: true # no alerts on a clean night
+        with:
+          pattern: nightly-alert-*
+          path: alerts
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          [ -d alerts ] && [ -n "$(ls -A alerts)" ] || { echo "no blocking failures"; exit 0; }
+          body="$(printf 'The nightly design check found blocking failures on the live site.\n\n%s\n\nRun: %s' "$(cat alerts/*/nightly-alert.md)" "$RUN")"
+          n=$(gh issue list --label design-nightly --state open --json number --jq '.[0].number')
+          if [ -n "$n" ]; then gh issue comment "$n" --body "$body"; else
+            gh label create design-nightly --color d93f0b --force >/dev/null
+            gh issue create --title "Nightly design check failing on the live site" --label design-nightly --body "$body"
+          fi

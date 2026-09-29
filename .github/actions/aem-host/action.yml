@@ -1,0 +1,59 @@
+name: AEM host for a branch
+description: >-
+  Resolves {branch}--{repo}--{owner}.aem.page (or .aem.live) and waits until it
+  serves this commit's front-end code, so no check runs against stale code.
+  Used by pr-quality, integration and post-deploy.
+inputs:
+  branch:
+    description: Branch whose preview or live host to use
+    required: true
+  tier:
+    description: "page (preview) or live"
+    default: page
+  diff:
+    description: git diff range whose changed front-end files must be served (e.g. origin/develop...HEAD)
+    default: ''
+  fail-if-stale:
+    description: "true: fail when the host never serves the code; false: warn and continue"
+    default: 'false'
+outputs:
+  url:
+    description: The host, e.g. https://main--ema-da-demo--sanjeevkshu.aem.live
+    value: ${{ steps.host.outputs.url }}
+runs:
+  using: composite
+  steps:
+    - id: host
+      shell: bash
+      env:
+        BRANCH: ${{ inputs.branch }}
+        TIER: ${{ inputs.tier }}
+        DIFF: ${{ inputs.diff }}
+        STRICT: ${{ inputs['fail-if-stale'] }}
+        OWNER: ${{ github.repository_owner }}
+        REPO: ${{ github.event.repository.name }}
+      run: |
+        safe=$(echo "$BRANCH" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g')
+        host="https://${safe}--${REPO}--${OWNER}.aem.${TIER}"
+        echo "url=$host" >> "$GITHUB_OUTPUT"
+        echo "host: $host"
+        files=""
+        if [ -n "$DIFF" ]; then
+          files=$(git diff --name-only "$DIFF" -- 'blocks/*.js' 'blocks/*.css' 'styles/*.css' 'scripts/*.js' | head -20)
+        fi
+        [ -z "$files" ] && files="scripts/scripts.js"
+        for i in $(seq 1 20); do
+          stale=""
+          for f in $files; do
+            [ -f "$f" ] || continue
+            if ! curl -sf --compressed "$host/$f?ck=$RANDOM" -o served.tmp || ! cmp -s served.tmp "$f"; then stale="$stale $f"; fi
+          done
+          [ -z "$stale" ] && { echo "host serves this commit's code"; exit 0; }
+          echo "attempt $i: stale:$stale"; sleep 15
+        done
+        msg="$host did not serve this commit's code in time:$stale"
+        if [ "$STRICT" = "true" ]; then
+          echo "::error title=AEM host::$msg. If the code bus is stuck, resync it: POST https://admin.hlx.page/code/${OWNER}/${REPO}/${BRANCH}/*"
+          exit 1
+        fi
+        echo "::warning title=AEM host::$msg; testing anyway"

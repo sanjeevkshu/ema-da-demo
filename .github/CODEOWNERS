@@ -1,0 +1,21 @@
+# Who reviews what. GitHub requests these reviews automatically.
+# Enforce with the ruleset option "Require review from Code Owners" once a
+# second maintainer exists (you can't approve your own PR, so a solo owner
+# would block every merge).
+
+# Delivery pipeline, gates and their levels
+/.github/                              @sanjeevkshu
+/test/design/                          @sanjeevkshu
+/test/a11y/                            @sanjeevkshu
+/test/check-coverage.js                @sanjeevkshu
+
+# Design-system decisions: levels, waivers, fixtures, tokens (design owns these)
+/reference/design/gate.config.json     @sanjeevkshu
+/reference/design/contrast-pairs.json  @sanjeevkshu
+/reference/design/fixtures.json        @sanjeevkshu
+/tokens/                               @sanjeevkshu
+
+# Integrations and site configuration
+/scripts/                              @sanjeevkshu
+/reference/site-config/                @sanjeevkshu
+/reference/brand-concierge/            @sanjeevkshu

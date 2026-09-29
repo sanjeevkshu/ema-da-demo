@@ -1,11 +1,11 @@
 /*
  * Design gate governance (runs in `npm test`, every build):
- * the gate config is well formed and never looser at a higher destination,
+ * the gate config is well formed, with one level per layer for develop and main,
  * and the code-level checks catch what they are meant to catch.
  */
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import {
   parseColor, literalCounts, orphanGridRules, checkTokens, checkCoverage, rules, offGridBreakpoints,
 } from './design/static.mjs'; // eslint-disable-line import/extensions
@@ -17,40 +17,21 @@ import {
 
 const config = JSON.parse(readFileSync('reference/design/gate.config.json', 'utf8'));
 const LEVELS = ['off', 'report', 'block'];
-const LAYERS = ['tokens', 'fixtures', 'responsive', 'a11y', 'specs', 'coverage', 'visual', 'visual-figma'];
+const LAYERS = ['fixtures', 'responsive', 'a11y', 'specs', 'visual'];
 
 describe('gate config', () => {
-  test('every layer has a known level for every destination and nightly', () => {
+  test('every layer has one known level and says what it checks', () => {
     assert.deepEqual(Object.keys(config.layers).sort(), [...LAYERS].sort());
     Object.entries(config.layers).forEach(([layer, l]) => {
-      [...config.destinations, 'nightly'].forEach((d) => {
-        assert.ok(LEVELS.includes(l[d]), `${layer}.${d} is "${l[d]}"`);
-      });
+      assert.ok(LEVELS.includes(l.level), `${layer} level is "${l.level}"`);
       assert.ok(l.what, `${layer} says what it checks`);
     });
   });
 
-  test('a higher destination is never looser than a lower one', () => {
-    const rank = (lvl) => LEVELS.indexOf(lvl);
+  test('one bar for develop and main: no per-destination levels', () => {
     Object.entries(config.layers).forEach(([layer, l]) => {
-      for (let i = 1; i < config.destinations.length; i += 1) {
-        const lower = config.destinations[i - 1];
-        const higher = config.destinations[i];
-        assert.ok(rank(l[higher]) >= rank(l[lower]), `${layer}: ${higher} (${l[higher]}) is looser than ${lower} (${l[lower]})`);
-      }
+      ['develop', 'main', 'nightly'].forEach((d) => assert.equal(l[d], undefined, `${layer} has a ${d} level`));
     });
-  });
-
-  test('promoted Figma pages have an approved baseline and keep promotion upward', () => {
-    const { promoted } = config.layers['visual-figma'];
-    const pages = JSON.parse(readFileSync('.github/page-types.json', 'utf8'))
-      .map((t) => (t.path === '/' ? 'index' : t.path.slice(1)));
-    Object.entries(promoted).forEach(([dest, list]) => list.forEach((slug) => {
-      assert.ok(pages.includes(slug), `${slug} is a page type`);
-      config.widths.forEach((w) => assert.ok(existsSync(`reference/design/baselines/${slug}-${w}.png`), `${slug}-${w}.png approved`));
-      const higher = config.destinations.slice(config.destinations.indexOf(dest) + 1);
-      higher.forEach((h) => assert.ok(promoted[h].includes(slug), `${slug} promoted on ${dest} but not on ${h}`));
-    }));
   });
 
   test('widths are the Figma phone, tablet and desktop frames', () => {
@@ -74,23 +55,26 @@ describe('the single required check', () => {
   test('skipped jobs pass; failed or cancelled jobs fail', () => {
     assert.equal(decide(needs({
       changes: 'success', preview: 'skipped', design: 'skipped', visual: 'skipped',
-    }), 'develop', config).ok, true);
-    assert.equal(decide(needs({ design: 'failure', visual: 'success' }), 'develop', config).ok, false);
-    assert.equal(decide(needs({ preview: 'cancelled' }), 'main', config).ok, false);
+    }), config).ok, true);
+    assert.equal(decide(needs({ design: 'failure', visual: 'success' }), config).ok, false);
+    assert.equal(decide(needs({ preview: 'cancelled' }), config).ok, false);
   });
   test('Applitools differences only fail where the visual layer blocks', () => {
     const visualFails = needs({ design: 'success', visual: 'failure' });
-    assert.equal(decide(visualFails, 'develop', config).ok, config.layers.visual.develop !== 'block');
-    const strict = { ...config, layers: { ...config.layers, visual: { develop: 'block', main: 'block' } } };
-    assert.equal(decide(visualFails, 'develop', strict).ok, false);
+    assert.equal(decide(visualFails, config).ok, config.layers.visual.level !== 'block');
+    const strict = { ...config, layers: { ...config.layers, visual: { level: 'block' } } };
+    assert.equal(decide(visualFails, strict).ok, false);
   });
 });
 
 describe('design tokens (Figma → Tokens Studio → Style Dictionary)', () => {
-  test('the committed CSS and JSON are exactly what the tokens generate', async () => {
-    const { css, json } = await build();
-    assert.equal(readFileSync('styles/pulse-tokens.css', 'utf8'), css, 'run npm run tokens');
-    assert.equal(readFileSync('reference/design-tokens.json', 'utf8'), json, 'run npm run tokens');
+  // that the committed CSS/JSON match the tokens is `npm run tokens:check`, a Build step
+  test('the Figma text styles survive as composite typography tokens', async () => {
+    const { json } = await build();
+    const { typography } = JSON.parse(json);
+    assert.deepEqual(Object.keys(typography).length, 12);
+    assert.equal(typography.display.letterSpacing, '-1.28px');
+    assert.equal(typography.eyebrow.textTransform, 'uppercase');
   });
   test('Tokens Studio colour notations come out as stylelint expects', () => {
     assert.equal(normalize('#FFFFFF'), '#fff');
