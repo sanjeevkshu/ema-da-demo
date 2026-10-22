@@ -43,7 +43,7 @@ Sources:
 
 **Best practice:**
 - Build and evaluate in a development sandbox. Recreate or promote to production only after evaluations pass.
-- Also add `sanjeevkshu@gmail.com` to the DA permissions sheet. The handover found them as a site admin who isn't on it.
+- Also check that every site admin in the Config Service access settings (`admin.hlx.page/config/{org}/sites/{site}.json` → `access.admin`) is on the DA permissions sheet. The handover found one admin missing from it.
 
 ## 2. Datastreams: one per environment (IT / analytics)
 

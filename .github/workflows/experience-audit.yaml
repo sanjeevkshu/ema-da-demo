@@ -49,8 +49,8 @@ jobs:
           HOST: ${{ steps.host.outputs.url }}
           BEFORE: ${{ github.event.before }}
         run: |
-          files=$(git diff --name-only "$BEFORE" "$GITHUB_SHA" || git diff --name-only HEAD~1 HEAD)
-          node .github/scripts/wait-for-code.mjs "$HOST" $files
+          mapfile -t files < <(git diff --name-only "$BEFORE" "$GITHUB_SHA" || git diff --name-only HEAD~1 HEAD)
+          node .github/scripts/wait-for-code.mjs "$HOST" "${files[@]}"
 
       - name: Install Lighthouse CI
         run: npm install -g @lhci/cli@0.14.x

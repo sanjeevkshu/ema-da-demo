@@ -69,7 +69,7 @@ jobs:
           GH_REPO: ${{ github.repository }}
           RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          [ -d alerts ] && [ -n "$(ls -A alerts)" ] || { echo "no blocking failures"; exit 0; }
+          if [ ! -d alerts ] || [ -z "$(ls -A alerts)" ]; then echo "no blocking failures"; exit 0; fi
           body="$(printf 'The nightly design check found blocking failures on the live site.\n\n%s\n\nRun: %s' "$(cat alerts/*/nightly-alert.md)" "$RUN")"
           n=$(gh issue list --label design-nightly --state open --json number --jq '.[0].number')
           if [ -n "$n" ]; then gh issue comment "$n" --body "$body"; else
