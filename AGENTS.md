@@ -68,6 +68,8 @@ Edge Delivery Services. Read a block first. Omissions are in the repo or known.
   critical path; PRs run "Design (gate)" (`pr-quality.yaml`, in parallel) on
   frozen fixture pages with one level per layer, the same for `develop` and
   `main`. Pin new actions by commit SHA with least-privilege `permissions:`.
+  After workflow edits run `npm run lint:actions` (pinned actionlint + shellcheck;
+  Build runs it, and GitHub's runners have shellcheck even if your machine doesn't).
 - New/changed `scripts/` files also meet the 80% per-file coverage gate
   (`aem.js` and `scripts.js` are exempt, with reasons, in `test/check-coverage.js`).
 - Brand Concierge (`scripts/brand-concierge.js`) loads only via `consented.js`,

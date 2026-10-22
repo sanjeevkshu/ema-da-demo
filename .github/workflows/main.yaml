@@ -24,6 +24,8 @@ jobs:
         cache: npm
     - run: npm ci
     - run: npm run lint
+    # Workflow lint: pinned actionlint + shellcheck (checksum-verified), same as local.
+    - run: npm run lint:actions
     # Headless accessibility lint (no browser, ~4 s): axe-core on every block's
     # decorated example in jsdom, plus the design-token contrast matrix.
     - run: npm run lint:a11y
