@@ -80,7 +80,7 @@ Design is governed like code, and none of it slows the build or deploy:
 npm run lint:a11y && npm run tokens:check && npm run test:coverage   # the critical path
 DESIGN_BASE_URL=https://<branch>--ema-da-demo--sanjeevkshu.aem.page \
   node test/design/run.mjs --destination develop --width 390
-migration-work/tools/actionlint .github/workflows/*.yaml             # after workflow edits
+npm run lint:actions                                                 # after workflow edits (pinned actionlint + shellcheck, as in Build)
 ```
 
 - The local browser build differs from the pinned one. Use `migration-work/probe/pw-design.config.js` with `PWB=/ms-playwright/chromium_headless_shell-1208/chrome-headless-shell-linux64/chrome-headless-shell`, and set `DESIGN_PW_CONFIG` and `DESIGN_RESULTS` to point at it.
