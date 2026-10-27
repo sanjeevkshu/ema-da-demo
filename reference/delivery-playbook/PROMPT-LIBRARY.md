@@ -14,10 +14,13 @@ The AI-credit cost model lives outside git.
 | S1 Figma → EDS foundation | 2026-09-16 | 24 | 10 pages, 16 blocks, design-token pipeline, Figma sync map, Lighthouse CI |
 | S2 Design and build add-on | 2026-09-21 | 20 | Hero carousel, full-bleed hero, 4 pages, Figma assets into DA, 80% coverage gate and backfilled tests, navigation and home |
 | S3 Search, integrate, deploy | 2026-09-25 to 27 | 45 | DA library and auto-update skill, experience audit, index/sitemap/search, Brand Concierge with Web SDK and consent, integration CI, 8 pages incl. legal, chat theme, phone menu |
+| S4 Baseline, boilerplate, hygiene | 2026-10-21 to 27 | 12 | Local sync from DA, v1.0.0 milestone, reusable starter-kit repo extracted from PULSE (v1.0.1), CI parity fixes back-ported here (v1.0.1), branch pruning |
 
-What the 89 prompts show:
-- **About 38% were release handoffs** ("open PR", "PR merged", "run the queue"), because the agent can't open or merge PRs here.
+What the 101 prompts show:
+- **About 38% of S1–S3 were release handoffs** ("open PR", "PR merged", "run the queue"), because the agent couldn't open or merge PRs then. In S4, once git and Actions access were set up in Settings, the agent opened, checked and merged PRs on approval. The human prompts became go/no-go calls (P6.8).
 - **About half of S3 went on diagnosing an external platform** (Brand Concierge crawl, datastream service, surface rules); most of the fixes were console steps.
+- **Access issues took several rounds in S4** (P7.5). The fix was always in Settings, never a token pasted into chat.
+- **Building something reusable is also an audit.** Extracting the starter kit (P8.4) surfaced latent issues in the source repo that its own CI never caught, and P4.6 applied them back.
 - **Standing rules ran unasked** once written down: library update, coverage gate, integration coverage, project notes.
 
 ## Frameworks
@@ -56,6 +59,9 @@ Guardrail suffixes to reuse:
 - "…open a PR into develop with Before/After preview links."
 - "…capture it as a skill or standing rule so it happens unasked."
 - "…capture gaps in reference/README."
+- "…confirm the plan and the gaps first; bring the open questions back once we're aligned."
+- "…verify on a clean copy exactly as CI runs (fresh `npm ci`, same steps), not on my working tree."
+- "…no history rewrites, and never move a published tag; fix forward with a patch release."
 
 ## Library
 
@@ -65,9 +71,10 @@ The ID prefix is the ADLC phase. `Seen` is the session the pattern came from.
 
 | ID | Prompt template | Role | Level | Seen |
 |---|---|---|---|---|
-| P0.1 | "Load context from the project skills, AGENTS.md, reference docs and your notes. Summarise what changed since last session, open items and blockers, then confirm ready." | All | F3 | S2, S3 |
-| P0.2 | "Memorise the status quo (merged work, open PRs, pending decisions, leftovers) and prioritise the next step." | DL | F3 | S3 |
+| P0.1 | "Load context from the project skills, AGENTS.md, reference docs and your notes. Summarise what changed since last session, open items and blockers, then confirm ready." | All | F3 | S2, S3, S4 |
+| P0.2 | "Memorise the status quo (merged work, open PRs, pending decisions, leftovers) and prioritise the next step." | DL | F3 | S3, S4 |
 | P0.3 | "Update settings: from the next session enable {capability}. Record it as a standing rule." | DL, DO | F4 | S1 |
+| P0.4 | "Resume from the {version} baseline with the {commerce or forms} add-on: load context (P0.1), enable the add-on, then run its detection or analysis on {pages or forms} and propose the approach before building anything. Advise and ask for confirmation." | SA, FE | F2/F3 | S4 |
 
 ### P1 Discover and analyse
 
@@ -86,6 +93,7 @@ The ID prefix is the ADLC phase. `Seen` is the session the pattern came from.
 | P2.2 | "Advise and plug {gate} into the {branch} merge flow. Advise and ask for confirmation." | SA, DO | F2 | S3 |
 | P2.3 | "Map {component} from the design as a variant or a new block. Make the optimum call and justify it." | SA, FE | F3 | S2 |
 | P2.4 | "Enforce best practices for setting up {platform}. Give a step-by-step walkthrough of what I do in {console} and what you do in code." | INT | F1/F3 | S3 |
+| P2.5 | "Before we switch workspace: does {agent or tool} support {platform or capability}? Separate what it's built for from general help, and tell me what to verify with the vendor." | SA, DL | F1 | S4 |
 
 ### P3 Build
 
@@ -107,6 +115,7 @@ The ID prefix is the ADLC phase. `Seen` is the session the pattern came from.
 | P4.3 | "Implement PSI/Lighthouse compliance checks and expand them to all {n} pages." | QA, DO | F3 | S1 |
 | P4.4 | "Prove no regression: measure live against the branch at 3 widths, and add a check that fails on the old behaviour." | QA | F3 | S3 |
 | P4.5 | "Review this PR and resolve the gaps: {url}." / "Spot-check {page} visually." | QA, FE | F3 | S2 |
+| P4.6 | "Does {this repo} need fixes to its {version} baseline, based on what you found in {derived repo}? Say which findings apply and which don't, and why. Fix the ones that apply through the PR flow, then cut a patch release." | QA, SA | F3 | S4 |
 
 ### P5 Integrate
 
@@ -117,6 +126,7 @@ The ID prefix is the ADLC phase. `Seen` is the session the pattern came from.
 | P5.3 | "Let {crawler} in while the public site stays noindex. Propose the robots rules and a timed 15-minute test." | INT, SEC | F2 | S3 |
 | P5.4 | "In {console} → {path} I see {options}. What is expected here?" | INT | F1 | S3 |
 | P5.5 | "Maintain a skill for system-integration coverage and gate PRs into main." | QA, DO | F4 | S3 |
+| P5.6 | "Remove {contact or environment value} from the repo and advise how to manage it through instructions or config management (repository variables, secrets, Config Service) before deployment. No history rewrite." | SEC, DO | F2 | S4 |
 
 ### P6 Release and deploy
 
@@ -126,7 +136,10 @@ The ID prefix is the ADLC phase. `Seen` is the session the pattern came from.
 | P6.2 | "Queue these for the next DA publish" / "Run the queue" / "Publish everything to live." | CA, DO | F3 | S1, S2 |
 | P6.3 | "The PR conflicts with develop. Resolve it, do the one-time branch reconciliation, and sync local branches." | DO | F3 | S2 |
 | P6.4 | "The preview doesn't match local. Verify everything is pushed, then verify production." | DO, QA | F3 | S1 |
-| P6.5 | "Promote develop to main with a merge commit, then verify live." | DO | F3 | S3 |
+| P6.5 | "Promote develop to main with a merge commit, then verify live." | DO | F3 | S3, S4 |
+| P6.6 | "Delete {old branch} and call it a milestone." The agent checks for unique work and open PRs before deleting, then cuts an annotated semver tag and a release whose notes come from the merged PRs. | DO, DL | F3 | S4 |
+| P6.7 | "Remove stale branches." The agent proves each one is merged (an ancestor of main, or a squash-merged PR) with no open PRs, deletes them, keeps main and develop, and prunes local refs. | DO | F3 | S4 |
+| P6.8 | "Are we good to call {version} a logical milestone for {foundation}? Give a go/no-go with evidence: CI on main, releases, branches, open items. List what carries into the next session." | DL | F2 | S4 |
 
 ### P7 Operate and observe
 
@@ -135,6 +148,9 @@ The ID prefix is the ADLC phase. `Seen` is the session the pattern came from.
 | P7.1 | "Enable a report-only experience audit per unique page type on main, and check the run results." | QA, DO | F3 | S3 |
 | P7.2 | "Set up the index and queries, the sitemap and site search." | FE, SA | F3 | S3 |
 | P7.3 | "{Error text}. Diagnose it, list the causes, and test the most likely first." | INT, DO | F3 | S3 |
+| P7.4 | "My local preview shows old content." The agent diagnoses content drift (local behind DA) and code drift (local behind main) before changing anything, backs up local content, syncs read-only from DA, and verifies in the preview. | FE, CA | F3 | S4 |
+| P7.5 | "I've configured {credential} in Settings. Is anything wrong with it? Check again." The agent diagnoses without revealing secrets (bad token vs missing permission vs not injected) and says exactly what to change in Settings. | DO | F1/F3 | S4 |
+| P7.6 | "Look into the Actions runs for {repo}: which workflows fail and why, from the logs. And are {branches} in sync?" | QA, DO | F3 | S4 |
 
 ### P8 Evolve and learn
 
@@ -143,6 +159,7 @@ The ID prefix is the ADLC phase. `Seen` is the session the pattern came from.
 | P8.1 | "Keep the block and template library up to date on every change, without being asked." | FE | F4 | S3 |
 | P8.2 | "Why did local differ from published, and how do we make sure it never recurs? Encode the rule." | SA | F4 | S1 |
 | P8.3 | "Help me understand which layer controls {behaviour}." | All | F1 | S3 |
+| P8.4 | "For any program starting on similar lines, how can they best reuse this setup, knowledge, skills and agentic capabilities as a ready-made boilerplate? Can you mitigate the gaps? Confirm first, then persist it in {new repo} once I create it." | SA, DL | F2/F3 | S4 |
 
 ## EMA co-worker by role
 
@@ -153,7 +170,7 @@ The ID prefix is the ADLC phase. `Seen` is the session the pattern came from.
 | EDS/FE Engineer | Blocks, tests, library, regression proofs | Code review at the PR | F3–F4 |
 | Integration Engineer | SDK wiring, configuration, guided console setup | Console, ID and sandbox decisions | F1–F3 |
 | QA/SDET | Coverage gates, integration specs, audits | Quality bar, gating policy | F3–F4 |
-| DevOps/Release | PRs, branches, publishing, CDN checks | Merges, production promotion | F3 |
+| DevOps/Release | PRs, merges on approval, tags and releases, branch pruning, CI log diagnosis, publishing, CDN checks | Go/no-go, production promotion, access in Settings | F3 |
 | Content Author | Pages, navigation, content-gap fixes | Messaging, brand voice | F2–F3 |
 | Privacy/Compliance | Consent build, legal drafts | Legal wording, approvals | F2 |
 | Delivery Lead | Status snapshots, prioritising | Scope, client commitments | F2 |
@@ -161,3 +178,4 @@ The ID prefix is the ADLC phase. `Seen` is the session the pattern came from.
 ## Changelog
 
 - 2026-09-27: first version from sessions S1–S3 (38 prompts).
+- 2026-10-27: session S4. Added P0.4, P2.5, P4.6, P5.6, P6.6–P6.8, P7.4–P7.6 and P8.4 (11 templates); refined the P0.1, P0.2 and P6.5 sightings, three guardrail suffixes, the DevOps/Release role row and "What the prompts show".
